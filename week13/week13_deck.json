@@ -1,0 +1,2039 @@
+{
+ "slides": [
+  {
+   "n": 1,
+   "hidden": false,
+   "title": "WEEK 11",
+   "slide_type": "cover",
+   "body": [
+    {
+     "level": 0,
+     "text": "WEEK 11"
+    },
+    {
+     "level": 1,
+     "text": "INTRODUCTION  TO K8S RBAC"
+    },
+    {
+     "level": 1,
+     "text": "IRSA (IAM ROLES FOR SERVICE ACCOUNTS)"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 2,
+   "hidden": false,
+   "title": "AGENDA",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Understanding authentication"
+    },
+    {
+     "level": 0,
+     "text": "Enable IAM users access to Amazon EKS cluster"
+    },
+    {
+     "level": 0,
+     "text": "What ServiceAccounts are and why they’re used"
+    },
+    {
+     "level": 0,
+     "text": "Understanding the role-based access control (RBAC) plugin"
+    },
+    {
+     "level": 0,
+     "text": "Using Roles and RoleBindings"
+    },
+    {
+     "level": 0,
+     "text": "Using ClusterRoles and ClusterRoleBindings"
+    },
+    {
+     "level": 0,
+     "text": "Understanding the default roles and bindings"
+    },
+    {
+     "level": 0,
+     "text": "IRSA (IAM Roles for Serviceaccounts) in AWS"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 3,
+   "hidden": false,
+   "title": "Course Outline",
+   "slide_type": "course_outline",
+   "body": [
+    {
+     "level": 0,
+     "text": "Week 1: Docker Introduction"
+    },
+    {
+     "level": 0,
+     "text": "Week 2: Docker Image Management"
+    },
+    {
+     "level": 0,
+     "text": "Week 3: Docker Networking, Storage & Security"
+    },
+    {
+     "level": 0,
+     "text": "Week 4: K8s Introduction"
+    },
+    {
+     "level": 0,
+     "text": "Week 5:K8s- PODs, ReplicaSets"
+    },
+    {
+     "level": 0,
+     "text": "Week 6: K8s – Services & Deployments"
+    },
+    {
+     "level": 0,
+     "text": "Week 7: K8s – Volumes"
+    },
+    {
+     "level": 0,
+     "text": "Study Week"
+    },
+    {
+     "level": 0,
+     "text": "Week 9: K8s- K8s- PVs & K8s in AKS"
+    },
+    {
+     "level": 0,
+     "text": "Week 10: K8s: Storage classes & Statefulsets"
+    },
+    {
+     "level": 0,
+     "text": "Week 11: K8s- Configmaps & Secrets"
+    },
+    {
+     "level": 0,
+     "text": "Week 12: Exam & Mock Exam week"
+    },
+    {
+     "level": 0,
+     "text": "Week 13: K8s – RBAC and AKS"
+    },
+    {
+     "level": 0,
+     "text": "Week 14: K8s – HPA"
+    },
+    {
+     "level": 0,
+     "text": "Week 14: Project presentation"
+    },
+    {
+     "level": 0,
+     "text": "Term End"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [],
+   "highlight": [
+    0
+   ]
+  },
+  {
+   "n": 4,
+   "hidden": false,
+   "title": "AUTHENTICATION AND AUTHORIZATION PROCESS IN K8S",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Kubernetes API can be configured with one or more authentication plugins"
+    },
+    {
+     "level": 1,
+     "text": "X509 client certificates"
+    },
+    {
+     "level": 1,
+     "text": "Static token file"
+    },
+    {
+     "level": 1,
+     "text": "Bootstrap tokens"
+    },
+    {
+     "level": 1,
+     "text": "Service account"
+    },
+    {
+     "level": 1,
+     "text": "OpenID Connect tokens"
+    },
+    {
+     "level": 1,
+     "text": "Webhook token authentication"
+    },
+    {
+     "level": 1,
+     "text": "Authenticating proxy"
+    },
+    {
+     "level": 0,
+     "text": "Auth plugin retrieves username, user ID and client's K8s groups from client's request"
+    },
+    {
+     "level": 0,
+     "text": "K8s API proceeds to authorization phase"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig4.png",
+     "desc": "Boxed auth pipeline: USER -> Authentication/Authorisation/Admission Control -> Kubernetes API"
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "hidden": false,
+   "title": "K8S API\nCLIENT  TYPES",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "K8s API distinguishes between 2 types of clients"
+    },
+    {
+     "level": 0,
+     "text": "Users – human clients"
+    },
+    {
+     "level": 1,
+     "text": "Admins deploying K8s add-ons and extensions"
+    },
+    {
+     "level": 1,
+     "text": "Developers deploying applications"
+    },
+    {
+     "level": 1,
+     "text": "K8s does not manage users. User management is provided by a third party such as"
+    },
+    {
+     "level": 2,
+     "text": "SSO"
+    },
+    {
+     "level": 2,
+     "text": "AWS IAM"
+    },
+    {
+     "level": 2,
+     "text": "Google accounts"
+    },
+    {
+     "level": 0,
+     "text": "Processes"
+    },
+    {
+     "level": 1,
+     "text": "Application interacting with K8s API"
+    },
+    {
+     "level": 1,
+     "text": "Observability tools collecting metrics from K8s API"
+    },
+    {
+     "level": 1,
+     "text": "Security tools querying K8s API"
+    },
+    {
+     "level": 1,
+     "text": "K8s manages serviceaccounts"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 6,
+   "hidden": false,
+   "title": "USERS AUTHENTICATION METHODS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "K8s users can be authenticated using one of the following methods:"
+    },
+    {
+     "level": 1,
+     "text": "Client certificates"
+    },
+    {
+     "level": 1,
+     "text": "Bearer tokens"
+    },
+    {
+     "level": 1,
+     "text": "Authenticating proxy"
+    },
+    {
+     "level": 0,
+     "text": "Authentication plugin returns all the K8s groups the user belongs to"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig6.png",
+     "desc": "2x2 grid of authentication-method sub-diagrams (OIDC, service account, auth proxy, X509 client cert)"
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "hidden": false,
+   "title": "GROUPS IN KUBERNTES",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "To avoid assigning roles to individual users, K8s support the use of groups."
+    },
+    {
+     "level": 0,
+     "text": "Kubernetes includes two types of groups:"
+    },
+    {
+     "level": 0,
+     "text": "System assigned: These groups start with the system: prefix and are assigned by the API server."
+    },
+    {
+     "level": 1,
+     "text": "system:authenticated"
+    },
+    {
+     "level": 1,
+     "text": "system:serviceaccounts:namespace"
+    },
+    {
+     "level": 1,
+     "text": "System:unauthenticated"
+    },
+    {
+     "level": 0,
+     "text": "User-asserted groups: These groups are asserted by the authentication system either in the token provided to the API server or via the authentications webhook."
+    },
+    {
+     "level": 1,
+     "text": "Groups don't exist as objects in the API server."
+    },
+    {
+     "level": 1,
+     "text": "Groups are asserted at authentication time by external users and tracked locally for system-generated groups"
+    },
+    {
+     "level": 0,
+     "text": "Users can be assigned to arbitrary groups"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 8,
+   "hidden": false,
+   "title": "SERVICEACCOUNTS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Default serviceaccoount per namespace"
+    },
+    {
+     "level": 0,
+     "text": "First class recourse in K8s"
+    },
+    {
+     "level": 0,
+     "text": "Multiple pods can use the same serviceaccount"
+    },
+    {
+     "level": 0,
+     "text": "Pod can only use one serviceaccount located in its namespace"
+    },
+    {
+     "level": 0,
+     "text": "Serviceaccount's token used to authenticate the pod and get pod's username"
+    },
+    {
+     "level": 0,
+     "text": "Authorization plugin configured by Admin is used to identify pod's permissions. RBAC is a default plugin"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig8.png",
+     "desc": "Namespace foo/bar/baz pods sharing ServiceAccounts, with 'Not possible' cross-namespace note"
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "hidden": true,
+   "title": "WORKSHOP 1 – CREATE AND EXPLORE SERVICEACCOUNT",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "$ kubectl create ns week11"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl create serviceaccount clo835 –n week11"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl describe sa clo835 –n week11"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl describe secret clo835-token-xxx –n week11"
+    },
+    {
+     "level": 0,
+     "text": " # The authentication tokens used in ServiceAccounts are JWT tokens."
+    },
+    {
+     "level": 0,
+     "text": "# Copy the token of the default serviceaccount in week11 namespace and decode it using  https://jwt.io/"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "text",
+     "lines": [
+      "HEADER: ALGORITHM & TOKEN TYPE",
+      "",
+      "{",
+      "  \"alg\": \"RS256\",",
+      "  \"kid\": \"f9Xha2QgbLFC7rtY0RQYgxJRuj4MnhULitXMgn3CadU\"",
+      "}",
+      "",
+      "PAYLOAD: DATA",
+      "",
+      "{",
+      "  \"iss\": \"kubernetes/serviceaccount\",",
+      "  \"kubernetes.io/serviceaccount/namespace\": \"week10\",",
+      "  \"kubernetes.io/serviceaccount/secret.name\": \"clo835-token-7zwf5\",",
+      "  \"kubernetes.io/serviceaccount/service-account.name\": \"clo835\",",
+      "  \"kubernetes.io/serviceaccount/service-account.uid\": \"93ba91df-4e0b-4a1e-9eed-ccdd6cabfee3\",",
+      "  \"sub\": \"system:serviceaccount:week10:clo835\"",
+      "}"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 10,
+   "hidden": true,
+   "title": "Image Pull secret used to authenticate against private registries",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Only mountable secrets can be mounted into containers"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "irinag:~/environment $ k describe sa clo835 –n week10",
+      "Name:                clo835",
+      "Namespace:           week10",
+      "Labels:              <none>",
+      "Annotations:         <none>",
+      "Image pull secrets:  <none>",
+      "Mountable secrets:   clo835-token-7zwf5",
+      "Tokens:              clo835-token-7zwf5",
+      "Events:              <none>"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 11,
+   "hidden": true,
+   "title": "UNDERSTANDING  THE JWT  TOKEN",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "The SA name is visible in \"sub\": \"sub\": \"system:serviceaccount:week10:clo835\""
+    },
+    {
+     "level": 0,
+     "text": "The token is signed by the master key of the Kubernetes cluster; in Amazon EKS this key is stored in Control plane"
+    },
+    {
+     "level": 0,
+     "text": "Pods are using JWT token for authentication when accessing K8s API"
+    },
+    {
+     "level": 0,
+     "text": "The API server validates the token by using its public key:"
+    },
+    {
+     "level": 1,
+     "text": "K8s API verifies that the token was not tampered with"
+    },
+    {
+     "level": 1,
+     "text": " K8s API verifies that the token was issued by this Kubernetes cluster"
+    },
+    {
+     "level": 0,
+     "text": "Note: If SA is not specified, the \"default\" SA is used and the default secrets are mounted into the containers"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig11.png",
+     "desc": "Boxed JWT flow: API server/Controller/AS across control plane and data plane to New Pod"
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "hidden": true,
+   "title": "DEPLOY A POD WITH NON-DEFAULT SERVICE ACCOUNT",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# From week11 folder"
+    },
+    {
+     "level": 0,
+     "text": "$ k create -f curl-custom-sa-token.yaml"
+    },
+    {
+     "level": 0,
+     "text": "# The SA specific token is mounted into the pod"
+    },
+    {
+     "level": 0,
+     "text": "$ k exec -it curl-custom-sa-token  -c main -n week11  -- /bin/sh"
+    },
+    {
+     "level": 0,
+     "text": "# Send curl request from inside the pod using environment variables"
+    },
+    {
+     "level": 0,
+     "text": "/$ printenv | grep KUBERNETES"
+    },
+    {
+     "level": 0,
+     "text": "/ $ curl  https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT/api/v1/namespaces/default/pods/  -k"
+    },
+    {
+     "level": 0,
+     "text": "# Why are we getting the \"Forbidden\" response?"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "/ $ curl https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT -k",
+      "{",
+      "  \"kind\": \"Status\",",
+      "  \"apiVersion\": \"v1\",",
+      "  \"metadata\": {",
+      "",
+      "  },",
+      "  \"status\": \"Failure\",",
+      "  \"message\": \"forbidden: User \\\"system:anonymous\\\" cannot get path \\\"/\\\"\",",
+      "  \"reason\": \"Forbidden\",",
+      "  \"details\": {",
+      "",
+      "  },",
+      "  \"code\": 403"
+     ],
+     "truncated": true
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 13,
+   "hidden": true,
+   "title": "ADDING AUTHENTICATION\nTO  THE CURL REQUEST",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Create environment variables for certificate and token"
+    },
+    {
+     "level": 0,
+     "text": "/ $ CERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+    },
+    {
+     "level": 0,
+     "text": "/ $  TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    },
+    {
+     "level": 0,
+     "text": "# Send the curl request with the certificate and token for authentication. This time K8s API server authenticates our pod as expected"
+    },
+    {
+     "level": 0,
+     "text": "curl --cacert $CERT -H \"Authorization: Bearer $TOKEN\" \"https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT/api/v1/namespaces/default/pods/\""
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "/ $ curl --cacert $CERT -H \"Authorization: Bearer $TOKEN\" \"https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT/api/v1/namespaces/default/pods/\"",
+      "{",
+      "  \"kind\": \"Status\",",
+      "  \"apiVersion\": \"v1\",",
+      "  \"metadata\": {",
+      "",
+      "  },",
+      "  \"status\": \"Failure\",",
+      "  \"message\": \"pods \\\"\\\\u200b\\\" is forbidden: User \\\"system:serviceaccount:week11:clo835\\\" cannot get resource \\\"pods\\\" in API group \\\"\\\" in the namespace \\\"defa",
+      "ult\\\"\",",
+      "  \"reason\": \"Forbidden\",",
+      "  \"details\": {",
+      "    \"name\": \"\",",
+      "    \"kind\": \"pods\"",
+      "  },"
+     ],
+     "truncated": true
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 14,
+   "hidden": true,
+   "title": "DEPLOY A POD WITH NON-DEFAULT SERVICE ACCOUNT AND AMBASSADOR CONTAINER",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# From week11 folder"
+    },
+    {
+     "level": 0,
+     "text": "$ k create –f curl-custom-sa.yaml"
+    },
+    {
+     "level": 0,
+     "text": "# The SA specific token is mounted into the pod"
+    },
+    {
+     "level": 0,
+     "text": "$ k exec -it curl-custom-sa -c main -n week11  -- /bin/sh"
+    },
+    {
+     "level": 0,
+     "text": "# Send curl request from inside the pod, the request is denied. We got a proper response, but the SA is not allowed to list the pods. Why?"
+    },
+    {
+     "level": 0,
+     "text": "/ $ curl localhost:8001/api/v1/pods"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "/ $ curl localhost:8001/api/v1/pods",
+      "{",
+      "  \"kind\": \"Status\",",
+      "  \"apiVersion\": \"v1\",",
+      "  \"metadata\": {",
+      "",
+      "  },",
+      "  \"status\": \"Failure\",",
+      "  \"message\": \"pods is forbidden: User \\\"system:serviceaccount:week11:clo835\\\" cannot list resource \\\"pods\\\" in API group \\\"\\\" at the cluster scope\",",
+      "  \"reason\": \"Forbidden\",",
+      "  \"details\": {",
+      "    \"kind\": \"pods\"",
+      "  },",
+      "  \"code\": 403",
+      "}/ $"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 15,
+   "hidden": false,
+   "title": "AUTHORIZATION IN K8S",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Up until version 1.6.0, authentication token was enough to get authorized access to K8s API"
+    },
+    {
+     "level": 0,
+     "text": "In 1.8.0, Role Based Access Control (RBAC) authorization plugin was released as GA"
+    },
+    {
+     "level": 0,
+     "text": "RBAC authorization is the default in Amazon EKS"
+    },
+    {
+     "level": 0,
+     "text": "A few properties of RBAC authorization plugin:"
+    },
+    {
+     "level": 1,
+     "text": "RBAC prevents unauthorized users from viewing or modifying the cluster state."
+    },
+    {
+     "level": 1,
+     "text": "The default ServiceAccount or newly created ServiceAccount and CRUD operations unless you grant it privileges"
+    },
+    {
+     "level": 0,
+     "text": "Other authorization plugins supported by K8s:"
+    },
+    {
+     "level": 1,
+     "text": "Attribute-based access control (ABAC) plugin"
+    },
+    {
+     "level": 1,
+     "text": "Web-Hook plugin"
+    },
+    {
+     "level": 1,
+     "text": "Custom plugin implementations."
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 16,
+   "hidden": false,
+   "title": "API GROUPS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "K8s has multiple APIs"
+    },
+    {
+     "level": 1,
+     "text": "/Version – for getting versions of cluster"
+    },
+    {
+     "level": 1,
+     "text": "/healthz – Monitor the healh of cluster"
+    },
+    {
+     "level": 1,
+     "text": "/logs – integrating with 3rd party logging application"
+    },
+    {
+     "level": 1,
+     "text": "Core -/api – Responsible for cluster functionality"
+    },
+    {
+     "level": 1,
+     "text": "Named - /apis – All newer features will be available under named group"
+    },
+    {
+     "level": 2,
+     "text": "API Groups"
+    },
+    {
+     "level": 2,
+     "text": "Resources"
+    },
+    {
+     "level": 2,
+     "text": "Verbs"
+    },
+    {
+     "level": 1,
+     "text": "Curl http://localhost:6443 –k to get the API groups"
+    },
+    {
+     "level": 1,
+     "text": "Access is only allowed for version APIs. For others, authentication is required. Kubectl Proxy can be used (8001)"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig16.png",
+     "desc": "Core /api and named /apis API-group trees (blue core resources, pink named groups/resources/verbs)"
+    }
+   ]
+  },
+  {
+   "n": 17,
+   "hidden": false,
+   "title": "WHY AUTHORIZATION??",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "WHAT CAN they (users/Sas do after authentication is Authorization"
+    },
+    {
+     "level": 0,
+     "text": "It helps ensuring least privileges"
+    },
+    {
+     "level": 0,
+     "text": "Devs shouldn’t have access to modifying clusters etc."
+    },
+    {
+     "level": 0,
+     "text": "Restrict access to users using Namespaces to their Namespaces"
+    },
+    {
+     "level": 0,
+     "text": "Authorization Mechanisms -"
+    },
+    {
+     "level": 1,
+     "text": "Node Authorization"
+    },
+    {
+     "level": 1,
+     "text": "ABAC"
+    },
+    {
+     "level": 1,
+     "text": "RBAC"
+    },
+    {
+     "level": 1,
+     "text": "Webhook"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig17.png",
+     "desc": "Admins/Developers/Bots terminal comparison showing allowed vs Forbidden kubectl output"
+    }
+   ]
+  },
+  {
+   "n": 18,
+   "hidden": false,
+   "title": "AUTHORIZATION MECHANISMS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "RBAC –"
+    },
+    {
+     "level": 1,
+     "text": "Define a Role eg; Developers"
+    },
+    {
+     "level": 1,
+     "text": "Associate the user to that role"
+    },
+    {
+     "level": 1,
+     "text": "RBACs provide more standard approach"
+    },
+    {
+     "level": 0,
+     "text": "Webhook:"
+    },
+    {
+     "level": 1,
+     "text": "Outsourcing all authorization mechanisms"
+    },
+    {
+     "level": 1,
+     "text": "User sends a request to Kube API and Open policy agent decides if authorization should be provided"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig18.png",
+     "desc": "RBAC role-assignment illustration (top) and Webhook/Open Policy Agent flow (bottom)"
+    }
+   ]
+  },
+  {
+   "n": 19,
+   "hidden": false,
+   "title": "RBAC - INTRO",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "RBAC –"
+    },
+    {
+     "level": 1,
+     "text": "Create a Role"
+    },
+    {
+     "level": 1,
+     "text": "Specify Rules"
+    },
+    {
+     "level": 1,
+     "text": "Create Role binding object"
+    },
+    {
+     "level": 1,
+     "text": "Link the User to the role using role binding"
+    },
+    {
+     "level": 1,
+     "text": "Roles and Role bindings scope is limited to Name spaces"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "kubectl create -f devuser-developer-binding.yaml"
+     ],
+     "truncated": false
+    },
+    {
+     "lang": "yaml",
+     "lines": [
+      "apiVersion: rbac.authorization.k8s.io/v1",
+      "kind: Role",
+      "metadata:",
+      "  name: developer",
+      "rules:",
+      "- apiGroups: [\"\"]",
+      "  resources: [\"pods\"]",
+      "  verbs: [\"list\", \"get\", \"create\", \"update\"]",
+      "- apiGroups: [\"\"]",
+      "  resources: [\"ConfigMap\"]",
+      "  verbs: [\"create\"]"
+     ],
+     "truncated": true
+    },
+    {
+     "lang": "yaml",
+     "lines": [
+      "apiVersion: rbac.authorization.k8s.io/v1",
+      "kind: RoleBinding",
+      "metadata:",
+      "  name: devuser-developer-binding",
+      "subjects:",
+      "- kind: User",
+      "  name: dev-user",
+      "  apiGroup: rbac.authorization.k8s.io",
+      "roleRef:",
+      "  kind: Role",
+      "  name: developer",
+      "  apiGroup: rbac.authorization.k8s.io"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": [
+    {
+     "file": "fig19.png",
+     "desc": "RBAC dev-user Developer role illustration plus developer-role.yaml and rolebinding.yaml terminals"
+    }
+   ]
+  },
+  {
+   "n": 20,
+   "hidden": false,
+   "title": "INTRODUCING RBAC RESOURCES",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Roles and ClusterRoles - specify which verbs can be performed on which resources."
+    },
+    {
+     "level": 0,
+     "text": "Verbs: [create delete deletecollection get list patch update watch]"
+    },
+    {
+     "level": 0,
+     "text": "RoleBindings and ClusterRoleBindings, which bind the above roles to specific users, groups, or ServiceAccounts."
+    },
+    {
+     "level": 0,
+     "text": "Roles define what can be done, while bindings define who can do it"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig20.png",
+     "desc": "Who?/What? venn: Admins group + User A + ServiceAccount -> RoleBinding -> Role -> allowed/denied resources"
+    }
+   ]
+  },
+  {
+   "n": 21,
+   "hidden": false,
+   "title": "WORKSHOP 2 – ROLES AND ROLEBINDINGS",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig21.png",
+     "desc": "Workshop 2 diagram: RoleBinding/Role per namespace plus cluster-scope ClusterRoleBinding/ClusterRole"
+    }
+   ]
+  },
+  {
+   "n": 22,
+   "hidden": false,
+   "title": "CONNECT  TO K8S API USING DEFAULT SA",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Create two namespaces and run proxy containers in the namespaces"
+    },
+    {
+     "level": 0,
+     "text": "# kube-porxy containers intercept the curl requests and add authentication token mounted to the container"
+    },
+    {
+     "level": 0,
+     "text": "$  k create ns week11-1"
+    },
+    {
+     "level": 0,
+     "text": "$  k create ns week11-2"
+    },
+    {
+     "level": 0,
+     "text": "$ k create sa clo835  -n week11-1"
+    },
+    {
+     "level": 0,
+     "text": "$ k create sa clo835  -n week11-1"
+    },
+    {
+     "level": 0,
+     "text": "$ k create sa clo835  -n week11-2"
+    },
+    {
+     "level": 0,
+     "text": "$ k create  -f week11/workshop1/kubectl-proxy-pod.yaml -n week11-1"
+    },
+    {
+     "level": 0,
+     "text": "$ k create  -f week11/workshop1/kubectl-proxy-pod.yaml -n week11-2"
+    },
+    {
+     "level": 0,
+     "text": "# Open shell prompts in 2 different terminals"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-1 – sh"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-2 – sh"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "#!/bin/sh",
+      "",
+      "API_SERVER=\"https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT\"",
+      "CA_CRT=\"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\"",
+      "TOKEN=\"$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\"",
+      "",
+      "/kubectl proxy --server=\"$API_SERVER\" --certificate-authority=\"$CA_CRT\" --token=\"$TOKEN\" --accept-paths='^.*"
+     ],
+     "truncated": true
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 23,
+   "hidden": false,
+   "title": "CONNECT  TO K8S API USING DEFAUL T SA",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-2 – sh"
+    },
+    {
+     "level": 0,
+     "text": "# Send a request to K8s API server to list all the services in the namespace from the pod"
+    },
+    {
+     "level": 0,
+     "text": "# The pod is authenticated as \\\"system:serviceaccount:week11-1:default\" but the request is denied"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/namespaces/week11-1/services"
+    },
+    {
+     "level": 0,
+     "text": "# List all the verbs available for services resource"
+    },
+    {
+     "level": 0,
+     "text": "$ k api-resources --sort-by name -o wide | grep services"
+    },
+    {
+     "level": 0,
+     "text": "# We will create a service-reader role that authorizes clo835 read access to  services"
+    },
+    {
+     "level": 0,
+     "text": "$ k create -f service-reader.yaml -n week11-1"
+    },
+    {
+     "level": 0,
+     "text": "$ k create -f service-reader.yaml -n week11-2"
+    },
+    {
+     "level": 0,
+     "text": "# Creating the role is not enough, we need to create RoleBinding to associate our SA with the Role"
+    },
+    {
+     "level": 0,
+     "text": "$ k create rolebinding test --role=service-reader --serviceaccount=week11-1:clo835 -n week11-1"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 24,
+   "hidden": false,
+   "title": "VERIFYING  THE FUNCTIONALITY",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "$ k get rolebinding test -n week11-1 -o yaml"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-1 – sh"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/namespaces/week11-1/services"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/namespaces/week11-2/services"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig24.png",
+     "desc": "Boxed week11-1 namespace: ServiceAccount clo835 -> RoleBinding Test -> Role service-reader -> Services"
+    }
+   ]
+  },
+  {
+   "n": 25,
+   "hidden": false,
+   "title": "GRANT SA IN ANOTHER NAMESPACE ACCESS  TO THE SERVICES IN  THE WEEK11-1 NAMESPACE",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Clo835 in week11-2 namespace has no access to services in either of the namespaces."
+    },
+    {
+     "level": 0,
+     "text": "# We will grant it access to services in week11-1 namespace"
+    },
+    {
+     "level": 0,
+     "text": "$ k create sa clo835 -n week11-2"
+    },
+    {
+     "level": 0,
+     "text": "# Add clo835 serviceaccount defined in week11-2 namespace to the \"subjects\" section"
+    },
+    {
+     "level": 0,
+     "text": "$ k edit rolebinding test -n week11-1"
+    },
+    {
+     "level": 0,
+     "text": "# Deploy the pod to week11-2 namespace"
+    },
+    {
+     "level": 0,
+     "text": "k create -f kubectl-proxy-pod.yaml -n week11-2"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "yaml",
+     "lines": [
+      "subjects:",
+      "- kind: ServiceAccount",
+      "  name: clo835",
+      "  namespace: week11-1",
+      "- kind: ServiceAccount",
+      "  name: clo835",
+      "  namespace: week11-2"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": [
+    {
+     "file": "fig25.png",
+     "desc": "subjects yaml terminal (left) and foo/bar namespace ServiceAccount->RoleBinding->Role->Services diagram (right)"
+    }
+   ]
+  },
+  {
+   "n": 26,
+   "hidden": false,
+   "title": "VERIFYING  THE FUNCTIONALITY",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Attache to the test pod in week11-2 namespace"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-2 – sh"
+    },
+    {
+     "level": 0,
+     "text": "# SA clo835 can list services in week11-1 namespace"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/namespaces/week11-1/services"
+    },
+    {
+     "level": 0,
+     "text": "# SA clo835 cannot list services in week11-2 namespace"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/namespaces/week11-2/services"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 27,
+   "hidden": false,
+   "title": "CLUSTERROLES AND CLUSTERROLEBINDINGS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Some K8s resources are not namespace-specific."
+    },
+    {
+     "level": 0,
+     "text": "# Some APIs such as /healthz are not related to K8s resources"
+    },
+    {
+     "level": 0,
+     "text": "# We might need cluster-level access, for example, for cluster admins"
+    },
+    {
+     "level": 0,
+     "text": "# The above cases are covered by ClusterRoles and ClusterRoleBinding"
+    },
+    {
+     "level": 0,
+     "text": "# A ClusterRole is a cluster-level resource for allowing access to non-namespaced resources or non-resource URLs or used as a common role to be bound inside individual namespaces, saving you from having to redefine the same role in each of them."
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl api-resources --sort-by name -o wide | grep nodes"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig27.png",
+     "desc": "Namespaced RoleBinding/Role diagram plus cluster-scope ClusterRoleBinding/ClusterRole flow"
+    }
+   ]
+  },
+  {
+   "n": 28,
+   "hidden": false,
+   "title": "USE CLUSTERROLES TO ACCESS PERSISTENTVOLUMES",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Grant our test pod access to PersistentVolumes"
+    },
+    {
+     "level": 0,
+     "text": "$ k create clusterrole pv-reader --verb=get,list  --resource=persistentvolumes"
+    },
+    {
+     "level": 0,
+     "text": "$ k get clusterrole pv-reader  -o yaml"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-2 – sh"
+    },
+    {
+     "level": 0,
+     "text": "# By default, our pod does not have permissions to query PersistentVolumes"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/persistentvolumes"
+    },
+    {
+     "level": 0,
+     "text": "# Create RoleBinding to the reader-pv ClusterRole"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl create rolebinding pv-test --clusterrole=pv-reader --serviceaccount=week11-1:clo835 -n week11-1"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "text",
+     "lines": [
+      "/ # curl localhost:8001/api/v1/persistentvolumes",
+      "{",
+      "  \"kind\": \"Status\",",
+      "  \"apiVersion\": \"v1\",",
+      "  \"metadata\": {",
+      "",
+      "  },",
+      "  \"status\": \"Failure\",",
+      "  \"message\": \"persistentvolumes is forbidden: User \\\"system:serviceaccount:week11-2:clo835\\\"",
+      "stentvolumes\\\" in API group \\\"\\\" at the cluster scope\",",
+      "  \"reason\": \"Forbidden\",",
+      "  \"details\": {",
+      "    \"kind\": \"persistentvolumes\"",
+      "  },",
+      "  \"code\": 403",
+      "}/ #"
+     ],
+     "truncated": true
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 29,
+   "hidden": false,
+   "title": "USE CLUSTERROLES TO ACCESS PERSISTENTVOLUMES",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Can we query PersistentVolumes now?"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-1 -- sh"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/persistentvolumes"
+    },
+    {
+     "level": 0,
+     "text": "# We still do not have access to persistent volumes!"
+    },
+    {
+     "level": 0,
+     "text": "# To grant access to cluster-level resources, we must always use a ClusterRoleBinding."
+    },
+    {
+     "level": 0,
+     "text": "$ k delete rolebindings pv-test -n week11-1"
+    },
+    {
+     "level": 0,
+     "text": "$ k create clusterrolebinding pv-test --clusterrole=pv-reader  --serviceaccount=week11-1:clo835"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl exec -it test -n week11-1 – sh"
+    },
+    {
+     "level": 0,
+     "text": "/ # curl localhost:8001/api/v1/persistentvolumes"
+    },
+    {
+     "level": 0,
+     "text": "# Now we can query PersistentVolumes!"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "irinag:~/environment/week11 $ kubectl exec -it test -n week11-1 -- sh",
+      "/ # curl localhost:8001/api/v1/persistentvolumes",
+      "{",
+      "  \"kind\": \"PersistentVolumeList\",",
+      "  \"apiVersion\": \"v1\",",
+      "  \"metadata\": {",
+      "    \"selfLink\": \"/api/v1/persistentvolumes\",",
+      "    \"resourceVersion\": \"284079\"",
+      "  },",
+      "  \"items\": []",
+      "}/ #"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 30,
+   "hidden": false,
+   "title": "EXPLORE PRE-CREATED CLUSTERROLES AND CLUSTERROLEBINDINGS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Allowing access to non-resource URLs"
+    },
+    {
+     "level": 0,
+     "text": "$ k get clusterrole system:discovery -o yaml"
+    },
+    {
+     "level": 0,
+     "text": "# Examine the subjects of the RoleBinding"
+    },
+    {
+     "level": 0,
+     "text": "$ k  get clusterrolebinding system:discovery -o yaml"
+    },
+    {
+     "level": 0,
+     "text": "# List all the SAs, Roles and RoleBindings"
+    },
+    {
+     "level": 0,
+     "text": "kubectl get rolebindings,clusterrolebindings \\"
+    },
+    {
+     "level": 0,
+     "text": "--all-namespaces  \\"
+    },
+    {
+     "level": 0,
+     "text": "-o custom-columns='KIND:kind,NAMESPACE:metadata.namespace,NAME:metadata.name,SERVICE_ACCOUNTS:subjects[?(@.kind==\"ServiceAccount\")].name'"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "ClusterRoleBinding   <none>     system:controller:pv-protection-controller     pv-protection-controller",
+      "ClusterRoleBinding   <none>     system:controller:pvc-protection-controller    pvc-protection-controller",
+      "ClusterRoleBinding   <none>     system:controller:replicaset-controller        replicaset-controller",
+      "ClusterRoleBinding   <none>     system:controller:replication-controller       replication-controller",
+      "ClusterRoleBinding   <none>     system:controller:resourcequota-controller     resourcequota-controller",
+      "ClusterRoleBinding   <none>     system:controller:route-controller             route-controller",
+      "ClusterRoleBinding   <none>     system:controller:service-account-controller   service-account-controller",
+      "ClusterRoleBinding   <none>     system:controller:service-controller           service-controller",
+      "ClusterRoleBinding   <none>     system:controller:statefulset-controller       statefulset-controller",
+      "ClusterRoleBinding   <none>     system:controller:ttl-controller               ttl-controller"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 31,
+   "hidden": false,
+   "title": "AMAZON EKS AUTHENTICATION FOR IAM USERS, GROUPS AND ROLES",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Reminder – K8s does not support resource of type \"user\""
+    },
+    {
+     "level": 0,
+     "text": "User identities should be stored and verified externally by. Identity providers (IdP, e.g., AD, OIDC provider or Amazon IAM)"
+    },
+    {
+     "level": 0,
+     "text": "Externally stored identities are mapped to K8s users and groups"
+    },
+    {
+     "level": 0,
+     "text": "Amazon EKS Control Plane is configured with:"
+    },
+    {
+     "level": 1,
+     "text": "Authentication: webhook token authentication"
+    },
+    {
+     "level": 1,
+     "text": "Authorization: role-based access control (RBAC)"
+    },
+    {
+     "level": 0,
+     "text": "Amazon IAM does not control user's data plane permissions in Amazon EKS; permissions are controlled by K8s RBAC"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig31.png",
+     "desc": "Boxed EKS IAM auth flow: laptop signed STS URL -> K8s Master API <-> IAM key, RBAC box"
+    }
+   ]
+  },
+  {
+   "n": 32,
+   "hidden": false,
+   "title": "SPECIAL CASE – IAM USER OR ROLE USED TO CREATE AMAZON EKS CLUSTER",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "IAM Role or IAM User used to create the cluster, is added to the \"system:masters\""
+    },
+    {
+     "level": 0,
+     "text": "This User or Role is granted cluster-wide admin permission with \"cluster-admin\" ClusterRole"
+    },
+    {
+     "level": 0,
+     "text": "\"cluster-admin\" is all powerful role and should be used with the same level of caution as \"root\" user in Amazon EKS"
+    },
+    {
+     "level": 0,
+     "text": "This mapping of creator IAM User or Role to system:masters group is not visible in any configuration such as \"aws-auth\" configmap."
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "irinag:~/environment $ k describe clusterrole \"cluster-admin\"",
+      "Name:         cluster-admin",
+      "Labels:       kubernetes.io/bootstrapping=rbac-defaults",
+      "Annotations:  rbac.authorization.kubernetes.io/autoupdate: true",
+      "PolicyRule:",
+      "  Resources  Non-Resource URLs  Resource Names  Verbs",
+      "  ---------  -----------------  --------------  -----",
+      "  *.*        []                 []              [*]",
+      "             [*]                []              [*]"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 33,
+   "hidden": false,
+   "title": "MAPPING IAM IDENTITIES  TO K8S USERS AND GROUPS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Amazon EKS uses \"aws-auth\" ConfigMap in kube-system namespace to map IAM Users and Roles to K8s Users with the sections below"
+    },
+    {
+     "level": 1,
+     "text": "mapRoles"
+    },
+    {
+     "level": 1,
+     "text": "mapUsers"
+    },
+    {
+     "level": 1,
+     "text": "mapAccounts"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "yaml",
+     "lines": [
+      "apiVersion: v1",
+      "kind: ConfigMap",
+      "metadata:",
+      "  name: aws-auth",
+      "  namespace: kube-system",
+      "data:",
+      "  mapRoles: |",
+      "    - rolearn: arn:aws:iam::111111111:role/worker-node-instance-role",
+      "      username: system:node:{{EC2PrivateDNSName}}",
+      "      groups:",
+      "        - system:bootstrappers",
+      "        - system:nodes"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 34,
+   "hidden": false,
+   "title": "ENABLE IAM USERS' ACCESS  TO AMAZON EKS CLUSTER – SERVER SIDE",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig34.png",
+     "desc": "EKS API server auth/authorisation: aws-iam-authenticator+ConfigMap+IAM and RBAC/Roles blocks"
+    }
+   ]
+  },
+  {
+   "n": 35,
+   "hidden": false,
+   "title": "ENABLE IAM USERS ACCESS TO AMAZON EKS CLUSTER – CLIENT SIDE",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig35.png",
+     "desc": "Client-side EKS access: kubectl/kubelet/Code -> Kubernetes Client Library + kubeconfig + aws-iam-authenticator -> EKS API"
+    }
+   ]
+  },
+  {
+   "n": 36,
+   "hidden": false,
+   "title": "WORKSHOP 2 – GRANT IAM USER K8S API PERMISSIONS",
+   "slide_type": "section_divider",
+   "body": [],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 37,
+   "hidden": false,
+   "title": "OUR GOAL",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Create an IAM user called clo835-user who is authenticated to access the EKS cluster but is only authorized (via RBAC) to list, get, and watch pods and deployments in the rbac-test' namespace."
+    },
+    {
+     "level": 0,
+     "text": "To achieve this, we'll create an IAM user, map that user to a kubernetes role, then perform kubernetes actions under that user's context."
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 38,
+   "hidden": false,
+   "title": "CREATE  THE AMAZON EKS CLUSTER AND CHECK AWS-AUTH CONFIGMAP SETTINGS",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Create the cluster with the CloudWatch logs enabled for authenticator actions to be recorded",
+      "$ eksctl create cluster -f ../eks_config_week11.yaml",
+      "# Check the aws-auth ConfigMap",
+      "$ k get configmap aws-auth -o yaml -n kube-system",
+      "# Check the permissions of \"cluster-admin\" ClusterRole",
+      "$ k get clusterrolebinding cluster-admin -o yaml",
+      "# Create rbac-test namespace and nginx deployment",
+      "$ k create ns rbac-test",
+      "$ k create deploy nginx --image=nginx -n rbac-test",
+      "$ k get all -n rbac-test"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 39,
+   "hidden": false,
+   "title": "CREATE IAM USER AND EXPORT ITS CREDENTIALS",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Create IAM User using AWS CLI",
+      "$ aws iam create-user --user-name clo835-user",
+      "$ aws iam create-access-key --user-name clo835-user | tee /tmp/create_output.json",
+      "# Run a script that stores the credentials as a local file. It will help switching between our Admin user and clo835 user",
+      "$ cd workshop2 && ./creds.sh",
+      "# Verify the content of clo835_creds.sh you created",
+      "$ cat clo835_creds.sh",
+      "# Switch to clo835 IAM user permissions and verify that you are using clo835 IAM user permissions",
+      "$ . ./clo835_creds.sh && aws sts get-caller-identity # mind the dot at the beginning of the command",
+      "# Check clo835 access to K8s API. The user is unauthorized. Why?",
+      "$ k get nodes",
+      "# Switch back to the Admin user and verify caller identity",
+      "$ . ./switch_to_admin.sh && aws sts get-caller-identity # mind the dot at the beginning of the command"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 40,
+   "hidden": false,
+   "title": "MAP IAM USER TO K8S USER IN AWS-AUTH CONFIGMAP. CHECK  ACCESS TO K8S API",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Add mapUsers block to auth-auth ConfigMap",
+      "$ k edit configmap aws-auth -n kube-system",
+      " mapUsers: |",
+      "    - userarn: arn:aws:iam::<your account number>:user/clo835-user",
+      "      username: clo835-user-k8s",
+      "# Still no access to the K8s resources, we are missing authorization component.",
+      "# Let's add a role with deployment permissions and bind this role to our clo835-user-k8s. Please note – role binding is using K8s user, not AWS IAM user."
+     ],
+     "truncated": false
+    },
+    {
+     "lang": "yaml",
+     "lines": [
+      "apiVersion: v1",
+      "data:",
+      "  mapRoles: |",
+      "    - groups:",
+      "      - system:bootstrappers",
+      "      - system:nodes",
+      "      rolearn: arn:aws:iam::047923129740:role/eksctl-clo835-nodegroup-nodegroup-NodeInstanceRole-1E0W8SH1FZ7FF",
+      "      username: system:node:{{EC2PrivateDNSName}}",
+      "  mapUsers: |",
+      "    - userarn: arn:aws:iam::047923129740:user/clo835-user",
+      "      username: clo835-user-k8s",
+      "kind: ConfigMap"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 41,
+   "hidden": false,
+   "title": "GRANT DEPLOYMENT PERMISSIONS  TO CLO835-USER-K8S WITH ROLE AND ROLEBINDING",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Switch to Admin role"
+    },
+    {
+     "level": 0,
+     "text": "$ . ./switch_to_admin.sh && aws sts get-caller-identity"
+    },
+    {
+     "level": 0,
+     "text": "Create a role that provides list, get, and watch access for pods and deployments in the rbac-test namespace only."
+    },
+    {
+     "level": 0,
+     "text": "$ k create -f clo835-role.yaml"
+    },
+    {
+     "level": 0,
+     "text": "# Bind the user and the Role together with the RoleBinding resource"
+    },
+    {
+     "level": 0,
+     "text": "$ k create -f clo835-role-binding.yaml"
+    },
+    {
+     "level": 0,
+     "text": "# Switch to clo835-user IAM user and check user's permissions in Amazon EKS"
+    },
+    {
+     "level": 0,
+     "text": "$ . clo835_creds.sh; aws sts get-caller-identity"
+    },
+    {
+     "level": 0,
+     "text": "# IAM user clo835-user has permissions to list pods in rbac-test namespace"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl get pods -n rbac-test"
+    },
+    {
+     "level": 0,
+     "text": "# IAM user clo835-user does not have permissions to list pods in kube-system namespace"
+    },
+    {
+     "level": 0,
+     "text": "$ kubectl get pods -n kube-system"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "yaml",
+     "lines": [
+      "kind: RoleBinding",
+      "apiVersion: rbac.authorization.k8s.io/v1",
+      "metadata:",
+      "  name: read-pods",
+      "  namespace: rbac-test",
+      "subjects:",
+      "- kind: User",
+      "  name: clo835-user-k8s",
+      "  apiGroup: rbac.authorization.k8s.io",
+      "roleRef:",
+      "  kind: Role",
+      "  name: pod-reader",
+      "  apiGroup: rbac.authorization.k8s.io"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 42,
+   "hidden": false,
+   "title": "ADD IAM USER  TO AWS-AUTH WITH EKSCTL",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Editing aws-auth ConfigMap manually is not ideal. We can achieve the same result with eksctl tool"
+    },
+    {
+     "level": 0,
+     "text": "# We will map our clo835-user to cluster-admin role through system:masters  group"
+    },
+    {
+     "level": 0,
+     "text": "# Delete the mapUser section from aws-auth ConfigMap"
+    },
+    {
+     "level": 0,
+     "text": "$ k edit configmap aws-auth -n kube-system"
+    },
+    {
+     "level": 0,
+     "text": "eksctl create iamidentitymapping --cluster  clo835  --region=us-east-1 --arn arn:aws:iam::<AWS_ACCOUNT_ID>:user/clo835-user  --group system:masters --username clo835admins"
+    },
+    {
+     "level": 0,
+     "text": "# Now clo835-user is part of the system:masters group which is Admins group in K8s. Let's check user's permissions."
+    },
+    {
+     "level": 0,
+     "text": "$ . clo835_creds.sh; aws sts get-caller-identity"
+    },
+    {
+     "level": 0,
+     "text": "$ k get pods -n kube-system"
+    }
+   ],
+   "code_blocks": [
+    {
+     "lang": "yaml",
+     "lines": [
+      "ion: v1",
+      "les: |",
+      "roups:",
+      " system:bootstrappers",
+      " system:nodes",
+      "learn: arn:aws:iam::047923129740:role/eksc",
+      "sername:  system:node:{{EC2PrivateDNSName}}",
+      "ers: |",
+      "roups:",
+      " system:masters",
+      "serarn: arn:aws:iam::047923129740:user/clo8",
+      "sername: clo835admins",
+      "onfigMap"
+     ],
+     "truncated": true
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 43,
+   "hidden": false,
+   "title": "UNDERSTANDING KUBECONFIG – WORKING WITHMULTIPLE CLUSTERS, USERS AND NAMESPACES",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig43.png",
+     "desc": "kubeconfig green panel: Users, Contexts (namespace dev/prod), Cluster1/Cluster2 mapping"
+    }
+   ]
+  },
+  {
+   "n": 44,
+   "hidden": false,
+   "title": "CONFIGURING LOCAL ENVIRONMENT – WORKING WITH KUBECONFIG",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "# Examine ~/.kube/config"
+    },
+    {
+     "level": 0,
+     "text": "# Let's check if our clo835-user can update the  ~/.kube/config"
+    },
+    {
+     "level": 0,
+     "text": "$ . clo835_creds.sh; aws sts get-caller-identity"
+    },
+    {
+     "level": 0,
+     "text": "$ aws eks update-kubeconfig --name clo835"
+    },
+    {
+     "level": 0,
+     "text": "# IAM user does not have any permissions to work with the EKS control plane. Let's grant the permissions"
+    },
+    {
+     "level": 0,
+     "text": "# Create the policy with access to your EKS cluster; Update your account id in the JSON document and in the commands below"
+    },
+    {
+     "level": 0,
+     "text": "$ . ./switch_to_admin.sh && aws sts get-caller-identity"
+    },
+    {
+     "level": 0,
+     "text": "$ aws iam create-policy --policy-name EKSCLO835 --policy-document file://iam_policy.json"
+    },
+    {
+     "level": 0,
+     "text": "$ aws iam attach-user-policy --policy-arn arn:aws:iam::<ACCOUNT-ID>:policy/EKSCLO835  --user-name clo835-user"
+    },
+    {
+     "level": 0,
+     "text": "$  . clo835_creds.sh; aws sts get-caller-identity && aws eks update-kubeconfig --name clo835"
+    },
+    {
+     "level": 0,
+     "text": "# Examine ~/.kube/config"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 45,
+   "hidden": false,
+   "title": "REFERENCES",
+   "slide_type": "references",
+   "body": [
+    {
+     "level": 0,
+     "text": "https://dev.to/aws-builders/eks-auth-deep-dive-4fib"
+    },
+    {
+     "level": 0,
+     "text": "https://docs.aws.amazon.com/eks/latest/userguide/cluster-auth.html"
+    },
+    {
+     "level": 0,
+     "text": "https://itnext.io/how-does-client-authentication-work-on-amazon-eks-c4f2b90d943b"
+    },
+    {
+     "level": 0,
+     "text": "https://www.cncf.io/blog/2020/07/31/kubernetes-rbac-101-authentication/"
+    },
+    {
+     "level": 0,
+     "text": "https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/"
+    },
+    {
+     "level": 0,
+     "text": "https://faun.pub/how-to-access-aws-services-from-eks-ab5fa003a1b6"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 46,
+   "hidden": false,
+   "title": "CLEANUP",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Delete the cluster",
+      "$ eksctl delete cluster --name clo835",
+      "# Stop cloud9 instance"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  }
+ ]
+}

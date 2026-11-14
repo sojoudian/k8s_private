@@ -1,0 +1,123 @@
+
+Recommended Delivery: a kubeadm cluster on EC2 inside the Learner Lab
+
+  v2 (2026-10-27). v1 built a single kind cluster on one EC2 machine. This
+  version builds the cluster that Lab_week04_v2.pptx and the course repository
+  teach: kubeadm on 3 real machines (1 master, 2 workers). No kind, no
+  Docker-in-Docker. The steps below are the tested script
+  https://github.com/sojoudian/CLO835_Fall_2026/blob/master/Week04/localMachine.sh
+
+  Each student does Step 1 to Step 3 once at the start of the lab.
+
+  Step 1 — Get the code (1 minute, on your laptop)
+
+    git clone https://github.com/sojoudian/CLO835_Fall_2026.git
+    cd CLO835_Fall_2026/Week04
+
+  Step 2 — Build the cluster (5 minutes, on your laptop)
+
+    In the Learner Lab, click Start Lab, then copy the AWS credentials into
+    ~/.aws/credentials.
+
+    terraform init
+    terraform apply
+
+    Terraform asks for key_name: the name of YOUR EC2 key pair
+    (AWS Console > EC2 > Key Pairs). It builds:
+
+    ┌────────────────┬──────────────────────────────────────────────────────┐
+    │    Setting     │                        Value                         │
+    ├────────────────┼──────────────────────────────────────────────────────┤
+    │ Machines       │ 3: masternode, workernode1, workernode2              │
+    │ Instance type  │ m5.large (2 vCPU, 8 GB). The lab blocks xlarge+.     │
+    │ AMI            │ Ubuntu 26.04 LTS                                     │
+    │ Kubernetes     │ v1.35, kubeadm, containerd, Flannel                  │
+    │ Open ports     │ 22 (SSH), 6443 (API server), 30000-32767 (NodePort)  │
+    └────────────────┴──────────────────────────────────────────────────────┘
+
+    The outputs are public_ips, private_ips, next_step and nodeport_url.
+    The cluster forms itself at boot. The workers join after a few minutes.
+
+  Step 3 — Connect to the master (1 minute)
+
+    Use the next_step output:
+
+    ssh -i <your-key.pem> ubuntu@<MASTER-PUBLIC-IP>
+
+    Run every kubectl command below ON THE MASTER.
+
+  Step 4 — Check the cluster
+
+    kubectl version
+    kubectl cluster-info
+    kubectl get nodes -o wide          # all three nodes must reach Ready
+    kubectl get nodes -w               # watch them arrive, then press Ctrl+C
+
+  Step 5 — What the control plane runs
+
+    # Every control-plane component runs as a static pod on the master.
+    kubectl get pods -n kube-system -o wide
+
+    # Flannel is the CNI. One pod per node gives the flat 10.244.0.0/16 pod network.
+    kubectl get pods -n kube-flannel -o wide
+
+  Step 6 — Deploy your first application
+
+    kubectl run nginx --image=nginx --port=80
+    kubectl get pods -o wide           # note WHICH node the scheduler picked
+    kubectl describe pod nginx | head -20
+
+  Step 7 — Expose it with a Service
+
+    kubectl expose pod nginx --type=NodePort --name=nginx-http \
+        --port=80 --target-port=80
+
+    # A NodePort gets a random port in 30000-32767. Pin it to 30000.
+    kubectl patch svc nginx-http -p '{"spec":{"ports":[{"port":80,"targetPort":80,"nodePort":30000}]}}'
+
+    kubectl get services
+    kubectl describe svc nginx-http | head -15
+
+  Step 8 — Reach it
+
+    # From the master:
+    curl -s http://localhost:30000 | head -5
+
+    # A NodePort opens on EVERY node. All three public IPs answer:
+    #   http://<MASTER-PUBLIC-IP>:30000
+    #   http://<WORKER1-PUBLIC-IP>:30000
+    #   http://<WORKER2-PUBLIC-IP>:30000
+
+  Step 9 — Scale, inspect, roll forward
+
+    kubectl create deployment nginx-deploy --image=nginx --replicas=3
+    kubectl rollout status deployment/nginx-deploy
+    kubectl get pods -l app=nginx-deploy -o wide   # spread across the 2 workers
+
+    kubectl scale deploy nginx-deploy --replicas=5
+    kubectl get pods -l app=nginx-deploy -o wide
+
+    # The Deployment owns a ReplicaSet, and the ReplicaSet owns the Pods.
+    kubectl get deploy,rs,pods -l app=nginx-deploy
+
+    kubectl set image deployment/nginx-deploy nginx=nginx:1.27
+    kubectl rollout status deployment/nginx-deploy
+    kubectl rollout undo deployment/nginx-deploy
+    kubectl rollout status deployment/nginx-deploy
+
+  Step 10 — Clean up the cluster objects (on the master)
+
+    # These are the commands of cleanup_lab04.sh. The master does not hold
+    # that file, so run them directly.
+    kubectl delete deployment nginx-deploy
+    kubectl delete service nginx-http
+    kubectl delete pod nginx
+    kubectl get deploy,svc,pods
+
+  Step 11 — Remove the machines (on your laptop)
+
+    exit
+    terraform destroy
+
+    Destroy the cluster at the end of every session. The Learner Lab budget
+    pays for each running machine.

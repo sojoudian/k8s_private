@@ -1,0 +1,28 @@
+# Project Instructions — k8s_week3 (CLO835)
+
+## Language: ASD-STE100 (MANDATORY — HIGHEST PRIORITY)
+
+**Write in ASD-STE100.**
+
+This rule has priority over all other style rules in this file. It applies to every
+sentence shown to the user, and to every document, report, and comment written.
+
+Simplified Technical English rules:
+- Use one approved word for one meaning. Do not use synonyms.
+- Keep procedural sentences to 20 words or fewer.
+- Keep descriptive sentences to 25 words or fewer.
+- Use the active voice. Use the present tense when you can.
+- Give one instruction in one sentence.
+- Keep the articles (the, a, an). Do not use contractions.
+- Do not use slang, idioms, or unnecessary jargon.
+- Keep paragraphs to 6 sentences or fewer.
+- Use a vertical list for complex data.
+- Start each instruction with the verb.
+
+Enforcement: a hook at `~/.claude/hooks/asd-ste100.sh` puts this rule into context
+at `SessionStart` and at each `UserPromptSubmit`. See `~/.claude/settings.json`.
+
+## Scope
+
+This rule applies to every session that runs in `/Users/maziar/Downloads/k8s_week3`.
+It repeats the global rule in `~/.claude/CLAUDE.md`. The repetition is intentional.

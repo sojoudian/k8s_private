@@ -1,0 +1,302 @@
+CLO835 Fall 2026 - Week 01 - Docker Introduction - question pool (100 questions)
+==================================================================
+
+  1. [slide  9] The deck lists the first reason you need Docker. What is it?
+     ANSWER D: Compatibility and dependency across many different stacks
+
+  2. [slide  9] Under 'Many different stacks', which three examples does the deck name?
+     ANSWER A: Languages, frameworks and databases
+
+  3. [slide  9] Besides compatibility, which problem does the deck list as a reason for Docker?
+     ANSWER D: Long setup time
+
+  4. [slide  9] The deck lists 'many different targets'. Which group is one of them?
+     ANSWER D: Pre-production, QA and staging
+
+  5. [slide 12] In 'Escape dependency hell', what is Step 1?
+     ANSWER C: Document all dependencies and setup steps in an INSTALL.txt file
+
+  6. [slide 12] In 'Escape dependency hell', what is Step 2?
+     ANSWER B: Convert the instructions into an install.sh script and verify it runs
+
+  7. [slide 12] In 'Escape dependency hell', what is Step 3?
+     ANSWER B: Translate the script into a Dockerfile
+
+  8. [slide 12] When the install script becomes a Dockerfile, what does each install step become?
+     ANSWER C: A Docker layer
+
+  9. [slide 12] In 'Escape dependency hell', what is Step 4?
+     ANSWER D: Build and test the Docker image locally
+
+ 10. [slide 13] Before Docker, how did developers hand work to operations?
+     ANSWER C: They dropped a tarball or a commit hash with instructions
+
+ 11. [slide 13] Before Docker, what does the deck say about the development environment?
+     ANSWER A: It was very different from production
+
+ 12. [slide 13] Before Docker, what problem did operations teams have?
+     ANSWER D: They did not always have a development environment themselves
+
+ 13. [slide 13] When operations did have a development environment, what was the risk?
+     ANSWER D: It could differ from the environment of the developers
+
+ 14. [slide 14] After Docker, how does a developer package the application?
+     ANSWER B: As a container image or a Compose file, a single portable artifact
+
+ 15. [slide 14] What confidence does the deck give the developer after Docker?
+     ANSWER C: If it runs locally, it runs in production
+
+ 16. [slide 14] Which developer benefit does the deck list after Docker?
+     ANSWER A: Self-service releases become possible without waiting on operations
+
+ 17. [slide 14] After Docker, what does operations receive with every delivery?
+     ANSWER A: A runnable container, so there is no more guessing of dependencies
+
+ 18. [slide 15] In 'Why Containers?', how does the deck describe applications BEFORE the change?
+     ANSWER B: Monolithic applications
+
+ 19. [slide 15] BEFORE the industry change, how long were the development cycles?
+     ANSWER D: Long
+
+ 20. [slide 15] BEFORE the industry change, how many environments does the deck list?
+     ANSWER A: A single environment
+
+ 21. [slide 15] BEFORE the industry change, how did systems scale?
+     ANSWER D: Slowly scaling up
+
+ 22. [slide 15] NOW, how does the deck describe the services?
+     ANSWER D: Decoupled services
+
+ 23. [slide 15] NOW, how does the deck describe the improvements?
+     ANSWER C: Fast and iterative
+
+ 24. [slide 15] NOW, how does the deck say systems scale?
+     ANSWER A: Quickly scaling out
+
+ 25. [slide 15] On the diagram, how are the UI, Logic and Data parts of the monolith described?
+     ANSWER C: Tightly coupled
+
+ 26. [slide 15] On the diagram, how are the microservices described?
+     ANSWER D: Loosely coupled
+
+ 27. [slide 16] How does the deck define LXC?
+     ANSWER C: An operating-system-level virtualization method
+
+ 28. [slide 16] According to the LXC definition, how many Linux kernels do the containers use?
+     ANSWER B: A single Linux kernel, shared by all of them
+
+ 29. [slide 16] Which kernel feature allows limitation and prioritization of resources?
+     ANSWER D: cgroups
+
+ 30. [slide 16] Which four resources does the deck list for cgroups?
+     ANSWER B: CPU, memory, block I/O and network
+
+ 31. [slide 16] What does the deck say cgroups achieve without needing something else?
+     ANSWER C: Resource limits without the need for virtual machines
+
+ 32. [slide 16] Which kernel feature provides complete isolation of the view an application has of the OS environment?
+     ANSWER B: Namespace isolation
+
+ 33. [slide 16] Which four items does the deck list for namespace isolation?
+     ANSWER C: Process trees, networking, user IDs and mounted file systems
+
+ 34. [slide 16] A container is limited to 512 MB of memory. Which kernel feature delivers that limit?
+     ANSWER B: cgroups
+
+ 35. [slide 19] On 'Containers vs VMs', how does the deck describe containers?
+     ANSWER B: Small, light weight and fast
+
+ 36. [slide 19] On 'Containers vs VMs', what does the deck say about the portability of containers?
+     ANSWER C: They are portable
+
+ 37. [slide 23] How does the deck define Docker?
+     ANSWER A: An open-source project that automates the deployment of applications inside software containers
+
+ 38. [slide 23] What do Docker containers wrap the software in?
+     ANSWER D: A complete file system that holds everything it needs to run
+
+ 39. [slide 23] Which four items does the deck list inside the container file system?
+     ANSWER B: Code, runtime, system tools and system libraries
+
+ 40. [slide 23] How far does the deck extend the contents of a container file system?
+     ANSWER C: Anything you can install on a server
+
+ 41. [slide 24] What does 'Installing Docker' really mean, according to the deck?
+     ANSWER B: Installing the Docker Engine and the Docker CLI
+
+ 42. [slide 24] What is the Docker Engine?
+     ANSWER A: A daemon, which is a service running in the background
+
+ 43. [slide 24] The deck compares the Docker daemon to which component?
+     ANSWER A: A hypervisor, because it manages containers the way a hypervisor manages VMs
+
+ 44. [slide 24] How do you interact with the Docker Engine?
+     ANSWER A: By using the Docker CLI
+
+ 45. [slide 24] How do the Docker CLI and the Docker Engine communicate?
+     ANSWER A: Through an API
+
+ 46. [slide 25] The deck lists six reasons containers are popular. Which one states that the same artifact runs in every environment?
+     ANSWER B: Build once, run everywhere
+
+ 47. [slide 25] Which listed reason keeps the libraries of one application away from the libraries of another?
+     ANSWER C: Dependencies isolation
+
+ 48. [slide 25] Which listed reason credits the docker command line tool?
+     ANSWER A: Ease of use with the docker command line tool
+
+ 49. [slide 25] Which listed reason depends on orchestration tools?
+     ANSWER C: Scalability with the orchestration tools
+
+ 50. [slide 26] On 'Separation of concerns', what is the developer responsible for?
+     ANSWER D: The inside of the container
+
+ 51. [slide 26] On 'Separation of concerns', what is the administrator responsible for?
+     ANSWER B: The outside of the container
+
+ 52. [slide 26] Which item does the deck place INSIDE the container, as the responsibility of the developer?
+     ANSWER A: The package manager
+
+ 53. [slide 26] Which item is listed as a developer responsibility inside the container?
+     ANSWER D: Libraries
+
+ 54. [slide 26] Which item does the deck place OUTSIDE the container, as the responsibility of the administrator?
+     ANSWER A: Logging
+
+ 55. [slide 28] How does the deck define an image?
+     ANSWER A: Files plus metadata
+
+ 56. [slide 28] What do the files of an image form?
+     ANSWER A: The root filesystem of the container
+
+ 57. [slide 28] Which item does the deck give as an example of image metadata?
+     ANSWER D: The author of the image
+
+ 58. [slide 28] Which other item does the deck give as an example of image metadata?
+     ANSWER B: The command to execute in the container when starting it
+
+ 59. [slide 28] Which third item does the deck give as an example of image metadata?
+     ANSWER A: Environment variables to be set
+
+ 60. [slide 28] How are images structured?
+     ANSWER D: They are made of layers, conceptually stacked on top of each other
+
+ 61. [slide 28] What can one layer do?
+     ANSWER B: Add, change and remove files and metadata
+
+ 62. [slide 28] Why can images share layers?
+     ANSWER B: To optimize disk usage, transfer times and memory use
+
+ 63. [slide 29] In the Java web application example, what is the base layer?
+     ANSWER A: A CentOS base layer
+
+ 64. [slide 29] Which layer sits directly on the CentOS base in the Java example?
+     ANSWER D: Packages and configuration files added by the local IT team
+
+ 65. [slide 29] Which Java runtime component is a layer in the example?
+     ANSWER A: The JRE
+
+ 66. [slide 29] Which application server is a layer in the Java example?
+     ANSWER A: Tomcat
+
+ 67. [slide 32] How does the deck describe an image file system?
+     ANSWER D: Read-only
+
+ 68. [slide 32] How does the deck define a container?
+     ANSWER D: An encapsulated set of processes running in a read-write copy of the image filesystem
+
+ 69. [slide 32] What kind of copy of the file system does a container run in?
+     ANSWER C: A read-write copy
+
+ 70. [slide 32] Which technique replaces a regular copy, to optimize container boot time?
+     ANSWER C: Copy-on-write
+
+ 71. [slide 33] Images are immutable. What is the FIRST step to change one?
+     ANSWER C: Create a new container from that image
+
+ 72. [slide 33] After creating the container, what is the next step?
+     ANSWER D: Make the changes inside that container
+
+ 73. [slide 33] When you are satisfied with the changes in the container, what do you do with them?
+     ANSWER B: Transform them into a new layer
+
+ 74. [slide 33] How is the new image produced?
+     ANSWER D: By stacking the new layer on top of the old image
+
+ 75. [slide 34] How many image namespaces does the deck list?
+     ANSWER D: Three
+
+ 76. [slide 34] Who gates the official images?
+     ANSWER D: Docker Inc
+
+ 77. [slide 34] Who authors and maintains the official images?
+     ANSWER D: Third parties
+
+ 78. [slide 34] Which two examples of official images does the deck give?
+     ANSWER C: ubuntu and busybox
+
+ 79. [slide 34] Which namespace holds images for DockerHub users and organizations?
+     ANSWER B: The user and organizations namespace
+
+ 80. [slide 35] How does Docker build an image?
+     ANSWER C: By reading the instructions provided in a Dockerfile
+
+ 81. [slide 35] How does the deck define a Dockerfile?
+     ANSWER D: A text document that contains all the commands a user could call to assemble an image
+
+ 82. [slide 35] Which command creates an automated build from a Dockerfile?
+     ANSWER A: docker build
+
+ 83. [slide 35] How does the automated build execute the instructions?
+     ANSWER B: In succession, one after the other
+
+ 84. [slide 36] In the example Dockerfile, what does each instruction generate?
+     ANSWER A: A new layer, which is pushed to the local image cache
+
+ 85. [slide 36] How does the example Dockerfile treat a line that starts with #?
+     ANSWER C: As a comment, which is ignored
+
+ 86. [slide 36] Which base image does the example Dockerfile use?
+     ANSWER D: ubuntu:latest
+
+ 87. [slide 36] Which instruction identifies the maintainer of an image in the example?
+     ANSWER D: LABEL
+
+ 88. [slide 36] Which instruction updates the image to the latest packages in the example?
+     ANSWER A: RUN apt-get update && apt-get upgrade -y
+
+ 89. [slide 36] Which web server does the example Dockerfile install?
+     ANSWER B: NGINX
+
+ 90. [slide 36] Which port does the example Dockerfile expose?
+     ANSWER D: 80
+
+ 91. [slide 36] Which instruction gives the command that starts NGINX in the example?
+     ANSWER D: CMD
+
+ 92. [slide 37] In which order are Dockerfile instructions executed?
+     ANSWER A: In the order they are written
+
+ 93. [slide 37] What does each Dockerfile instruction create?
+     ANSWER A: A new layer in the image
+
+ 94. [slide 37] What does Docker keep from previous builds?
+     ANSWER B: A cache with the layers of previous builds
+
+ 95. [slide 37] When there is no change in the instruction and the files of a layer, what does the builder do?
+     ANSWER C: It re-uses the cached layer and does not execute the instruction
+
+ 96. [slide 37] Which rule does the deck state about FROM?
+     ANSWER D: FROM must be the first non-comment instruction
+
+ 97. [slide 38] How many ways can the RUN instruction be written?
+     ANSWER B: Two
+
+ 98. [slide 38] What does shell wrapping do with the command?
+     ANSWER C: It runs the command inside a shell, with /bin/sh -c
+
+ 99. [slide 38] Which line is the shell form of the RUN instruction in the example?
+     ANSWER C: RUN apt-get update
+
+100. [slide 38] What does the exec method of RUN avoid?
+     ANSWER C: Shell string expansion

@@ -1,0 +1,63 @@
+CLO835 Fall 2026 - Weeks 01-03 - 20 harder questions - question pool (20 questions)
+Every question stands on its own. No question needs a slide.
+======================================================================
+
+  1. [W01 - kernel features] A container is capped at 512 MB of memory and cannot see host processes. Which features deliver those two effects, in that order?
+     ANSWER B: cgroups, then namespaces
+
+  2. [W01 - containers vs VMs] A security team says a container is weaker than a virtual machine as an isolation boundary. What is the main reason?
+     ANSWER A: A flaw in the shared kernel can reach every container
+
+  3. [W01 - images] A 900 MB image and a 910 MB image share the same base. How much extra disk does the second one need?
+     ANSWER B: Roughly the size of the layers it does not share
+
+  4. [W01 - copy-on-write] A container reads a file that exists in three layers. Which copy does it get?
+     ANSWER D: The one in the highest layer that holds the file
+
+  5. [W01 - build cache] A developer edits line 2 of a ten line Dockerfile. Which layers must be rebuilt?
+     ANSWER C: Line 2 and everything after it
+
+  6. [W01 - build cache] Why do experienced authors copy the dependency list before the source code?
+     ANSWER A: The dependency layer stays cached while the code changes
+
+  7. [W01 - dockerfile] Which instruction may legally appear before FROM in a Dockerfile?
+     ANSWER A: ARG
+
+  8. [W02 - expose] An image declares EXPOSE 8080 and is started with no port flag. Can a browser on another machine reach it?
+     ANSWER D: No, because nothing has been published to the host
+
+  9. [W02 - expose] Two containers sit on one user-defined network. One serves on port 80, and nothing is published. Can the second one connect?
+     ANSWER A: Yes, because they share a network and can reach each other
+
+ 10. [W02 - publishing] Two containers both need host port 8080. What happens?
+     ANSWER C: The second one fails, because the host port is taken
+
+ 11. [W02 - cmd vs entrypoint] An image sets ENTRYPOINT ["python"] and CMD ["app.py"]. The user adds other.py at start. What runs?
+     ANSWER D: python other.py
+
+ 12. [W02 - cmd vs entrypoint] An image sets only CMD ["python", "app.py"]. The user adds bash at start. What runs?
+     ANSWER C: bash
+
+ 13. [W02 - cmd vs entrypoint] An image sets both ENTRYPOINT and CMD, and the user types nothing. What runs?
+     ANSWER A: The ENTRYPOINT, with the CMD words as its arguments
+
+ 14. [W02 - cmd] A container is started from an image whose default command is a shell, and no terminal is attached. What happens?
+     ANSWER D: The shell starts, finds no input, and the container exits
+
+ 15. [W03 - service discovery] A web container cannot resolve the name redis. Both run on the default bridge. What is the fix?
+     ANSWER A: Create a network and attach both containers to it
+
+ 16. [W03 - service discovery] Two containers on two different user-defined networks try to resolve each other. What happens?
+     ANSWER C: Resolution fails, because the networks are separate
+
+ 17. [W03 - cnm vs cni] What is the isolation default in Kubernetes, before an operator does anything?
+     ANSWER D: Isolation is off, and a policy object is needed
+
+ 18. [W03 - copy-on-write] A process in a container edits a configuration file that arrived with the image. Where does the new version live?
+     ANSWER C: In the writable layer of that container
+
+ 19. [W03 - mount syntax] A bind mount names a host path that does not exist, and -v is used. What happens?
+     ANSWER C: The path is created silently, as an empty directory
+
+ 20. [W03 - storage] A container is removed. Which kind of mounted data is lost with it?
+     ANSWER B: Data held in a tmpfs mount

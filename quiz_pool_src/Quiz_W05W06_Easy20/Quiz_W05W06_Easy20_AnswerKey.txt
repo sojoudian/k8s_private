@@ -1,0 +1,226 @@
+CLO835 Fall 2026 - Easy quiz - Pods, ReplicaSets, Deployments, Rollouts and Services
+20 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 5, 'B': 5, 'C': 5, 'D': 5}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [clo835-e56-001 pods] A Pod holds a web container and a log container. The cluster has three nodes. On how many nodes do these two containers run?
+   * A. On one node, the same node for both
+     B. On two nodes, one node for each container
+     C. On three nodes, one copy on each node
+     D. On any node, because a container moves at any time
+     ANSWER A
+     WHY: A Pod is the unit of placement. The scheduler binds the whole Pod to one node, so every container of that Pod runs there.
+     IF B: The containers of one Pod never separate.
+     IF C: One Pod is one copy; three nodes need three Pods.
+     IF D: A running container stays on its node.
+
+  2. [clo835-e56-002 pods] A log container sends a request to 127.0.0.1:8080. The web container of the same Pod listens on port 8080. What is the result?
+     A. The request arrives only after you publish the port
+   * B. The request arrives, because the two containers share one network stack
+     C. The request fails, because each container keeps its own address
+     D. The request fails, because a Service is missing
+     ANSWER B
+     WHY: The containers of one Pod share one network namespace and one address, so they reach each other on the loopback interface.
+     IF C: One Pod has one address for all of its containers.
+     IF D: A Service serves clients outside the Pod.
+     IF A: A Pod needs no port map for traffic inside itself.
+
+  3. [clo835-e56-003 manifest] Which command prints the full description of the running Pod web, with the fields that the cluster added?
+     A. kubectl apply pod web
+   * B. kubectl get pod web -o yaml
+     C. kubectl list pod web
+     D. kubectl logs pod/web
+     ANSWER B
+     WHY: The -o yaml option prints the live object, with the metadata, the spec and the status.
+     IF D: The logs command prints the output of a container.
+     IF A: The apply command needs a file and changes the object.
+     IF C: The kubectl program has no list command.
+
+  4. [clo835-e56-004 manifest] Which apiVersion belongs at the top of a Deployment manifest?
+   * A. apps/v1
+     B. apps/v1beta1
+     C. deployment/v1
+     D. v1
+     ANSWER A
+     WHY: A Deployment and a ReplicaSet belong to the apps group. A Pod and a Service belong to the core group, which is written v1.
+     IF D: The plain v1 group holds the Pod and the Service.
+     IF B: The beta group is old and is gone from current clusters.
+     IF C: There is no group with the name of the object.
+
+  5. [clo835-e56-005 namespaces] Two teams must each run a Deployment with the name web in one cluster. What makes that possible?
+     A. Two labels, one for each team
+     B. Two nodes, one for each team
+   * C. Two namespaces, one for each team
+     D. A longer name for one of the teams
+     ANSWER C
+     WHY: A namespace gives a scope for names. One name can appear one time in each namespace.
+     IF A: A label groups objects; it does not free the name.
+     IF B: A node carries work; it does not hold the names.
+     IF D: A new name answers a different request.
+
+  6. [clo835-e56-006 replicaset] A ReplicaSet asks for three Pods. You delete one of its Pods by hand. What happens next?
+     A. The deleted Pod starts again with the same name
+   * B. The controller starts a new Pod
+     C. The count stays at two until you scale the object
+     D. Nothing happens, because you asked for the delete
+     ANSWER B
+     WHY: The controller compares the count that you declare with the count that runs, and it closes the difference.
+     IF A: The new Pod carries a new name.
+     IF C: The controller repairs the count without a command.
+     IF D: The controller does not read who deleted the Pod.
+
+  7. [clo835-e56-007 replicaset] Which section of a ReplicaSet manifest describes the Pods that the object must create?
+     A. The metadata section
+     B. The replicas field
+     C. The selector section
+   * D. The template section
+     ANSWER D
+     WHY: The template holds a whole Pod recipe: the labels and the containers. The controller stamps new Pods from it.
+     IF C: The selector says which Pods to count.
+     IF A: The metadata names the ReplicaSet itself.
+     IF B: The replicas field holds a number only.
+
+  8. [clo835-e56-008 replicaset] A ReplicaSet runs three Pods of the version 1.0 of an application. You must move the application to the version 2.0 with no stop. Which object do you use?
+   * A. A Deployment
+     B. A larger ReplicaSet
+     C. A second ReplicaSet beside the first one
+     D. A Service with two selectors
+     ANSWER A
+     WHY: A Deployment holds the ReplicaSets for you. It raises the new one and lowers the old one, step by step.
+     IF C: Two ReplicaSets by hand give no order and no rollback.
+     IF D: A Service sends traffic; it changes no version.
+     IF B: More copies of 1.0 do not bring 2.0.
+
+  9. [clo835-e56-009 rollout] A Deployment runs a rolling update. When does Kubernetes stop one of the old Pods?
+     A. Before it starts the first new Pod
+     B. At the same moment as it starts a new Pod
+   * C. After a new Pod reports the ready state
+     D. After every new Pod is ready
+     ANSWER C
+     WHY: The default strategy keeps the application available. It adds a Pod, it waits for the ready state, and then it removes an old Pod.
+     IF A: That order is the Recreate strategy, and it stops the application.
+     IF D: The update works Pod by Pod, not in one block at the end.
+     IF B: A new Pod needs time before it can take traffic.
+
+ 10. [clo835-e56-010 rollout] Which update strategy of a Deployment leaves the application without any running Pod for a short time?
+     A. The BlueGreen strategy
+     B. The Canary strategy
+   * C. The Recreate strategy
+     D. The RollingUpdate strategy
+     ANSWER C
+     WHY: The Recreate strategy stops the old Pods first, and it starts the new Pods after that. You must ask for it in the manifest.
+     IF D: The rolling strategy keeps Pods alive through the change.
+     IF B: A canary release is a pattern; it is no strategy field.
+     IF A: A blue-green release is a pattern that you build with Services.
+
+ 11. [clo835-e56-011 service] A Service selects the Pods with the label app=kubia. You start one more Pod with that label. What happens?
+     A. The new Pod stays outside, because the Service is full
+     B. The Service refuses the Pod and prints an error
+     C. The new Pod waits for a change of the Service
+   * D. The new Pod joins the Service
+     ANSWER D
+     WHY: A Service matches on labels and nothing else. Any Pod with the label joins, and any Pod that loses the label leaves.
+     IF C: The match is live; it needs no edit.
+     IF A: A Service holds no limit on the number of Pods.
+     IF B: A Service makes no error for a new Pod.
+
+ 12. [clo835-e56-012 service] A Service answers clients on port 80, and the container listens on port 8080. Which field of the Service holds 8080?
+     A. containerPort
+     B. nodePort
+     C. port
+   * D. targetPort
+     ANSWER D
+     WHY: The port field is the port of the Service. The targetPort field is the port inside the Pod.
+     IF C: The port field holds 80 here.
+     IF B: The nodePort field holds the high port on each node.
+     IF A: The containerPort field belongs to the Pod manifest.
+
+ 13. [clo835-e56-013 service] A user outside the cluster opens a browser at the address of a node and the port 30123, and the application answers. Which Service type is in use?
+     A. The ClusterIP type
+   * B. The NodePort type
+     C. The LoadBalancer type
+     D. The ExternalName type
+     ANSWER B
+     WHY: A NodePort Service opens one high port on every node, and a client outside reaches the Pods through it.
+     IF A: A ClusterIP Service answers inside the cluster only.
+     IF D: An ExternalName Service points at a name outside the cluster.
+     IF C: A LoadBalancer Service answers on one address of the platform.
+
+ 14. [clo835-e56-014 service] A program in a Pod calls http://kubia and reaches the Service kubia in the same namespace. Which part of the cluster answers that name?
+     A. The container runtime
+     B. The host file of the node
+   * C. The name server of the cluster
+     D. The scheduler
+     ANSWER C
+     WHY: Each Service receives a name in the cluster name server, and the search list of the Pod completes the short name.
+     IF D: The scheduler places Pods; it answers no name.
+     IF A: The runtime starts containers; it answers no name.
+     IF B: The file of the node holds no Service names.
+
+ 15. [clo835-e56-015 service] A Service of the type ClusterIP has the address 10.96.0.17. Can a laptop outside the cluster open that address?
+     A. Yes, after the laptop learns the name of the Service
+     B. No, because the address belongs to one Pod
+     C. Yes, because every Service address is public
+   * D. No, the address works inside the cluster only
+     ANSWER D
+     WHY: A ClusterIP address comes from a private range of the cluster. Only the nodes and the Pods route to it.
+     IF A: A name does not build a route to a private address.
+     IF C: A Service address is private until a type opens it.
+     IF B: The address belongs to the Service, not to a Pod.
+
+ 16. [clo835-e56-016 service] You ask for a Service of the type LoadBalancer on a local cluster, and the external address stays pending. What is the reason?
+     A. The Service needs a second selector
+   * B. No platform under the cluster gives a load balancer
+     C. The Pods carry the wrong port number
+     D. The cluster needs a restart of the name server
+     ANSWER B
+     WHY: A LoadBalancer Service asks the platform below the cluster for an address. A laptop cluster has no such platform.
+     IF A: A selector finds Pods; it gives no address.
+     IF C: A port number does not block the external address.
+     IF D: The name server plays no part in this step.
+
+ 17. [clo835-e56-017 service] A Pod behind a Service fails, and a new Pod takes its place with a new address. What does a client use after that?
+   * A. The same Service name and the same Service address
+     B. The new address of the new Pod
+     C. The address of the node that holds the new Pod
+     D. A new Service that the cluster creates
+     ANSWER A
+     WHY: The Service address stays stable, and the list of Pods behind it changes. That is the reason to put a Service in front of Pods.
+     IF B: A client must never follow a Pod address.
+     IF C: The node address reaches no Pod by itself.
+     IF D: The cluster makes no new Service for this.
+
+ 18. [clo835-e56-018 labels] Which command lists only the Pods that carry the label app=kubia?
+     A. kubectl describe pods app=kubia
+     B. kubectl get pods --filter app=kubia
+   * C. kubectl get pods --selector app=kubia
+     D. kubectl get pods app=kubia
+     ANSWER C
+     WHY: The --selector option takes a label, and the command prints the objects that carry it.
+     IF B: The kubectl program has no --filter option.
+     IF D: Without the option, kubectl reads the text as a name.
+     IF A: The describe command needs a name, not a label.
+
+ 19. [clo835-e56-019 ingress] Two host names, shop.example.com and api.example.com, must reach two different Services through one address. Which resource does that?
+   * A. An Ingress
+     B. A Pod with two containers
+     C. A ReplicaSet with two templates
+     D. A second NodePort Service
+     ANSWER A
+     WHY: An Ingress reads the host name and the path of a request, and it sends the request to the Service of the rule.
+     IF D: A NodePort Service reads no host name.
+     IF C: A ReplicaSet holds one template and routes nothing.
+     IF B: A Pod runs the application; it routes no traffic.
+
+ 20. [clo835-e56-020 deployment] You delete the ReplicaSet of a healthy Deployment. What does the cluster do?
+     A. The cluster asks you for a new manifest
+     B. The Pods stay and no object owns them
+     C. The Deployment goes away with its ReplicaSet
+   * D. The Deployment creates a new ReplicaSet
+     ANSWER D
+     WHY: The Deployment is the owner. It compares the state that you declare with the state of the cluster, and it builds the missing object.
+     IF C: A Deployment lives above the ReplicaSet and stays.
+     IF B: The new ReplicaSet owns Pods again.
+     IF A: The repair needs no command from you.

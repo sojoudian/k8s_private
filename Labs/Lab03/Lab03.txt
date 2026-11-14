@@ -1,0 +1,70 @@
+
+ Please submit a report that displays all the main points of Lab Week04.
+
+
+
+ * - EC2 instance kind-lab launched (Ubuntu 24.04 LTS, t3.small, 32 GB gp3) and connected via EC2 Instance Connect — capture the running instance in the EC2 console and the terminal prompt. Explain which
+
+ security-group ports you opened (22, 80, 443, 8443) and why kind needs at least t3.small (not nano/micro).
+
+
+
+ * - Docker, kind v0.31.0, and kubectl v1.35.0 installed — docker version, kind version, and kubectl version --client must all return output. Explain why kubectl's MINOR version must match the cluster (v1.35)
+
+ and what would happen on a major version skew.
+
+
+
+ * - kind.yaml written and cluster created with kind create cluster --config kind.yaml — output must end with Set kubectl context to "kind-kind". Explain what extraPortMappings does in the config, why it's
+
+ needed to reach a NodePort Service from your browser, and what the default CNI (kindnet) gives you.
+
+
+
+ * - nginx pod deployed with kubectl run nginx --image=nginx --port=80 and verified with kubectl get pods (STATUS = Running, READY = 1/1). Explain what the Events block in kubectl describe pod nginx | head -20
+
+  shows — the Scheduled → Pulling → Pulled → Created → Started lifecycle.
+
+
+
+ * - Service exposed with kubectl expose pod nginx --type=NodePort --name=nginx-http and confirmed with kubectl get services (shows 80:<NodePort>/TCP). Hit it with curl <KIND_IP>:<NodePort> and capture the
+
+ nginx welcome HTML. Explain the difference between ClusterIP, NodePort, and LoadBalancer Service types.
+
+
+
+ * - Deployment created with kubectl create deployment nginx-deploy --image=nginx --replicas=3, then scaled to 5 with kubectl scale deploy nginx-deploy --replicas=5 — kubectl get pods must show all 5 pods
+
+ Running. Explain why scaling needs a Deployment, not the bare pod from step 4.
+
+
+
+ * - Rolling update performed with kubectl set image deployment/nginx-deploy nginx=nginx:1.27, watched with kubectl rollout status deployment/nginx-deploy, and reverted with kubectl rollout undo
+
+ deployment/nginx-deploy — capture each command's output. Explain what "rolling" means and why it gives zero-downtime upgrades.
+
+
+
+ * - Bonus (optional): Kubernetes Dashboard deployed via the official manifest, exposed over HTTPS through an nginx reverse proxy at https://<EC2_PUBLIC_IP>:8443/.../proxy/. Capture the login screen (with the
+
+ admin-user token pasted) and the cluster-overview page.
+
+
+
+ Submission should include -
+
+
+
+   • Name label on every screenshot
+
+   • Detailed explanation of commands being executed
+
+   • Highlight the output of commands executed
+
+
+
+
+
+Integrity Pledge:
+
+By submitting this assignment you affirm that you will not plagiarize, give or receive illegitimate help on assignments, papers or examinations. You will uphold fairness and honesty in your work and the work of others. Please read Seneca Academic Integrity policy for more details.

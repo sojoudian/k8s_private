@@ -1,0 +1,226 @@
+CLO835 Fall 2026 - Easy quiz - Docker Introduction and Docker Image Management
+20 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 5, 'B': 5, 'C': 5, 'D': 5}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [containers] You run three containers on one Linux host. How many operating system kernels do these containers use?
+     A. Two kernels, one for the host and one for all the containers
+     B. Three kernels, one for each container
+   * C. One kernel, the kernel of the host
+     D. Four kernels, one for the host and one for each container
+     ANSWER C
+     WHY: Containers are processes on the host. They share the host kernel.
+     IF A: It believes that the containers get a second, separate kernel.
+     IF B: It treats a container like a virtual machine, which carries its own kernel.
+     IF D: It adds a kernel for the host and one for each container.
+
+  2. [containers] A container must use no more than 1 GB of memory. Which Linux kernel feature applies that limit?
+     A. Namespaces
+     B. The seccomp filter
+     C. The union file system
+   * D. Control groups
+     ANSWER D
+     WHY: Control groups (cgroups) measure and limit CPU, memory, block input and output, and network use.
+     IF A: Namespaces hide resources from the container; they do not limit the amount.
+     IF B: The seccomp filter blocks system calls; it does not limit memory.
+     IF C: The union file system stacks the image layers; it does not limit memory.
+
+  3. [images] You start two containers from the same image. What does each container get?
+     A. A read-only view with no place to write
+     B. A shared read-write layer for both
+   * C. Its own read-write layer above the image files
+     D. A full copy of the image files
+     ANSWER C
+     WHY: The image stays read-only. Each container adds its own read-write layer, so one container cannot change the files of the other.
+     IF A: A container can write; the write goes to its own layer.
+     IF B: The containers do not share one read-write layer.
+     IF D: Docker uses copy-on-write, so it does not copy the full image.
+
+  4. [images] Which command creates a container from the image nginx and starts it?
+     A. docker start nginx
+   * B. docker run nginx
+     C. docker build nginx
+     D. docker create nginx
+     ANSWER B
+     WHY: The run command creates the container and starts it in one step.
+     IF A: The start command starts a container that already exists.
+     IF C: The build command makes an image; it does not start a container.
+     IF D: The create command makes the container but leaves it stopped.
+
+  5. [images] You install a package inside a running container. What happens to the image that started the container?
+     A. The image is built again from its Dockerfile
+     B. The image takes the package when the container stops
+     C. The image gets a new layer with the package
+   * D. The image does not change
+     ANSWER D
+     WHY: An image is immutable. The new files stay in the read-write layer of the container. A new image needs a new build or a commit.
+     IF A: Docker does not start a build when you work inside a container.
+     IF B: The container layer disappears with the container; the image stays the same.
+     IF C: A running container does not add a layer to its image.
+
+  6. [images] An image has the name jenkins/jenkins. What does the part before the slash name?
+     A. The registry host that stores the image
+   * B. The user or the organization that owns the image
+     C. The version tag of the image
+     D. The base image of the build
+     ANSWER B
+     WHY: A Docker Hub name has the form user/image. An official image, for example ubuntu, has no user part.
+     IF A: The registry host carries a dot or a port number, for example registry.example.net:5000.
+     IF C: The tag comes after a colon, for example jenkins:lts.
+     IF D: The name does not show the base image.
+
+  7. [dockerfile] A Dockerfile starts with the line RUN apt-get update, and the FROM line comes after it. What happens when you build the image?
+   * A. The build fails, because FROM must come before RUN
+     B. The build works, because Docker sorts the instructions
+     C. The build works, and Docker takes ubuntu as the parent
+     D. The build works, but the image keeps no name
+     ANSWER A
+     WHY: A build needs a parent image before it can run an instruction. Only a comment, a parser directive or an ARG line may come before FROM.
+     IF B: Docker runs the instructions in the order of the file.
+     IF C: Docker picks no parent image for you.
+     IF D: A missing name is a different problem; here the build stops.
+
+  8. [dockerfile] You change only the last line of a Dockerfile, then you build the image again. What does the builder do with the earlier instructions?
+     A. It removes their layers and builds them again
+   * B. It takes their layers from the cache
+     C. It runs them again, because every build starts clean
+     D. It runs only the instructions that install packages
+     ANSWER B
+     WHY: The builder re-uses a cached layer while the instruction and its files stay the same. The cache stops at the first change.
+     IF A: The builder keeps the layers of the earlier builds.
+     IF C: A build does not start clean; it uses the layer cache.
+     IF D: The cache works for every instruction, not only for package installs.
+
+  9. [dockerfile] Which line uses the exec form of the RUN instruction?
+     A. RUN apt-get update
+     B. RUN /bin/sh -c apt-get update
+   * C. RUN ["apt-get", "update"]
+     D. RUN exec apt-get update
+     ANSWER C
+     WHY: The exec form is a JSON array. It starts the program directly, so no shell expands the string.
+     IF A: This is the shell form; it runs the command through /bin/sh -c.
+     IF B: This line writes the shell call by hand, so it is still the shell form.
+     IF D: The word exec is not part of the two RUN forms.
+
+ 10. [dockerfile] A Dockerfile sits in the current folder. Which command builds an image with the name webapp?
+     A. docker create -t webapp .
+   * B. docker build -t webapp .
+     C. docker build --name webapp .
+     D. docker build webapp .
+     ANSWER B
+     WHY: The -t option gives the name and the tag. The dot gives the build context, which is the current folder.
+     IF A: The create command makes a container, not an image.
+     IF C: The build command has no --name option.
+     IF D: Without -t, Docker reads webapp as the build context.
+
+ 11. [dockerfile] Which first line starts an image that has no parent image?
+   * A. FROM scratch
+     B. FROM none
+     C. FROM ubuntu:latest
+     D. FROM base
+     ANSWER A
+     WHY: The name scratch is an empty, reserved image. A base image starts from it and adds the first file system.
+     IF B: There is no reserved image with the name none.
+     IF C: The image ubuntu is a parent image; it already holds a file system.
+     IF D: There is no reserved image with the name base.
+
+ 12. [ports] A Dockerfile declares EXPOSE 80. You start the container with the command docker run myimage. Can a user on another machine reach port 80?
+   * A. No, because EXPOSE alone does not publish the port
+     B. Yes, but only after the container restarts
+     C. Yes, because EXPOSE publishes the port
+     D. No, because port 80 needs the host network driver
+     ANSWER A
+     WHY: EXPOSE is documentation for the image. A port becomes public with the -p option or with the -P option at run time.
+     IF B: A restart does not publish a port.
+     IF C: EXPOSE declares a port; it does not open it on the host.
+     IF D: The bridge driver also publishes a port with -p.
+
+ 13. [ports] You start a container with the command docker run -p 8080:80 nginx. Which address does a browser on the host use?
+   * A. http://localhost:8080
+     B. http://localhost:8080:80
+     C. http://172.17.0.2:80
+     D. http://localhost:80
+     ANSWER A
+     WHY: The first number is the host port, and the second number is the container port. The browser uses the host port.
+     IF B: An address carries one port number.
+     IF C: The private container address is not reachable from the host browser.
+     IF D: Port 80 is the container port; the host listens on 8080.
+
+ 14. [ports] You start a container with the command docker run -P myimage. Which ports become public?
+     A. No port, because -P needs a port number
+   * B. Every port that the image declares with EXPOSE
+     C. Every port of the container
+     D. Only port 80, the default web port
+     ANSWER B
+     WHY: The capital -P option publishes each declared port, and Docker picks a free host port for each one.
+     IF A: The capital -P option takes no port number.
+     IF C: Docker publishes the declared ports only.
+     IF D: Docker does not prefer port 80.
+
+ 15. [cmd] An image declares CMD sleep 20. You start it with the command docker run myimage sleep 60. Which command runs in the container?
+     A. sleep 20, and then sleep 60
+     B. No command, because the two commands conflict
+     C. sleep 20
+   * D. sleep 60
+     ANSWER D
+     WHY: A command on the docker run line replaces the CMD instruction.
+     IF A: Docker runs one command, not two.
+     IF B: The two commands do not conflict; one replaces the other.
+     IF C: The CMD instruction gives the default only; the run line wins.
+
+ 16. [cmd] The image jobrunner declares ENTRYPOINT ["sleep"]. A student types docker run jobrunner 30. What runs inside the container?
+     A. sleep, with no parameter
+     B. the program 30, which fails at once
+     C. sleep and 30, as two separate programs
+   * D. sleep 30
+     ANSWER D
+     WHY: Docker appends the arguments of the run line to the ENTRYPOINT.
+     IF A: The argument 30 reaches the entry point as a parameter.
+     IF B: An ENTRYPOINT image does not read the argument as a program name.
+     IF C: The entry point and the argument form one command line.
+
+ 17. [cmd] A MySQL container needs the root password at start. Which part of the docker run command passes it?
+     A. -v MYSQL_ROOT_PASSWORD=secret
+     B. --password secret
+   * C. -e MYSQL_ROOT_PASSWORD=secret
+     D. --name MYSQL_ROOT_PASSWORD=secret
+     ANSWER C
+     WHY: The -e option sets an environment variable, and the image reads the password from that variable.
+     IF A: The -v option mounts a volume.
+     IF B: The docker run command has no --password option.
+     IF D: The --name option names the container.
+
+ 18. [registry] You run the command docker tag myapp:v1 myapp:latest. What happens to the tag v1?
+   * A. It stays, and the image carries two tags
+     B. It stays until the next build
+     C. It is removed, because the image is renamed
+     D. It points at an empty image
+     ANSWER A
+     WHY: A tag is a pointer to an image. A new tag adds a second pointer to the same image.
+     IF B: A build does not remove a tag of another image.
+     IF C: The tag command adds a tag; it does not rename the image.
+     IF D: Both tags point at the same image.
+
+ 19. [registry] You must push an image to a private registry at registry.example.net:5000. Where does that address belong?
+     A. In the FROM line of the Dockerfile
+     B. In the daemon configuration file
+   * C. In the image tag, before the image name
+     D. In a flag of the docker push command
+     ANSWER C
+     WHY: The push command reads the destination from the tag, for example registry.example.net:5000/team/app:v1.
+     IF A: The FROM line names the parent image, not the destination.
+     IF B: The daemon configuration does not set the destination of a push.
+     IF D: The push command takes the name only; it has no registry flag.
+
+ 20. [networking] You start a container and you give no network option. Which network driver does the container use?
+     A. The overlay driver
+     B. The null driver
+     C. The host driver
+   * D. The bridge driver
+     ANSWER D
+     WHY: Docker connects a new container to the default bridge network, and the container gets a private address.
+     IF A: The overlay driver works across more than one host, and you must create it.
+     IF B: The null driver leaves the container with no network.
+     IF C: The host driver needs --net host.

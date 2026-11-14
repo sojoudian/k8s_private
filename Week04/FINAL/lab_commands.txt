@@ -1,0 +1,264 @@
+
+Recommended Delivery: EC2 inside Learner Lab
+
+  Each student does this once at the start of the lab:
+
+  Step 1 — Launch EC2 (5 minutes)
+
+  In the Learner Lab, students click Start Lab → click the green AWS link → go to EC2 → Launch instance with:
+
+  ┌────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │    Setting     │                                                      Value                                                      │
+  ├────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Name           │ kind-lab                                                                                                        │
+  ├────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ AMI            │ Ubuntu Server 24.04 LTS (battle-tested; 26.04 LTS just released April 2026 — AMI may not be in all regions yet) │
+  ├────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Instance type  │ t3.small (2 vCPU, 2 GB — kind minimum)                                                                          │
+  ├────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Key pair       │ Use the Learner Lab default (vockey)                                                                            │
+  ├────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Storage        │ 32 GB gp3                                                                                                       │
+  ├────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Security group │ Allow SSH (22), HTTP (80), HTTPS (443), Custom TCP (8443)                                                       │
+  └────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  Step 2 — Connect (1 minute)
+
+  Select the instance → click Connect → use EC2 Instance Connect (no SSH key needed, works in browser).
+
+  Step 3 — Install Docker + Lab Tools (5 minutes)
+
+  # Install Docker
+  sudo apt-get update && sudo apt-get install -y ca-certificates curl
+  sudo install -m 0755 -d /etc/apt/keyrings
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+  sudo usermod -aG docker $USER
+  newgrp docker
+
+  # Install kind v0.31.0
+  curl -sLo kind https://kind.sigs.k8s.io/dl/v0.31.0/kind-linux-amd64
+  sudo install -o root -g root -m 0755 kind /usr/local/bin/kind
+
+  # Install kubectl v1.35.0 (exact match to kind's default K8s version)
+  curl -LO "https://dl.k8s.io/release/v1.35.0/bin/linux/amd64/kubectl"
+  chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+  # Verify
+  docker version
+  kind version
+  kubectl version --client
+
+  Step 4 — Workshop 1: kind on your laptop (~20 minutes)
+
+  Reference links (keep these tabs open):
+  - kind quick-start: https://kind.sigs.k8s.io/docs/user/quick-start/
+  - eksworkshop — kind cluster: https://www.eksworkshop.com/intermediate/200_migrate_to_eks/create-kind-cluster/
+  - Kubernetes docs: https://kubernetes.io/docs/
+  - kubectl cheat sheet: https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+
+  4a — Create the cluster
+
+  Write the cluster config and deploy it:
+
+  cat > kind.yaml <<EOF
+  kind: Cluster
+  apiVersion: kind.x-k8s.io/v1alpha4
+  nodes:
+  - role: control-plane
+    extraPortMappings:
+    - containerPort: 30000
+      hostPort: 30000
+    - containerPort: 30001
+      hostPort: 30001
+  EOF
+
+  kind create cluster --config kind.yaml
+
+  Expected output:
+  Creating cluster "kind" ...
+   ✓ Ensuring node image (kindest/node:v1.35.0)
+   ✓ Preparing nodes · Writing configuration
+   ✓ Starting control-plane · Installing CNI
+   ✓ Installing StorageClass
+  Set kubectl context to "kind-kind"
+
+  What you just built:
+  - One control-plane node running as a Docker container
+  - A working API server on https://127.0.0.1:6443
+  - kubectl context kind-kind set automatically
+  - Port mappings: 30000 → 30000, 30001 → 30001 (host ↔ node)
+  - Default CNI: kindnet — flat /16 pod network
+
+  4b — Deploy your first application
+
+  # Create one nginx pod, listening on port 80
+  kubectl run nginx --image=nginx --port=80
+
+  # List pods — wait until STATUS shows "Running"
+  kubectl get pods
+
+  # See detailed pod info (node, IP, containers, events)
+  kubectl describe pod nginx | head -20
+
+  Expected kubectl get pods output:
+  NAME    READY   STATUS    RESTARTS   AGE
+  nginx   1/1     Running   0          12s
+
+  What is a pod? The smallest deployable unit in Kubernetes. A pod wraps one or more containers that share a network namespace (one IP) and storage volumes, and run on the same node. Rule of thumb: one main app per pod.
+
+  4c — Expose your application (Services)
+
+  # Expose the nginx pod via a NodePort service
+  kubectl expose pod nginx --type=NodePort --name=nginx-http
+
+  # List services — note the PORT(S) column (e.g. 80:31873/TCP — 31873 is your NodePort)
+  kubectl get services
+
+  # Describe the service — shows Selector, Endpoints, and NodePort
+  kubectl describe svc nginx-http | head -15
+
+  Expected kubectl get services output:
+  NAME         TYPE       CLUSTER-IP    PORT(S)        AGE
+  kubernetes   ClusterIP  10.96.0.1     443/TCP        12m
+  nginx-http   NodePort   10.96.45.122  80:31873/TCP   8s
+
+  What is a Service? A stable network identity in front of one or more pods. Three common types:
+  - ClusterIP — internal only (default)
+  - NodePort — opens a port on every node
+  - LoadBalancer — provisions a cloud LB
+
+  Services match pods by label (run=nginx here). Add a pod with that label and it joins automatically.
+
+  4d — Access, scale, inspect, and roll forward
+
+  # Find the kind container's IP (note: uses .Networks.kind.IPAddress, not .IPAddress)
+  docker inspect kind-control-plane -f '{{.NetworkSettings.Networks.kind.IPAddress}}'
+
+  # Hit nginx via NodePort (replace 31873 with YOUR NodePort from 4c)
+  curl <KIND_CONTAINER_IP>:<YOUR_NODEPORT>
+
+  # Create a Deployment with 3 replicas
+  kubectl create deployment nginx-deploy --image=nginx --replicas=3
+
+  # Verify all 3 pods are running
+  kubectl get pods
+
+  Inspect and roll:
+
+  # Detailed info on a single pod
+  kubectl describe pod <POD_NAME>
+
+  # Info on the node
+  kubectl describe node kind-control-plane
+
+  # Scale up to 5 replicas
+  kubectl scale deploy nginx-deploy --replicas=5
+
+  # Rolling update to a new nginx version
+  kubectl set image deployment/nginx-deploy nginx=nginx:1.27
+
+  # Watch the rollout
+  kubectl rollout status deployment/nginx-deploy
+
+  # Roll back if needed
+  kubectl rollout undo deployment/nginx-deploy
+
+  4e — Bonus: Deploy the Kubernetes Dashboard
+
+  # Apply the official dashboard manifest
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+  # Create an admin service account
+  kubectl -n kubernetes-dashboard create serviceaccount admin-user
+
+  # Bind it to cluster-admin role
+  kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:admin-user
+
+  # Get the login token (copy this — you'll paste it in the browser)
+  kubectl -n kubernetes-dashboard create token admin-user
+
+  Set up HTTPS access with nginx reverse proxy:
+
+  # Generate a self-signed certificate
+  sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/dashboard.key -out /etc/ssl/certs/dashboard.crt -subj "/CN=dashboard"
+
+  # Install nginx
+  sudo apt-get install -y nginx
+
+  # Configure nginx as HTTPS reverse proxy (Host must be "localhost" for kubectl proxy)
+  sudo tee /etc/nginx/sites-available/dashboard <<'EOF'
+  server {
+      listen 8443 ssl;
+      ssl_certificate /etc/ssl/certs/dashboard.crt;
+      ssl_certificate_key /etc/ssl/private/dashboard.key;
+
+      location / {
+          proxy_pass http://127.0.0.1:8001;
+          proxy_set_header Host localhost;
+      }
+  }
+  EOF
+  sudo ln -sf /etc/nginx/sites-available/dashboard /etc/nginx/sites-enabled/dashboard
+  sudo nginx -t && sudo systemctl restart nginx
+
+  # Start kubectl proxy in the background
+  kubectl proxy --accept-hosts='.*' &
+
+  Open in your browser (accept the self-signed certificate warning):
+  https://<YOUR_EC2_PUBLIC_IP>:8443/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+  Paste the token from earlier to log in. You'll see cluster-wide resource overview, pods/deployments/services per namespace, logs, and a YAML editor.
+
+  4f — Deliverable
+
+  Students submit their lab notebook containing all commands and their output. They should have:
+  - A live nginx pod
+  - A NodePort Service
+  - A rolling deployment (scaled and updated)
+
+  Next week: Pods, Deployments, and Services in depth (Week 5).
+
+  ---
+  Version Summary
+
+  ┌─────────────┬──────────────────────────────────┬────────────────────────────────┐
+  │    Tool     │             Version              │              Why               │
+  ├─────────────┼──────────────────────────────────┼────────────────────────────────┤
+  │ Ubuntu      │ 24.04 LTS                        │ Stable, well-tested AMI on AWS │
+  ├─────────────┼──────────────────────────────────┼────────────────────────────────┤
+  │ Docker      │ 29.x (latest from official repo) │ Current stable engine          │
+  ├─────────────┼──────────────────────────────────┼────────────────────────────────┤
+  │ kind        │ v0.31.0                          │ Latest stable (Dec 2025)       │
+  ├─────────────┼──────────────────────────────────┼────────────────────────────────┤
+  │ K8s cluster │ v1.35.0                          │ kind's default node image      │
+  ├─────────────┼──────────────────────────────────┼────────────────────────────────┤
+  │ kubectl     │ v1.35.0                          │ Exact match to cluster version │
+  └─────────────┴──────────────────────────────────┴────────────────────────────────┘
+
+  Budget Impact per Student
+
+  ┌─────────────────────────────────────────────────┬─────────────┬───────────────────────────────────────┐
+  │                    Resource                     │    Cost     │                 Notes                 │
+  ├─────────────────────────────────────────────────┼─────────────┼───────────────────────────────────────┤
+  │ t3.small compute                                │ $0.0208/hr  │ Only when running                     │
+  ├─────────────────────────────────────────────────┼─────────────┼───────────────────────────────────────┤
+  │ 32 GB gp3 storage                               │ $2.56/month │ Charged even when instance is stopped │
+  ├─────────────────────────────────────────────────┼─────────────┼───────────────────────────────────────┤
+  │ Per 2-hour lab session                          │ ~$0.05      │ Compute only                          │
+  ├─────────────────────────────────────────────────┼─────────────┼───────────────────────────────────────┤
+  │ Storage for full summer (3 months)              │ ~$7.68      │ Ongoing EBS cost                      │
+  ├─────────────────────────────────────────────────┼─────────────┼───────────────────────────────────────┤
+  │ Estimated total per student (12 labs + storage) │ ~$8.18      │ Well within $50                       │
+  └─────────────────────────────────────────────────┴─────────────┴───────────────────────────────────────┘
+
+  Important Student Instructions
+
+  - After each lab: Stop the instance (don't terminate) — preserves Docker/kind setup for next time
+  - End Lab: Click "End Lab" in the Learner Lab when done for the day
+  - Session timer: The Learner Lab session lasts 4 hours. Click Start Lab again before it expires to refresh — your EC2 instance keeps running, only the console credentials reset
+  - Budget warning: EBS storage costs ~$2.56/month even when stopped. If students are done with all labs, terminate the instance to free the volume
+  - The Learner Lab stops EC2 instances automatically when the session timer runs out, but the volume persists
+

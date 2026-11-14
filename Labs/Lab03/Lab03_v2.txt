@@ -1,0 +1,63 @@
+
+ Please submit a report that displays all the main points of Lab Week04.
+
+
+
+ * - Cluster built with terraform init and terraform apply in the Week04 folder of the course repository: 3 EC2 machines (masternode, workernode1, workernode2; Ubuntu 26.04 LTS, m5.large). Capture the three running instances in the EC2 console and an SSH session on the master. Explain why the security group opens 22, 6443 and 30000-32767.
+
+
+
+ * - kubectl version and kubectl cluster-info run on the master, and kubectl get nodes -o wide shows all three nodes Ready. Explain why kubectl's MINOR version must match the cluster (v1.35) and what would happen on a major version skew.
+
+
+
+ * - Control plane inspected with kubectl get pods -n kube-system -o wide (the control-plane components run as static pods on the master) and kubectl get pods -n kube-flannel -o wide (one Flannel pod per node). Explain what kubeadm init and kubeadm join did, and what Flannel gives you (one flat 10.244.0.0/16 pod network).
+
+
+
+ * - nginx pod deployed with kubectl run nginx --image=nginx --port=80 and verified with kubectl get pods -o wide (STATUS = Running, READY = 1/1, and the node that the scheduler picked). Explain what the Events block in kubectl describe pod nginx | head -20
+
+  shows — the Scheduled → Pulling → Pulled → Created → Started lifecycle.
+
+
+
+ * - Service exposed with kubectl expose pod nginx --type=NodePort --name=nginx-http, pinned to node port 30000 with kubectl patch, and confirmed with kubectl get services (shows 80:30000/TCP). Hit it with curl http://localhost:30000 on the master and with http://<PUBLIC-IP>:30000 for all three nodes, and capture the
+
+ nginx welcome HTML. Explain the difference between ClusterIP, NodePort, and LoadBalancer Service types.
+
+
+
+ * - Deployment created with kubectl create deployment nginx-deploy --image=nginx --replicas=3, then scaled to 5 with kubectl scale deploy nginx-deploy --replicas=5 — kubectl get pods -o wide must show all 5 pods
+
+ Running on the two workers. Explain why scaling needs a Deployment, not the bare pod from step 4.
+
+
+
+ * - Rolling update performed with kubectl set image deployment/nginx-deploy nginx=nginx:1.27, watched with kubectl rollout status deployment/nginx-deploy, and reverted with kubectl rollout undo
+
+ deployment/nginx-deploy — capture each command's output. Explain what "rolling" means and why it gives zero-downtime upgrades.
+
+
+
+ * - Bonus (optional): show that the NodePort answers on the public IP of a node that does not run the nginx pod (kubectl get pods -o wide shows where the pod runs). Explain how kube-proxy forwards the request to the right node. End with kubectl delete for the three objects and terraform destroy.
+
+
+
+ Submission should include -
+
+
+
+   • Name label on every screenshot
+
+   • Detailed explanation of commands being executed
+
+   • Highlight the output of commands executed
+
+
+
+
+
+Integrity Pledge:
+
+By submitting this assignment you affirm that you will not plagiarize, give or receive illegitimate help on assignments, papers or examinations. You will uphold fairness and honesty in your work and the work of others. Please read Seneca Academic Integrity policy for more details.
+

@@ -1,0 +1,767 @@
+{
+ "slides": [
+  {
+   "n": 1,
+   "hidden": false,
+   "title": "Week 12",
+   "slide_type": "cover",
+   "body": [
+    {
+     "level": 0,
+     "text": "Introduction  to K8s RBAC, Continued"
+    },
+    {
+     "level": 0,
+     "text": "Horizontal pods autoscaling"
+    },
+    {
+     "level": 0,
+     "text": "IRSA (IAM ROLES for service accounts) - Optional"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 2,
+   "hidden": false,
+   "title": "Agenda",
+   "slide_type": "title_only",
+   "body": [
+    {
+     "level": 0,
+     "text": "K8s API access for IAM users"
+    },
+    {
+     "level": 0,
+     "text": "Horizontal pods auto-scaling in Amazon EKS"
+    },
+    {
+     "level": 0,
+     "text": "IRSA – IAM Roles for ServiceAccounts (Optional)"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 3,
+   "hidden": false,
+   "title": "Course Outline",
+   "slide_type": "course_outline",
+   "body": [
+    {
+     "level": 0,
+     "text": "Week 1: Docker Introduction"
+    },
+    {
+     "level": 0,
+     "text": "Week 2: Docker Image Management"
+    },
+    {
+     "level": 0,
+     "text": "Week 3: Docker Networking, Storage & Security"
+    },
+    {
+     "level": 0,
+     "text": "Week 4: K8s Introduction"
+    },
+    {
+     "level": 0,
+     "text": "Week 5:K8s- PODs, ReplicaSets"
+    },
+    {
+     "level": 0,
+     "text": "Week 6: K8s – Services & Deployments"
+    },
+    {
+     "level": 0,
+     "text": "Week 7: K8s – Volumes"
+    },
+    {
+     "level": 0,
+     "text": "Study Week"
+    },
+    {
+     "level": 0,
+     "text": "Week 9: K8s- K8s- PVs & K8s in AKS"
+    },
+    {
+     "level": 0,
+     "text": "Week 10: K8s: Storage classes & Statefulsets"
+    },
+    {
+     "level": 0,
+     "text": "11: Exam & Mock Exam week"
+    },
+    {
+     "level": 0,
+     "text": "Week 12: K8s- Configmaps & SecretsWeek"
+    },
+    {
+     "level": 0,
+     "text": "Week 13: K8s – RBAC and AKS"
+    },
+    {
+     "level": 0,
+     "text": "Week 13: Project presentation"
+    },
+    {
+     "level": 0,
+     "text": "Week 14: Project presentation"
+    },
+    {
+     "level": 0,
+     "text": "Term End"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [],
+   "highlight": [
+    12
+   ]
+  },
+  {
+   "n": 4,
+   "hidden": false,
+   "title": "Workshop 1– grant IAM user K8s API permissions",
+   "slide_type": "section_divider",
+   "body": [],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 5,
+   "hidden": false,
+   "title": "Our goal",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Create an IAM user called clo835-user who is authenticated to access the EKS cluster but is only authorized (via RBAC) to list, get, and watch pods and deployments in the rbac-test' namespace."
+    },
+    {
+     "level": 0,
+     "text": "To achieve this, we'll create an IAM user, map that user to a kubernetes role, then perform kubernetes actions under that user's context."
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 6,
+   "hidden": false,
+   "title": "Create  the Amazon EKS cluster and check aws-auth configmap settings",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Create the cluster with the CloudWatch logs enabled for authenticator actions to be recorded",
+      "$ eksctl create cluster -f eks_config_auth.yaml",
+      "# Check the aws-auth ConfigMap",
+      "$ k get configmap aws-auth -o yaml -n kube-system",
+      "# Check the permissions of \"cluster-admin\" ClusterRole",
+      "# Check the permissions of the cluster-admin role",
+      "$ k get clusterrole cluster-admin  -o yaml",
+      "$ k get clusterrolebinding cluster-admin -o yaml"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 7,
+   "hidden": false,
+   "title": "Create IAM user and export its credentials",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Create IAM User using AWS CLI",
+      "$ aws iam create-user --user-name clo835-user",
+      "$ aws iam create-access-key --user-name clo835-user | tee /tmp/create_output.json",
+      "# Run a script that stores the credentials as a local file. It will help switching between our Admin user and clo835 user",
+      "$ cd workshop2 && ./creds.sh",
+      "# Verify the content of clo835_creds.sh you created",
+      "$ cat clo835_creds.sh",
+      "# Switch to clo835 IAM user permissions and verify that you are using clo835 IAM user permissions",
+      "$ . ./clo835_creds.sh && aws sts get-caller-identity # mind the dot at the beginning of the command",
+      "# Check clo835 access to K8s API. The user is unauthorized. Why?",
+      "$ k get nodes",
+      "# Switch back to the Admin user and verify caller identity",
+      "$ . ./switch_to_admin.sh && aws sts get-caller-identity # mind the dot at the beginning of the command"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 8,
+   "hidden": false,
+   "title": "Map IAM User  to K8s user in aws-auth configmap. check  access to K8s API",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Add mapUsers block to auth-auth ConfigMap",
+      "$ k edit configmap aws-auth -n kube-system",
+      " mapUsers: |",
+      "    - userarn: arn:aws:iam::<your account number>:user/clo835-user",
+      "      username: clo835-user-k8s",
+      "# Still no access to the K8s resources, we are missing authorization component.",
+      "# Let's add a role with deployment permissions and bind this role to our clo835-user-k8s. Please note – role binding is using K8s user, not AWS IAM user."
+     ],
+     "truncated": false
+    },
+    {
+     "lang": "yaml",
+     "lines": [
+      "apiVersion: v1",
+      "data:",
+      "  mapRoles: |",
+      "    - groups:",
+      "      - system:bootstrappers",
+      "      - system:nodes",
+      "      rolearn: arn:aws:iam::047923129740:role/eksctl-clo835-nodegroup-nodegroup-NodeInstanceRole-1E0W8SH1FZ7FF",
+      "      username: system:node:{{EC2PrivateDNSName}}",
+      "  mapUsers: |",
+      "    - userarn: arn:aws:iam::047923129740:user/clo835-user",
+      "      username: clo835-user-k8s",
+      "kind: ConfigMap"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 9,
+   "hidden": false,
+   "title": "Grant deployment permissions  to clo835-user-k8s with role and rolebinding",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "yaml",
+     "lines": [
+      "kind: RoleBinding",
+      "apiVersion: rbac.authorization.k8s.io/v1",
+      "metadata:",
+      "  name: read-pods",
+      "  namespace: rbac-test",
+      "subjects:",
+      "- kind: User",
+      "  name: clo835-user-k8s",
+      "  apiGroup: rbac.authorization.k8s.io",
+      "roleRef:",
+      "  kind: Role",
+      "  name: pod-reader",
+      "  apiGroup: rbac.authorization.k8s.io"
+     ],
+     "truncated": false
+    },
+    {
+     "lang": "bash",
+     "lines": [
+      "# Switch to Admin role",
+      "$ . ./switch_to_admin.sh && aws sts get-caller-identity",
+      "Create a role that provides list, get, and watch access for pods and deployments in the rbac-test namespace only.",
+      "$ k create -f clo835-role.yaml",
+      "# Bind the user and the Role together with the RoleBinding resource",
+      "$ k create -f clo835-role-binding.yaml",
+      "# Switch to clo835-user IAM user and check user's permissions in Amazon EKS",
+      "$ . clo835_creds.sh; aws sts get-caller-identity",
+      "# IAM user clo835-user has permissions to list pods in rbac-test namespace",
+      "$ kubectl get pods -n rbac-test",
+      "# IAM user clo835-user does not have permissions to list pods in kube-system namespace",
+      "$ kubectl get pods -n kube-system"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 10,
+   "hidden": false,
+   "title": "Add IAM user  to AWS-auth with eksctl",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Editing aws-auth ConfigMap manually is not ideal. We can achieve the same result with eksctl tool",
+      "# We will map our clo835-user to cluster-admin role through system:masters  group",
+      "# Delete the mapUser section from aws-auth ConfigMap",
+      "$ k edit configmap aws-auth -n kube-system",
+      "eksctl create iamidentitymapping --cluster  clo835  --region=us-east-1 --arn arn:aws:iam::<AWS_ACCOUNT_ID>:user/clo835-user  --group system:masters --username clo835admins",
+      "# Now clo835-user is part of the system:masters group which is Admins group in K8s. Let's check user's permissions.",
+      "$ . clo835_creds.sh; aws sts get-caller-identity",
+      "$ k get pods -n kube-system"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": [
+    {
+     "file": "fig10.png",
+     "desc": "Small dark terminal capture of the aws-auth ConfigMap YAML (mapRoles/mapUsers: system:bootstrappers, system:nodes, arn:aws:iam::047923129740, system:masters, clo835admins). Sits in the lower-right; the rest of the slide is the dark title panel and body bullets."
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "hidden": false,
+   "title": "Understanding Kubeconfig – Working withmultiple clusters, users and namespaces",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "kubeconfig is the file kubectl reads (by default ~/.kube/config) to decide WHICH cluster to contact, as WHICH user, and in WHICH namespace."
+    },
+    {
+     "level": 0,
+     "text": "It stores three independent lists:"
+    },
+    {
+     "level": 1,
+     "text": "Clusters – each is an API-server address + its CA certificate (the \"where\")."
+    },
+    {
+     "level": 1,
+     "text": "Users – each holds credentials: a client certificate, token, or auth plugin (the \"who\")."
+    },
+    {
+     "level": 1,
+     "text": "Contexts – a named bundle of one Cluster + one User + an optional namespace."
+    },
+    {
+     "level": 0,
+     "text": "kubectl uses the current-context by default; switch environments in one command:  kubectl config use-context <name>  (list them with kubectl config get-contexts)."
+    },
+    {
+     "level": 0,
+     "text": "In the diagram each Context links a User to a Cluster – e.g. Context 1 = User 1 on Cluster 1 (namespace dev), while Contexts 2 and 3 both target Cluster 2."
+    },
+    {
+     "level": 0,
+     "text": "One file can define many users, clusters, and contexts, and the same user or cluster may be reused by several contexts (here Users 2 and 4 are defined but unused)."
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig11.png",
+     "desc": "kubeconfig flow diagram on a mint-green background: User 1-4 (teal) at top, Context 1/2/3 (blue, namespace:dev/prod) in middle, Cluster 1/Cluster 2 (teal) at bottom, with arrows mapping users<-contexts->clusters."
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "hidden": false,
+   "title": "Configuring local environment – working with kubeconfig",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Examine ~/.kube/config",
+      "# Let's check if our clo835-user can update the  ~/.kube/config",
+      "$ . clo835_creds.sh; aws sts get-caller-identity",
+      "$ aws eks update-kubeconfig --name clo835",
+      "# IAM user does not have any permissions to work with the EKS control plane. Let's grant the permissions",
+      "# Create the policy with access to your EKS cluster; Update your account id in the JSON document and in the commands below",
+      "$ . ./switch_to_admin.sh && aws sts get-caller-identity",
+      "$ aws iam create-policy --policy-name EKSCLO835 --policy-document file://iam_policy.json",
+      "$ aws iam attach-user-policy --policy-arn arn:aws:iam::<ACCOUNT-ID>:policy/EKSCLO835  --user-name clo835-user",
+      "$  . clo835_creds.sh; aws sts get-caller-identity && aws eks update-kubeconfig --name clo835",
+      "# Examine ~/.kube/config"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 13,
+   "hidden": false,
+   "title": "End of workshop 1",
+   "slide_type": "closing",
+   "body": [],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 14,
+   "hidden": false,
+   "title": "Workshop 2– granting IAM permissions  to pods",
+   "slide_type": "section_divider",
+   "body": [],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 15,
+   "hidden": false,
+   "title": "Goals",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Understanding Amazon EKS Pod's default access to AWS resources with worker nodes IAM roles"
+    },
+    {
+     "level": 0,
+     "text": "Enhancing security posture with Fine-Grained IAM Roles for Service Accounts"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 16,
+   "hidden": false,
+   "title": "DEFAULT PERMISSIONS- EXAMINE WORKER NODES ROLE",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Describe EC2 instances with the official awscli image",
+      "$ k run awscli -it  --image=amazon/aws-cli -n week12 -- ec2 describe-instances",
+      "# List Amazon ECR registries",
+      "$ k exec awscli -n week12 -- ecr describe-repositories",
+      "# What credentials are used by the Pod?",
+      "$ k exec awscli -n week12 -- aws sts get-caller-identity",
+      "# This role does not have access to Amazon Kinesis",
+      "$ k exec awscli -n week12 -- aws kinesis list-streams",
+      "An error occurred (AccessDeniedException) when calling the ListStreams operation: User: arn:aws:sts::047923129740:assumed-role/eksctl-clo835-nodegroup-nodegroup-NodeInstanceRole-1E0W8SH1FZ7FF/i-01f2dfc7a89c65b0b is not authorized to perform: kinesis:ListStreams because no identity-based policy allows the kinesis:ListStreams action command terminated with exit code 254",
+      "# We need to update the eksctl-clo835-nodegroup-nodegroup-NodeInstanceRole-1E0W8SH1FZ7FF role",
+      "# Review this role in the console and add AmazonKinesisReadOnlyAccess permissions to this role"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 17,
+   "hidden": false,
+   "title": "",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig17.png",
+     "desc": "Full AWS IAM console screenshot: 'Attach policy to eksctl-clo835-nodegroup...NodeInstanceRole', Other permissions policies filtered by \"kinesis\", AmazonKinesisReadOnlyAccess checked, Attach policies button. White console content framed by the dark slide background."
+    }
+   ]
+  },
+  {
+   "n": 18,
+   "hidden": false,
+   "title": "TEST READ ONLY ACCESS  TO AMAZON KINESIS",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Re-test the access with updated permissions",
+      "# Discuss and pros and cons of this approach of granting IAM permissions of processes in Amazon EKS",
+      "$ k exec awscli -n week11 -- aws kinesis list-streams",
+      "{",
+      "    \"StreamNames\": []",
+      "}",
+      "#  Will other pods in the cluster have the same level of access?"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 19,
+   "hidden": false,
+   "title": "END OF WORKSHOP 2",
+   "slide_type": "closing",
+   "body": [],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 20,
+   "hidden": false,
+   "title": "HPA – HORIZONTAL POD AUTOSCALING",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "HPA is the process of automatically adjusting the number of replicas based on the requested metric"
+    },
+    {
+     "level": 0,
+     "text": "Enabled and controlled by HorizontalPodAutoscaler resource"
+    },
+    {
+     "level": 0,
+     "text": "The HPA controller polls metrics server every 15 seconds and adjusts the number of replicas on the target resource (Deployment, ReplicaSet, Replication-Controller, or StatefulSet) to meet the target metric value"
+    },
+    {
+     "level": 0,
+     "text": "The control loop, step by step (numbers match the diagram):"
+    },
+    {
+     "level": 1,
+     "text": "Query the Metrics Server for each managed pod's current metric (e.g. CPU utilization)"
+    },
+    {
+     "level": 1,
+     "text": "Calculate the replica count needed to bring the metric to (or near) the target value"
+    },
+    {
+     "level": 1,
+     "text": "Update the replica count on the target's Scale sub-resource (Deployment → ReplicaSet)"
+    },
+    {
+     "level": 1,
+     "text": "The ReplicaSet then adds or removes Pods to reach the desired number"
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig20.png",
+     "desc": "HPA control-loop diagram: HPA box + Metrics Server (top, '1. Query for metrics', '2. Calculate the replicas' loop), Deployment/Replica Set box ('3. Update the Replica count'), and POD 1 / POD 2 / POD N in a dashed group ('4. Scale the desired Replicas'). Green/teal on white."
+    }
+   ]
+  },
+  {
+   "n": 21,
+   "hidden": false,
+   "title": "AUTOSCALING PROCESS",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "Obtain metrics of all the pods managed by the scaled resource object."
+    },
+    {
+     "level": 0,
+     "text": "Calculate the number of pods required to bring the metrics to (or close to) the specified target value."
+    },
+    {
+     "level": 0,
+     "text": "Update the replicas field of the scaled resource."
+    }
+   ],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig21.png",
+     "desc": "TWO diagrams boxed together in the lower band. Left: autoscaling calculation with Pod 1/2/3 CPU%/QPS, target CPU 50% / target QPS 20, math ((60+90+50)/50=Replicas:4, (15+30+12)/20=Replicas:3, Max(4,3)=Replicas:4). Right: 'Horizontal Pod Autoscaler' -> 'Autoscaler adjusts replicas (++ or --)' -> Deployment/ReplicaSet/StatefulSet Scale sub-resource box."
+    }
+   ]
+  },
+  {
+   "n": 22,
+   "hidden": false,
+   "title": "Workshop 3 – implementing HPA",
+   "slide_type": "section_divider",
+   "body": [],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 23,
+   "hidden": true,
+   "title": "Install kube-ops-view",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Install open source resource monitor",
+      "# Note: exposing this application via public ALB is for demo purposes only",
+      "$ helm install kube-ops-view stable/kube-ops-view --set service.type=LoadBalancer --set rbac.create=True",
+      "$ helm list",
+      "# Access the kube-ops via your browser with the LB DNS",
+      "# kubectl get svc kube-ops-view"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": [
+    {
+     "file": "fig23.png",
+     "desc": "kube-ops-view terminal screenshot (black bg, purple node panels): '> ', 'SORT: NAME', https://10.100.0.1:443, nodes ip-192-168-24-88 / ip-192-168-43-17, and a flux pod detail popup (flux-679c886577-6kwd8, Namespace flux, Running 1/1, CPU/Memory requested). White picture frame around it excluded."
+    }
+   ]
+  },
+  {
+   "n": 24,
+   "hidden": true,
+   "title": "",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [],
+   "figures": [
+    {
+     "file": "fig24.png",
+     "desc": "kube-ops-view high-contrast screenshot: top bar '> monte / SORT: CPU / HIGHCONTRAST', cluster https://10.100.0.1:443, three node panels (ip-192-168-12-17, ip-192-168-12-21, ip-192-168-33-20) with pod tiles. Box is the black terminal only; orange annotation arrows/labels (Select Box, Cluster, Node, CPU/Memory Requested, Kube-System/Regular Pods) and the overlaid white title sit outside this crop."
+    }
+   ]
+  },
+  {
+   "n": 25,
+   "hidden": false,
+   "title": "DEPLOY METRICS SERVER",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Deploy  Kubernetes Metrics Server.",
+      "$ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.1/components.yaml",
+      "$ k get apiservice v1beta1.metrics.k8s.io -o json | jq '.status'",
+      "# Depoy sample app",
+      "$ k create deployment php-apache --image=us.gcr.io/k8s-artifacts-prod/hpa-example",
+      "$ k set resources deploy php-apache --requests=cpu=200m",
+      "$ k expose deploy php-apache --port 80",
+      "$ k get pod -l app=php-apache"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 26,
+   "hidden": false,
+   "title": "SCALE AN APPLICATION WITH HPA",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Create HPA resource",
+      "$ k autoscale deployment php-apache `#The target average CPU utilization` \\ --cpu-percent=50 \\ --min=1 `#The lower limit for the number of pods that can be set by the autoscaler` \\ --max=10 `#The upper limit for the number of pods that can be set by the autoscaler`",
+      "$ k get hpa",
+      "# Generate load to trigger scaling",
+      "$ k run -i --tty load-generator --image=busybox /bin/sh",
+      "$ while true; do wget -q -O - http://php-apache; done",
+      "$ k get hpa -w"
+     ],
+     "truncated": false
+    }
+   ],
+   "figures": []
+  },
+  {
+   "n": 27,
+   "hidden": false,
+   "title": "END OF WORKSHOP 3",
+   "slide_type": "closing",
+   "body": [],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 28,
+   "hidden": false,
+   "title": "OPTIONAL GROUP ACTIVITY – FOLLOW AMAZON EKS WORKSHOP",
+   "slide_type": "content",
+   "body": [
+    {
+     "level": 0,
+     "text": "https://www.eksworkshop.com/docs/security/iam-roles-for-service-accounts/"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 29,
+   "hidden": false,
+   "title": "REFERENCES",
+   "slide_type": "references",
+   "body": [
+    {
+     "level": 0,
+     "text": "https://dev.to/aws-builders/eks-auth-deep-dive-4fib"
+    },
+    {
+     "level": 0,
+     "text": "https://www.eksworkshop.com/beginner/090_rbac/"
+    },
+    {
+     "level": 0,
+     "text": "https://docs.aws.amazon.com/eks/latest/userguide/cluster-auth.html"
+    },
+    {
+     "level": 0,
+     "text": "https://itnext.io/how-does-client-authentication-work-on-amazon-eks-c4f2b90d943b"
+    },
+    {
+     "level": 0,
+     "text": "https://www.cncf.io/blog/2020/07/31/kubernetes-rbac-101-authentication/"
+    },
+    {
+     "level": 0,
+     "text": "https://www.eksworkshop.com/docs/security/iam-roles-for-service-accounts/"
+    },
+    {
+     "level": 0,
+     "text": "https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/"
+    },
+    {
+     "level": 0,
+     "text": "https://codeberg.org/hjacobs/kube-ops-view"
+    },
+    {
+     "level": 0,
+     "text": "https://www.eksworkshop.com/beginner/080_scaling/"
+    },
+    {
+     "level": 0,
+     "text": "https://mjarosie.github.io/dev/2021/09/15/iam-roles-for-kubernetes-service-accounts-deep-dive.html"
+    }
+   ],
+   "code_blocks": [],
+   "figures": []
+  },
+  {
+   "n": 30,
+   "hidden": false,
+   "title": "CLEANUP",
+   "slide_type": "content",
+   "body": [],
+   "code_blocks": [
+    {
+     "lang": "bash",
+     "lines": [
+      "# Delete the cluster",
+      "$ eksctl delete cluster --name clo835",
+      "# Stop cloud9 instance"
+     ]
+    }
+   ],
+   "figures": []
+  }
+ ]
+}

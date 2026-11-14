@@ -1,0 +1,303 @@
+CLO835 Fall 2026 - Week 03 - Docker Networking, Storage and Security - question pool (100 questions)
+Every question stands on its own. No question needs a slide.
+======================================================================
+
+  1. [networks] What does a Docker network behave like, for the containers attached to it?
+     ANSWER B: A virtual switch with its own address range
+
+  2. [networks] A container joins a bridge network. What does that network give it?
+     ANSWER B: An address from the range of that network
+
+  3. [networks] A container starts and names no network. What does it join?
+     ANSWER A: The default bridge network
+
+  4. [networks] How many networks can one container be attached to?
+     ANSWER B: Zero, one or several
+
+  5. [networks] Can a running container be attached to another network?
+     ANSWER C: Yes, with docker network connect
+
+  6. [networks] Which scope does a bridge network have?
+     ANSWER D: One host
+
+  7. [networks] Which scope does an overlay network have?
+     ANSWER D: Several hosts in a cluster
+
+  8. [networks] How does traffic from outside reach a container on a bridge network?
+     ANSWER B: Through a port published on the host
+
+  9. [networks] What is the practical difference between the default bridge and a network you create?
+     ANSWER D: Only the one you create resolves container names
+
+ 10. [networks] Why is a user-defined network preferred for a multi-container application?
+     ANSWER A: It isolates the group and gives name resolution inside it
+
+ 11. [drivers] Which driver gives an isolated virtual switch on a single host?
+     ANSWER D: bridge
+
+ 12. [networks] What must exist before two containers can resolve each other by name?
+     ANSWER A: A user-defined network they both join
+
+ 13. [drivers] Which driver spans several nodes of a cluster?
+     ANSWER A: overlay
+
+ 14. [drivers] Which driver gives each container its own MAC address on the physical network?
+     ANSWER D: macvlan
+
+ 15. [networks] Where do the addresses of the containers on a network come from?
+     ANSWER B: The subnet set for that network
+
+ 16. [drivers] A network works only on the machine where it was created. How is that described?
+     ANSWER C: Single host scope
+
+ 17. [drivers] What does the driver of a network decide for the containers attached to it?
+     ANSWER D: How their traffic reaches the rest of the world
+
+ 18. [drivers] Which driver should a team pick when containers must talk across machines?
+     ANSWER A: overlay
+
+ 19. [drivers] Which driver should a team pick when a container needs an address on the office LAN?
+     ANSWER A: macvlan
+
+ 20. [drivers] What does a container lose when it is started on the host driver?
+     ANSWER A: Network isolation from the machine it runs on
+
+ 21. [drivers] What does a container gain when it is started on the host driver?
+     ANSWER B: A faster path, with no address translation in the way
+
+ 22. [drivers] Two containers on the host driver both bind port 8080. What happens?
+     ANSWER D: The second one fails, because the port is already taken
+
+ 23. [networks] Two containers on one bridge network must reach each other. What has to be published?
+     ANSWER A: Nothing, because they already share a network
+
+ 24. [drivers] A benchmark needs the lowest possible network latency on one host. Which driver fits?
+     ANSWER A: host
+
+ 25. [network commands] Which command lists the networks on a host?
+     ANSWER A: docker network ls
+
+ 26. [network commands] Which command shows the driver, the subnet and the attached containers of a network?
+     ANSWER C: docker network inspect
+
+ 27. [network commands] Which command attaches an existing container to a network?
+     ANSWER A: docker network connect
+
+ 28. [network commands] Which command detaches a container from a network?
+     ANSWER B: docker network disconnect
+
+ 29. [network commands] Which command removes a network that nothing is using?
+     ANSWER C: docker network rm
+
+ 30. [network commands] Which option sets the address range of a new network?
+     ANSWER D: --subnet
+
+ 31. [network commands] Which option chooses the driver of a new network?
+     ANSWER B: --driver
+
+ 32. [network commands] A fresh Docker install is inspected. Which three networks are present?
+     ANSWER C: bridge, host and none
+
+ 33. [network commands] Removing a network fails. What is the most likely reason?
+     ANSWER A: A container is still attached to it
+
+ 34. [network commands] A team must find the IP address handed to a running container. What should they inspect?
+     ANSWER B: The container or the network it joined
+
+ 35. [service discovery] Two containers share a user-defined network. How can one address the other?
+     ANSWER D: By the container name, which resolves on that network
+
+ 36. [service discovery] Which network does NOT give name resolution between containers?
+     ANSWER D: The default bridge
+
+ 37. [service discovery] A web container cannot resolve the name redis. Both run on the default bridge. What is the fix?
+     ANSWER D: Create a network and attach both containers to it
+
+ 38. [service discovery] What does container name resolution remove the need for?
+     ANSWER A: Hard coded addresses inside the application config
+
+ 39. [service discovery] An application is told the name of its database instead of an address. Why does that help?
+     ANSWER C: The same image then works in every environment
+
+ 40. [service discovery] Which command proves from inside a container that a name resolves?
+     ANSWER D: Run a lookup tool in a throwaway container on the network
+
+ 41. [service discovery] A database must not be reachable from outside the host, but the app must reach it. What is the clean design?
+     ANSWER B: Share a network, and publish only the app port
+
+ 42. [service discovery] An application reads a hostname from an environment variable. Why does that help in containers?
+     ANSWER D: The same image then works in every environment
+
+ 43. [service discovery] Where does the name of a container resolve?
+     ANSWER D: On the user-defined networks it is attached to
+
+ 44. [service discovery] Two containers on two different user-defined networks try to resolve each other. What happens?
+     ANSWER D: Resolution fails, because the networks are separate
+
+ 45. [cnm vs cni] What does CNI stand for in the Kubernetes world?
+     ANSWER A: Container Network Interface
+
+ 46. [cnm vs cni] What does CNM stand for in the Docker world?
+     ANSWER A: Container Network Model
+
+ 47. [cnm vs cni] How is the Docker model extended with new kinds of network?
+     ANSWER D: Through drivers
+
+ 48. [cnm vs cni] How is the Kubernetes model extended with new kinds of network?
+     ANSWER C: Through plugins
+
+ 49. [cnm vs cni] What topology does Kubernetes present to a workload by default?
+     ANSWER B: One flat network where every pod can be reached
+
+ 50. [cnm vs cni] What is the isolation default in Docker, before an operator does anything?
+     ANSWER C: Isolation is on, and connecting networks takes work
+
+ 51. [cnm vs cni] What is the isolation default in Kubernetes, before an operator does anything?
+     ANSWER A: Isolation is off, and a policy object is needed
+
+ 52. [cnm vs cni] Which Kubernetes object restricts which pods may talk to which?
+     ANSWER B: NetworkPolicy
+
+ 53. [cnm vs cni] Which of these is a Kubernetes network plugin?
+     ANSWER D: Calico
+
+ 54. [cnm vs cni] How is name resolution scoped in Kubernetes?
+     ANSWER A: By namespace, through a cluster wide service
+
+ 55. [layers] What is a container image made of?
+     ANSWER D: A stack of read only layers
+
+ 56. [layers] What does a container add on top of the image layers?
+     ANSWER D: One thin writable layer
+
+ 57. [copy-on-write] An image holds two versions of one file, in two different layers. Which version does a process in the container see?
+     ANSWER C: The version in the upper layer
+
+ 58. [copy-on-write] A process in a container edits a configuration file that arrived with the image. Where does the new version live?
+     ANSWER D: In the writable layer of that container
+
+ 59. [copy-on-write] Why does a container start quickly even from a large image?
+     ANSWER B: Nothing is copied until something is written
+
+ 60. [ephemeral] Why does mounting storage solve the data loss problem?
+     ANSWER B: The data then lives outside the container layers
+
+ 61. [layers] A line that only sets the working directory is added to a Dockerfile. What does the image gain?
+     ANSWER B: A metadata change, and no filesystem layer
+
+ 62. [layers] What does the FROM instruction do?
+     ANSWER C: It selects the image the build starts from
+
+ 63. [layers] Why is an image layer never changed after it is built?
+     ANSWER D: Every layer below the writable one is read only
+
+ 64. [layers] Five containers start from one image at once. What does each of them get of its own?
+     ANSWER C: A new empty writable layer
+
+ 65. [layers] Why does a secret removed by a later RUN line still leak from an image?
+     ANSWER A: The earlier layer that added it is still in the image
+
+ 66. [layers] A container writes a file and no storage is mounted. Which part of the container holds that file?
+     ANSWER A: The writable layer added at start
+
+ 67. [ephemeral] A database container writes rows, and then the container is removed. What happens to the rows?
+     ANSWER D: They are lost with the writable layer
+
+ 68. [ephemeral] Why is a container called ephemeral by default?
+     ANSWER A: Its writable layer dies when the container is removed
+
+ 69. [ephemeral] What is the correct fix for data that must outlive a container?
+     ANSWER D: Mount storage from outside the container
+
+ 70. [ephemeral] Which storage options keep data after the container is removed?
+     ANSWER D: Volumes and bind mounts
+
+ 71. [ephemeral] Which option is managed by Docker and suits most cases?
+     ANSWER C: A volume
+
+ 72. [ephemeral] Which option maps a chosen host path straight into the container?
+     ANSWER C: A bind mount
+
+ 73. [ephemeral] Which option keeps data in memory and never writes it to disk?
+     ANSWER B: A tmpfs mount
+
+ 74. [ephemeral] A container is restarted rather than removed. What happens to its writable layer?
+     ANSWER D: It survives, because the container still exists
+
+ 75. [storage] Where does Docker keep the data of a named volume on a Linux host?
+     ANSWER A: In an area the daemon manages under /var/lib/docker
+
+ 76. [storage] Where does the data of a bind mount live?
+     ANSWER A: At any host path the operator chooses
+
+ 77. [storage] Where does the data of a tmpfs mount live?
+     ANSWER D: In the memory of the host machine
+
+ 78. [storage] Which command creates a named volume?
+     ANSWER D: docker volume create
+
+ 79. [storage] A container is removed. Which kind of mounted data is lost with it?
+     ANSWER D: Data held in a tmpfs mount
+
+ 80. [storage] Two containers must read and write the same data at the same time. Which option fits?
+     ANSWER B: One named volume mounted into both
+
+ 81. [storage] Which option is the most portable between hosts?
+     ANSWER A: A volume, because a driver can back it elsewhere
+
+ 82. [storage] Why is a bind mount tied to one machine?
+     ANSWER C: It names a path that must exist on that host
+
+ 83. [storage] Which option is the usual choice for production database files?
+     ANSWER C: A volume
+
+ 84. [storage] Which option is the usual choice for editing source code live during development?
+     ANSWER A: A bind mount
+
+ 85. [storage] Which option is the usual choice for a secret that must never touch a disk?
+     ANSWER A: A tmpfs mount
+
+ 86. [storage] A volume is mounted at the same path in two containers. What do they see?
+     ANSWER A: The same data, shared between them
+
+ 87. [storage] A named volume is mounted into an empty directory of a fresh container. What is in it?
+     ANSWER C: Whatever the volume already held
+
+ 88. [storage] Which statement about volumes and the image is correct?
+     ANSWER A: A volume is outside the image and outlives the container
+
+ 89. [storage] A team must back up container data with ordinary host tools. Which option makes that simplest?
+     ANSWER C: A bind mount at a path the team controls
+
+ 90. [storage] A container that used a named volume is removed. What happens to the volume?
+     ANSWER A: It stays until somebody removes it
+
+ 91. [mount syntax] Which mount form uses explicit key and value pairs?
+     ANSWER B: --mount
+
+ 92. [mount syntax] Which mount form is the shortest to type?
+     ANSWER D: -v
+
+ 93. [mount syntax] Which mount form can also create a tmpfs mount?
+     ANSWER D: --mount
+
+ 94. [mount syntax] A bind mount names a host path that does not exist, and -v is used. What happens?
+     ANSWER B: The path is created silently, as an empty directory
+
+ 95. [mount syntax] A bind mount names a host path that does not exist, and --mount is used. What happens?
+     ANSWER B: The command fails with a clear error
+
+ 96. [mount syntax] Which form is recommended for scripts, Compose files and production?
+     ANSWER B: --mount, because the intent is explicit
+
+ 97. [security] Which practice reduces the risk of a vulnerable base image?
+     ANSWER C: Use a slim official base and scan it before release
+
+ 98. [security] Which practice reduces the damage if a process inside a container is compromised?
+     ANSWER A: Run as a non-root user and drop every capability
+
+ 99. [security] Where should a production password come from?
+     ANSWER B: A secret manager, injected when the container starts
+
+100. [security] Why must the daemon socket never be shared with a container?
+     ANSWER C: Anything that reaches it can control the whole host

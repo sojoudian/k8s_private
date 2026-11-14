@@ -1,0 +1,18 @@
+Please submit a report that displays all the main points of Lab Week02.
+
+* - simple-webapp-flask is built as clo835-week2 and answers on port 18080 — docker ps shows the container running and curl http://localhost:18080 returns Welcome to CLO835!. Explain which Dockerfile instruction made the container listen on 18080, and what would happen if ENTRYPOINT were written as CMD instead — would docker run clo835-week2 bash still serve Flask?
+
+* - postgres refuses to start when no POSTGRES_PASSWORD is supplied and becomes healthy after re-running with -e POSTGRES_PASSWORD=... — show docker logs pg with the missing-variable error and the subsequent docker ps showing the container healthy. Explain why the image refuses to start by default and why a default password is not baked into the image.
+
+* - simple-webapp-color runs on two ports at the same time, showing two different colours from the same image — port 8080 with the ENV APP_COLOR=teal default and port 8081 with -e APP_COLOR=blue overriding it (two browser windows side by side, or two curl outputs). Explain the override priority between ENV in the Dockerfile and -e on the command line, and identify the evidence in the screenshot that proves it.
+
+* - your image is tagged and pushed to your own Docker Hub repository (hub.docker.com/r/<your-username>/clo835-flask) — capture the repository page with the tag visible. Explain which local image was tagged, and what would change if a classmate ran docker pull <your-username>/clo835-flask:v1.0 from a fresh machine — why is the local tag name irrelevant once the image is on Docker Hub?
+
+* - a multi-architecture image is built with docker buildx build --platform linux/amd64,linux/arm64 -t "$REPO:v1.0" --push . and verified with docker buildx imagetools inspect "$REPO:v1.0" — the inspect output must show both linux/amd64 and linux/arm64 under Manifests:. Explain why the --push flag is required (rather than --load) when building multi-platform images, and which platform variant your laptop pulls when you run docker pull on the same tag.
+
+Submission should include -
+
+Name label on every screenshot
+Detailed explanation of commands being executed
+Highlight the output of commands executed.
+Integrity Pledge: By submitting this assignment you affirm that you will not plagiarize, give or receive illegitimate help on assignments, papers or examinations. You will uphold fairness and honesty in your work and the work of others. Please read Seneca Academic Integrity policy for more details.

@@ -1,0 +1,23 @@
+Please submit a report that displays all the main points of Lab Week02.
+
+The lab recording demonstrates every step in this assignment. You may follow it
+directly to complete the work.
+
+* - the Terraform in Week02 builds one Ubuntu 26.04 EC2 machine — run terraform init and terraform apply, then show the public_ip, private_ip and app_url outputs, and an ssh session on the machine. Explain why key_name has no default and Terraform asks you for it, and explain what iam_instance_profile = LabInstanceProfile gives the machine.
+
+* - the new machine has git and nothing else — show git --version succeeding, and python3 -m venv failing before you install python3-venv. Explain why bootstrap.sh installs git only, and name the one thing user_data does at first boot.
+
+* - simple-webapp-flask runs on the EC2 machine by hand and answers on port 8080 — follow runAWS_EC2.sh, then show curl http://localhost:8080 returning Welcome CLO835!, and the same page in your browser at http://<public_ip>:8080. Explain why pip3 install flask is not the correct way on Ubuntu 26.04, and what python3 -m venv changes. Count the commands you typed.
+
+* - the same application runs as a container on your own laptop — follow localMachine.sh, then show docker build, docker ps, and curl http://localhost:8080 returning Welcome CLO835!. Explain which part makes the container listen on 8080, and why EXPOSE 8080 alone does not open the port. Then explain what would happen if CMD were written as ENTRYPOINT instead — would docker run simple-webapp-flask:v1 bash still serve Flask?
+
+* - a multi-architecture image is built with docker buildx build --platform linux/amd64,linux/arm64 -t "<your-username>/simple-webapp-flask:v1" --push . and verified with docker buildx imagetools inspect — the inspect output must show both linux/amd64 and linux/arm64 under Manifests:. Capture your Docker Hub repository page with the tag visible. Explain why --push is required rather than --load, and explain why a single-architecture image built on a Mac fails on the EC2 machine.
+
+* - the machine is deleted at the end — run terraform destroy in the Week02 directory and show "Destroy complete!". Explain why a stopped machine still costs money, and which file tells Terraform what to delete.
+
+Submission should include -
+
+Name label on every screenshot
+Detailed explanation of commands being executed
+Highlight the output of commands executed.
+Integrity Pledge: By submitting this assignment you affirm that you will not plagiarize, give or receive illegitimate help on assignments, papers or examinations. You will uphold fairness and honesty in your work and the work of others. Please read Seneca Academic Integrity policy for more details.

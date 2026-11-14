@@ -1,0 +1,125 @@
+CLO835 Week 1 Quiz — Docker Introduction (20 questions, DIFFICULT)
+Source: week01/Week01_lecture_style_v5.pptx
+
+Q1. A container is capped at 512 MB of RAM, and it cannot see host processes. Which kernel feature delivers each effect, in that order?   [slide 16]
+    A) namespaces limit the memory; cgroups hide the processes
+  * B) cgroups limit the memory; namespaces hide the processes
+    C) cgroups deliver both the memory cap and the process hiding
+    D) namespaces deliver both the memory cap and the process hiding
+
+Q2. A Dockerfile opens with twelve comment lines, then a LABEL line, then FROM. The build fails. Which rule does it break?   [slide 37]
+    A) LABEL is not valid before a base image has been chosen
+    B) Comment lines are not allowed before the FROM line
+    C) LABEL may appear only once, and only after the CMD line
+  * D) FROM must be the first non-comment instruction
+
+Q3. A Dockerfile ends with three different CMD lines. What happens when the container starts?   [slide 37]
+  * A) Only the last CMD applies; the first two are useless
+    B) All three run, in the order they were written
+    C) The build fails, because CMD may appear only once
+    D) Only the first CMD applies; the later two are ignored
+
+Q4. An image has no /bin/sh at all. Which RUN form still works, and why?   [slide 38]
+    A) The shell form, because Docker injects a shell during the build
+    B) The shell form, because /bin/sh is needed only at run time
+  * C) The exec form, because it does not need a shell to run
+    D) The exec form, because it expands the shell variables itself
+
+Q5. You rebuild an image after editing only the last instruction. What does the builder do with the earlier layers?   [slide 37]
+    A) It executes them again, because any edit voids the whole file
+    B) It executes only the RUN layers again, and caches the others
+    C) It deletes them, then rebuilds every layer from FROM downward
+  * D) It re-uses them from cache, and does not execute them
+
+Q6. Why does Docker use copy-on-write when it starts a container from an image?   [slide 31]
+  * A) To shorten boot time, by not copying the whole filesystem
+    B) To keep the image writable, so many containers can edit it
+    C) To compress the image layers before the container mounts them
+    D) To encrypt the read-write layer before the processes start
+
+Q7. Ten containers run from one image on a single host. What does layer sharing save?   [slide 28]
+    A) Only network bandwidth, because the image is pulled one time
+    B) Only disk space, because the layers are stored one time
+  * C) Disk usage, transfer time and memory
+    D) Nothing, because each container gets a private copy of them
+
+Q8. You must add a package to an existing image. What does the deck say you actually do?   [slide 33]
+    A) Edit the image in place, then commit the change to the same tag
+  * B) Run a container, change it, then stack the change as a new layer
+    C) Edit the Dockerfile, then push the identical image tag again
+    D) Mount the package as a volume, so that the image stays untouched
+
+Q9. Which statement about the three image namespaces is correct?   [slide 34]
+    A) An official image always carries the publisher's user name
+    B) A user image is gated and maintained by Docker Inc itself
+  * C) A self-hosted image carries its own registry host and port
+    D) An official image must be pulled from a self-hosted registry
+
+Q10. The deck says that “installing Docker” really installs which two things?   [slide 24]
+  * A) The Docker Engine and the Docker CLI
+    B) The Docker CLI and a dedicated Linux kernel module
+    C) The Docker Engine and a lightweight hypervisor
+    D) The Docker CLI and a private container registry
+
+Q11. How does the Docker CLI reach the Docker Engine?   [slide 24]
+    A) It writes directly into the container filesystem
+    B) It signals the daemon through a kernel namespace
+    C) It runs as a thread inside the daemon process
+  * D) It calls an API that other clients can also use
+
+Q12. A logging agent must collect the output of every container on a host. Whose responsibility is that, and why?   [slide 26]
+    A) The developer, because the application writes the log lines
+  * B) The administrator, because logging sits outside it
+    C) The developer, because logging is a library inside the image
+    D) Neither one, because the runtime does it with no clear owner
+
+Q13. Why does the deck call a container light and a virtual machine heavy?   [slide 19]
+    A) A container has no filesystem at all; a VM has a complete one
+  * B) A container shares the host kernel; a VM ships a guest OS
+    C) A container runs a single process; a VM always runs many
+    D) A container is compressed on disk; a VM is stored uncompressed
+
+Q14. In the survey on the deck, which benefit did the most respondents report?   [slide 22]
+    A) Shortened software development cycles, at 53%
+    B) Containerized monolithic applications, at 50%
+  * C) Improved resource utilization, at 56%
+    D) Enabled our move to the cloud, at 42%
+
+Q15. The same survey shows two very low bars. What do those two bars report?   [slide 22]
+  * A) 2% chose “Other”, and 5% realized no benefits
+    B) 2% reduced public cloud costs, and 5% moved to the cloud
+    C) 5% shortened their cycles, and 2% reduced their cloud costs
+    D) 5% chose “Other”, and 2% realized no benefits
+
+Q16. In the five-step escape from dependency hell, what does Step 3 produce?   [slide 12]
+    A) An INSTALL.txt file that lists every dependency and step
+    B) A tested Docker image that runs on your own machine
+    C) An install.sh script, verified on your own machine
+  * D) A Dockerfile, where each install step becomes a layer
+
+Q17. A student passes every other item but scores zero on the final project. Which course policy blocks the pass?   [slide 6]
+    A) A weighted average of 50% is required across all the labs
+    B) Every quiz must be attempted before the exam week starts
+  * C) A grade of 50% or better is required on the final project
+    D) The final project is worth 30% of the total course grade
+
+Q18. The deck lists Labs 2.5% × 8, Quizzes 2% × 5, Individual Assignments 15% × 2, Tests, and Final Project 20%. What weight must Tests carry?   [slide 6]
+  * A) 20%
+    B) 10%
+    C) 25%
+    D) 30%
+
+Q19. How does the deck define LXC?   [slide 16]
+    A) A hypervisor that runs several Linux kernels side by side
+    B) A daemon that builds images from a Dockerfile and a context
+    C) A registry that stores and distributes Linux images
+  * D) OS-level virtualization on a single shared Linux kernel
+
+Q20. In the example on the deck, which command gives an existing image another name?   [slide 36]
+    A) docker build, which takes the name from the Dockerfile
+  * B) docker tag, which adds a name to an existing image id
+    C) docker run, which names the container and the image at once
+    D) docker push, which renames the image while it uploads it
+
+Answer summary: 1-B, 2-D, 3-A, 4-C, 5-D, 6-A, 7-C, 8-B, 9-C, 10-A, 11-D, 12-B, 13-B, 14-C, 15-A, 16-D, 17-C, 18-A, 19-D, 20-B
+Position balance: A×5, B×5, C×5, D×5

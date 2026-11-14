@@ -1,0 +1,66 @@
+CLO835 Week 1 Quiz v2 — Docker Introduction (10 questions, DIFFICULT)
+Source: week01/Week01_lecture_style_v5.pptx
+Every question stands alone. No question refers to the slides or to another question.
+
+Q1. A container is capped at 512 MB of RAM, and it cannot see host processes. Which Linux kernel feature delivers each effect, in that order?   [slide 16]
+    A) namespaces limit the memory; cgroups hide the processes
+    B) cgroups deliver both the memory cap and the process hiding
+  * C) cgroups limit the memory; namespaces hide the processes
+    D) namespaces deliver both the memory cap and the process hiding
+
+Q2. A Dockerfile opens with twelve comment lines, then a LABEL line, then FROM. The build fails. Which rule does it break?   [slide 37]
+  * A) FROM must be the first non-comment instruction
+    B) LABEL is not valid before a base image has been chosen
+    C) Comment lines are not allowed before the FROM line
+    D) LABEL may appear only once, and only after the CMD line
+
+Q3. A Dockerfile ends with three different CMD lines. What happens when a container starts from that image?   [slide 37]
+    A) All three run, in the order they were written
+    B) The build fails, because CMD may appear only once
+    C) Only the first CMD applies; the later two are ignored
+  * D) Only the last CMD applies; the first two are useless
+
+Q4. An image has no /bin/sh at all. Which RUN form still works, and why?   [slide 38]
+    A) The shell form, because Docker injects a shell during the build
+  * B) The exec form, because it does not need a shell to run
+    C) The shell form, because /bin/sh is needed only at run time
+    D) The exec form, because it expands the shell variables itself
+
+Q5. You rebuild an image after editing only the last instruction. What does the builder do with the earlier layers?   [slide 37]
+  * A) It re-uses them from cache, and does not execute them
+    B) It executes them again, because any edit voids the whole file
+    C) It executes only the RUN layers again, and caches the others
+    D) It deletes them, then rebuilds every layer from FROM downward
+
+Q6. Why does Docker use copy-on-write when it starts a container from an image?   [slide 31]
+    A) To keep the image writable, so many containers can edit it
+    B) To compress the image layers before the container mounts them
+  * C) To shorten boot time, by not copying the whole filesystem
+    D) To encrypt the read-write layer before the processes start
+
+Q7. Ten containers run from one image on a single host. What does layer sharing save?   [slide 28]
+    A) Only network bandwidth, because the image is pulled one time
+  * B) Disk usage, transfer time and memory
+    C) Only disk space, because the layers are stored one time
+    D) Nothing, because each container gets a private copy of them
+
+Q8. A Docker image is immutable. You must add a package to an existing image. Which sequence actually produces the new image?   [slide 33]
+    A) Edit the image in place, then commit the change to the same tag
+    B) Edit the Dockerfile, then push the identical image tag again
+    C) Mount the package as a volume, so that the image stays untouched
+  * D) Run a container, change it, then stack the change as a new layer
+
+Q9. A logging agent must collect the output of every container on a host. Who owns that work, and why?   [slide 26]
+    A) The developer, because the application writes the log lines
+    B) The developer, because logging is a library inside the image
+  * C) The administrator, because logging sits outside the container
+    D) Neither one, because the container runtime does it automatically
+
+Q10. A team moves an application from a monolith to microservices. Which pair of changes matches that move?   [slide 15]
+  * A) Fast, iterative improvements, and scaling out
+    B) Long development cycles, and slowly scaling up
+    C) A single environment, and scaling out
+    D) Decoupled services, and scaling up
+
+Answer summary: 1-C, 2-A, 3-D, 4-B, 5-A, 6-C, 7-B, 8-D, 9-C, 10-A
+Position balance: A×3, B×2, C×3, D×2

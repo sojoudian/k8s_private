@@ -1,0 +1,226 @@
+CLO835 Fall 2026 - Easy quiz - Amazon EKS and the jobs that EKS does for you
+20 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 5, 'B': 5, 'C': 5, 'D': 5}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [clo835-e09-001 responsibility] A team moves its web application from a kubeadm cluster to Amazon EKS. Which job does the team still do on EKS?
+     A. Install the security patches of the scheduler
+     B. Set up the load balancer in front of the API server
+     C. Replace a failed control plane machine
+   * D. Set the replica count of each Deployment
+     ANSWER D
+     WHY: On EKS, AWS runs the control plane: the API server, the scheduler and etcd. The team still owns its workloads, and the replica count is a setting of a workload.
+     IF C: AWS repairs and replaces the machines of the control plane.
+     IF A: AWS applies the security patches of the control plane.
+     IF B: AWS sets up the load balancer of the API server when it creates the cluster.
+
+  2. [clo835-e09-002 cost] An EKS cluster runs for one full day at the standard price. It has no worker nodes and no Pods. What does AWS bill for its control plane?
+     A. 0.00 USD
+     B. 0.10 USD
+   * C. 2.40 USD
+     D. 24.00 USD
+     ANSWER C
+     WHY: AWS bills 0.10 USD for each hour of each EKS control plane, also when no node runs. One day has 24 hours, and 24 x 0.10 USD = 2.40 USD.
+     IF A: The control plane costs money also when no node runs.
+     IF B: 0.10 USD is the price of one hour, not of one day.
+     IF D: This value uses 1.00 USD for each hour in place of 0.10 USD.
+
+  3. [clo835-e09-003 worker options] A team wants to manage no servers for its Pods, and it wants to pay for each Pod. Which EKS worker option fits?
+   * A. AWS Fargate
+     B. EC2 Auto Scaling
+     C. Managed nodes
+     D. Self-managed nodes
+     ANSWER A
+     WHY: With Fargate, AWS runs each Pod on capacity that AWS manages. The team manages no node, and AWS bills the CPU and the memory of each Pod.
+     IF B: An Auto Scaling group adds EC2 servers, and AWS bills each server.
+     IF C: A managed node group puts EC2 nodes in the account, and AWS bills each node.
+     IF D: Self-managed nodes give the team the most server work.
+
+  4. [clo835-e09-004 networking] A worker node of an EKS cluster has the address 192.168.20.34 in the subnet 192.168.20.0/24. The cluster uses the Amazon VPC CNI. Which address can a new Pod of a Deployment on that node get?
+     A. 10.244.1.7
+     B. 172.17.0.2
+     C. 192.168.20.34
+   * D. 192.168.20.57
+     ANSWER D
+     WHY: The VPC CNI gives each Pod its own address from the VPC subnet of the node. There is no overlay network, so a Pod address looks like a node address.
+     IF A: 10.244.x.x is the Flannel overlay range of a kubeadm cluster.
+     IF B: 172.17.x.x is the default bridge range of Docker.
+     IF C: The node keeps its own address. Each Pod of a Deployment gets a different address.
+
+  5. [clo835-e09-005 endpoint] The API endpoint of an EKS cluster is private only. From where can kubectl reach the cluster API?
+     A. From the master node, after an SSH login
+     B. From your laptop at home, with an IAM admin user
+   * C. From a machine inside the VPC of the cluster
+     D. From any EC2 machine in the same AWS Region
+     ANSWER C
+     WHY: A private endpoint answers only inside the VPC of the cluster, or in a network that connects to that VPC. A public endpoint answers from the internet.
+     IF D: A Region holds many VPCs. A machine in a different VPC has no route to the endpoint.
+     IF B: IAM rights give no network route. A private endpoint has no address on the internet.
+     IF A: EKS gives no SSH access to the control plane.
+
+  6. [clo835-e09-006 storage] Pods in three Availability Zones of an EKS cluster must read and write the same files at the same time. Which storage fits?
+     A. An emptyDir volume in each Pod
+     B. Amazon EBS, through the EBS CSI driver
+     C. A hostPath volume on one worker node
+   * D. Amazon EFS, through the EFS CSI driver
+     ANSWER D
+     WHY: An EFS file system gives shared files (ReadWriteMany) to Pods in many Availability Zones.
+     IF B: An EBS volume stays in one Availability Zone, and one node mounts it (ReadWriteOnce).
+     IF A: Each emptyDir volume belongs to one Pod, so the Pods share nothing.
+     IF C: A hostPath volume exists on one node only, and the other nodes cannot see it.
+
+  7. [clo835-e09-007 storage] A team runs its cluster on Amazon EKS, and it needs the EBS CSI driver. Which way to install the driver does AWS recommend?
+   * A. As an Amazon EKS add-on of the cluster
+     B. With a user data script on each Amazon EKS node
+     C. As a DaemonSet manifest that you write by hand
+     D. As a Docker container that you start on each node
+     ANSWER A
+     WHY: AWS recommends the EKS add-on for each CSI driver. AWS tests each add-on version for EKS, and you start each update from the console, the AWS CLI or eksctl.
+     IF D: The driver runs as Pods that Kubernetes manages; a container by hand on each node is no install method.
+     IF B: A user data script runs one time at boot; AWS recommends the add-on, which you manage for the whole cluster.
+     IF C: A manifest by hand can work, but AWS recommends the add-on: AWS tests each version for EKS.
+
+  8. [clo835-e09-008 permissions] A user runs kubectl get pods on an EKS cluster. The answer is Forbidden. Which part denies the request?
+     A. AWS IAM
+   * B. Kubernetes RBAC
+     C. The kubelet of the node
+     D. The VPC security group
+     ANSWER B
+     WHY: IAM answers the question: who are you? Kubernetes authorization (RBAC) answers the question: what can you do in the cluster? Forbidden comes from the authorization step inside the cluster.
+     IF A: IAM proves who the user is. A failed IAM check gives Unauthorized, not Forbidden.
+     IF C: The kubelet runs Pods; it does not decide on a kubectl get pods request.
+     IF D: A security group stops network traffic; it sends no Forbidden answer.
+
+  9. [clo835-e09-009 certificates] kubeadm builds a cluster today with the default settings. Nobody upgrades the cluster, and nobody renews anything. When does the certificate of the API server expire?
+     A. After 90 days
+   * B. After one year
+     C. After five years
+     D. After ten years
+     ANSWER B
+     WHY: kubeadm gives each certificate of the cluster one year. Only the CA certificates get 10 years. On a kubeadm cluster the renewal is your job; on EKS, AWS manages the certificates.
+     IF A: 90 days is a common life of a web certificate, not of a kubeadm certificate.
+     IF C: kubeadm uses no five-year period.
+     IF D: Ten years is the life of the CA certificates only.
+
+ 10. [clo835-e09-010 provisioning] You describe an EKS cluster and its node group in the file cluster.yaml. Which command builds the cluster and its node group from that file?
+   * A. eksctl create cluster -f cluster.yaml
+     B. eksctl create nodegroup -f cluster.yaml
+     C. kubeadm init --config cluster.yaml
+     D. kubectl apply -f cluster.yaml
+     ANSWER A
+     WHY: eksctl is the official CLI for EKS. eksctl create cluster reads the file and creates the cluster and the node group through AWS CloudFormation stacks.
+     IF B: create nodegroup adds a node group to a cluster that exists already.
+     IF C: kubeadm builds a cluster on machines that you own; it cannot create EKS.
+     IF D: kubectl apply sends objects to a cluster that exists already.
+
+ 11. [clo835-e09-011 control plane] On a kubeadm master, which component starts the control plane Pods from the files in /etc/kubernetes/manifests?
+     A. containerd
+     B. kubeadm
+     C. The controller manager
+   * D. The kubelet
+     ANSWER D
+     WHY: The kubelet reads each file of that folder and runs it as a static Pod. No Deployment owns these Pods; the node owns them.
+     IF A: containerd runs the containers that the kubelet asks for; it reads no Pod file.
+     IF B: kubeadm runs one time to build the cluster; it is no service that runs all the time.
+     IF C: The controller manager is itself one of the static Pods.
+
+ 12. [clo835-e09-012 scheduling] The scheduler of a cluster is down. You create a new Pod with kubectl run. What does kubectl get pod -o wide show for it?
+   * A. STATUS Pending, with no node
+     B. STATUS Error, with no node
+     C. STATUS Running on masternode
+     D. STATUS ContainerCreating on workernode1
+     ANSWER A
+     WHY: The scheduler picks a node for each new Pod. With no scheduler, the API server stores the Pod, but no component binds it to a node, so it waits in Pending.
+     IF C: No other component puts the Pod on the master; that is the job of the scheduler.
+     IF D: ContainerCreating comes only after the Pod has a node.
+     IF B: The API server accepts the Pod; nothing fails, the Pod only waits.
+
+ 13. [clo835-e09-013 cluster state] You create a Namespace with the name billing. Where does the cluster store this object?
+     A. In a kube-system ConfigMap
+   * B. In etcd, as a key
+     C. In the kubeconfig file
+     D. In the API server memory only
+     ANSWER B
+     WHY: etcd is the database of the cluster. Every object is a key there, for example /registry/namespaces/billing.
+     IF A: A ConfigMap is itself an object, and etcd stores it too.
+     IF C: The kubeconfig file holds the connection data of kubectl, not cluster objects.
+     IF D: The API server writes each object to etcd; it keeps no object only in memory.
+
+ 14. [clo835-e09-014 availability] A kubeadm cluster has one master, from kubeadm init, and two workers, from kubeadm join. The master machine stops. What happens to the cluster API?
+     A. A worker takes over as the master, and the API keeps working
+   * B. It stops until the master runs again; Pods on the workers keep running
+     C. It answers read requests, but it refuses every change
+     D. It keeps working, because each worker runs an API server too
+     ANSWER B
+     WHY: One master gives no high availability. The API server and etcd stop with the master, so kubectl gets no answer. The Pods that run on the workers continue to run.
+     IF A: kubeadm makes no worker into a master by itself.
+     IF D: A worker runs the kubelet and kube-proxy, but no API server.
+     IF C: With the master gone, no API server runs, so no request gets an answer.
+
+ 15. [clo835-e09-015 identity] On a kubeadm master, kubectl auth whoami prints the user kubernetes-admin. What proves this identity to the API server?
+   * A. A client certificate in the kubeconfig file
+     B. The TLS certificate of the API server
+     C. The SSH key that you used to log in
+     D. A ServiceAccount token in kube-system
+     ANSWER A
+     WHY: kubeadm writes a client certificate into the admin kubeconfig file. The API server checks that certificate against the CA of the cluster.
+     IF D: A ServiceAccount token identifies a process in a Pod; whoami then shows a ServiceAccount.
+     IF B: The certificate of the API server proves the identity of the server, not of the user.
+     IF C: The SSH key opens the machine, not the Kubernetes API.
+
+ 16. [clo835-e09-016 maintenance] A kubeadm cluster has one master and two workers. A Deployment runs 4 Pods: 2 on workernode1 and 2 on workernode2. workernode1 has room for 2 more Pods. You run kubectl drain workernode2 --ignore-daemonsets, and the drain completes. Where do the 2 Pods from workernode2 run then?
+     A. Nowhere; the Deployment keeps only 2 Pods
+     B. On the master node, as 2 new Pods
+     C. Nowhere until workernode2 takes Pods again
+   * D. On workernode1, as 2 new Pods
+     ANSWER D
+     WHY: A drain marks the node unschedulable and evicts its Pods. The Deployment makes 2 new Pods to keep 4, and the scheduler puts them on the free worker.
+     IF A: The Deployment keeps its replica count; it makes new Pods.
+     IF B: kubeadm puts a taint on the master, so application Pods do not go there.
+     IF C: workernode1 has room, so the new Pods start there and wait for nothing.
+
+ 17. [clo835-e09-017 maintenance] Two Pods run on workernode2. You run kubectl cordon workernode2. What happens?
+     A. The two Pods move to other nodes at once
+     B. The two Pods stop, and the node shows NotReady
+   * C. The two Pods keep running, and new Pods go to other nodes
+     D. The two Pods keep running, and new Pods still go there
+     ANSWER C
+     WHY: A cordon marks the node SchedulingDisabled. The scheduler sends no new Pod there, and the Pods on the node keep running. A drain is the command that moves them.
+     IF A: A cordon moves nothing; a drain evicts the Pods.
+     IF B: The node stays Ready; only the scheduling stops.
+     IF D: A cordon exists to stop new Pods on that node.
+
+ 18. [clo835-e09-018 clean up] You delete every Deployment and Pod of a kubeadm cluster with kubectl. The three EC2 machines that Terraform made still run. Which command stops the AWS charge for the machines?
+     A. kubeadm reset --force
+     B. kubectl delete nodes --all
+   * C. terraform destroy
+     D. terraform plan -destroy
+     ANSWER C
+     WHY: Terraform made the machines, so terraform destroy removes them. AWS stops the charge when the instances are gone.
+     IF A: kubeadm reset removes the cluster setup, but the EC2 machine still runs.
+     IF B: A delete of the Node objects changes Kubernetes only; the machines still run.
+     IF D: plan -destroy only shows what a destroy would remove; it removes nothing.
+
+ 19. [clo835-e09-019 upgrades] You run sudo kubeadm upgrade plan on the master of a kubeadm cluster. What does the command change?
+     A. It renews every certificate of the cluster
+   * B. It only reads the cluster and reports the versions
+     C. It upgrades the control plane to the newest version
+     D. It downloads the new control plane images and starts none
+     ANSWER B
+     WHY: upgrade plan checks the cluster and prints the versions that are available. It only reads. kubeadm upgrade apply makes the change.
+     IF D: upgrade plan pulls no image; upgrade apply does that work.
+     IF C: kubeadm upgrade apply upgrades the control plane.
+     IF A: upgrade plan renews nothing; kubeadm upgrade apply and kubeadm certs renew renew the certificates.
+
+ 20. [clo835-e09-020 nodes] A new EC2 machine must become the third worker of a kubeadm cluster. Which command on the master gives the exact line to run on the new machine?
+     A. kubeadm config print join-defaults
+     B. kubeadm join phase preflight
+   * C. kubeadm token create --print-join-command
+     D. kubeadm token list
+     ANSWER C
+     WHY: This command makes a new bootstrap token and prints the full kubeadm join line, with the token and the hash of the CA certificate.
+     IF A: This command prints a default join configuration with no real token and no real hash.
+     IF B: This command runs the checks of a join on the new machine; it prints no join line.
+     IF D: This command lists the tokens, but it gives no CA hash and no join line.

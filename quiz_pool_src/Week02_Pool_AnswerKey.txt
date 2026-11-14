@@ -1,0 +1,303 @@
+CLO835 Fall 2026 - Week 02 - Docker Image Management - question pool (100 questions)
+Every question stands on its own. No question needs a slide.
+======================================================================
+
+  1. [base and parent] A Dockerfile opens with FROM scratch. What kind of image is being built?
+     ANSWER A: A base image, which starts from nothing at all
+
+  2. [base and parent] What is a parent image?
+     ANSWER C: An image another Dockerfile names in its FROM line
+
+  3. [base and parent] Which image name is reserved for an empty starting point?
+     ANSWER B: scratch
+
+  4. [base and parent] A Dockerfile reads FROM httpd and then copies one HTML file. What does the new image add?
+     ANSWER D: One layer holding that file, on top of httpd
+
+  5. [base and parent] Why do teams build on a published parent rather than from scratch?
+     ANSWER C: The parent already carries the runtime and system libraries
+
+  6. [base and parent] An image is built with FROM scratch and one COPY line. What does it contain?
+     ANSWER D: Only what the Dockerfile puts into it
+
+  7. [layers] A Dockerfile has one FROM, three RUN lines, one COPY and one CMD. How many filesystem layers does the build add?
+     ANSWER A: Four
+
+  8. [layers] A build is repeated with no change to the Dockerfile and no change to the files. What does the builder do?
+     ANSWER C: It reuses the cached layers and runs nothing
+
+  9. [layers] Why does the order of instructions matter in a Dockerfile?
+     ANSWER D: A changed instruction invalidates the cache for every later one
+
+ 10. [layers] A Dockerfile installs packages, then copies source code. A developer edits the source. What is rebuilt?
+     ANSWER A: Only the copy step and anything after it
+
+ 11. [dockerfile] Which instruction sets the directory that later instructions run in?
+     ANSWER B: WORKDIR
+
+ 12. [dockerfile] Which instruction sets a variable that both the build and the container can read?
+     ANSWER A: ENV
+
+ 13. [expose] What does the EXPOSE instruction actually do?
+     ANSWER D: It records which ports the image is meant to serve on
+
+ 14. [expose] An image declares EXPOSE 8080 and is started with no port flag. Can a browser on another machine reach it?
+     ANSWER B: No, because nothing has been published to the host
+
+ 15. [expose] What is the state of a container port that has not been published?
+     ANSWER A: Private to the container networks it is attached to
+
+ 16. [expose] How do you declare a port together with its protocol?
+     ANSWER D: EXPOSE 53/udp
+
+ 17. [expose] Can one EXPOSE line declare more than one port?
+     ANSWER D: Yes, the port numbers are separated by spaces
+
+ 18. [expose] Who really decides which host port a service becomes available on?
+     ANSWER B: The person who starts the container
+
+ 19. [expose] What is the main value of EXPOSE for a team?
+     ANSWER A: It documents the intent of the image for whoever runs it
+
+ 20. [expose] Which statement about EXPOSE and -p together is correct?
+     ANSWER C: A port can be published with -p even with no EXPOSE line
+
+ 21. [expose] Two containers sit on one user-defined network. One serves on port 80, and nothing is published. Can the second one connect?
+     ANSWER A: Yes, because they share a network and can reach each other
+
+ 22. [expose] A developer wants a port reachable from outside the host. Which action is required?
+     ANSWER B: Publish it when the container starts
+
+ 23. [publishing] Which option publishes container port 80 on host port 8080?
+     ANSWER A: -p 8080:80
+
+ 24. [publishing] A container is started with capital -P and no port numbers. What happens?
+     ANSWER D: Each port declared with EXPOSE is published on a host port chosen for you
+
+ 25. [publishing] In docker run -p 8080:80, which number is the host port?
+     ANSWER D: 8080
+
+ 26. [publishing] In docker run -p 8080:80, which number is the container port?
+     ANSWER C: 80
+
+ 27. [publishing] A web server listens on port 80 inside a container, and the team wants it on host port 3000. Which option is right?
+     ANSWER B: -p 3000:80
+
+ 28. [publishing] What does publishing a port create on the host?
+     ANSWER C: A forwarding rule from a host socket to the container
+
+ 29. [publishing] Two containers both need host port 8080. What happens?
+     ANSWER B: The second one fails, because the host port is taken
+
+ 30. [publishing] What does a published port let through?
+     ANSWER C: Traffic from outside the host to the container
+
+ 31. [publishing] Port forwarding is sometimes called by another name. Which one?
+     ANSWER A: Port mapping
+
+ 32. [publishing] How is port forwarding defined in general networking terms?
+     ANSWER B: Data sent to one socket is redirected to another socket
+
+ 33. [publishing] Which two mechanisms commonly implement port forwarding?
+     ANSWER A: Rewriting the destination address, or using a proxy process
+
+ 34. [publishing] A team publishes port 5432 of a database container to 0.0.0.0 on the host. What is the risk?
+     ANSWER A: Anything that can reach the host can now reach the database
+
+ 35. [cmd] What does CMD set for an image?
+     ANSWER C: A default command, used when none is given at start
+
+ 36. [cmd] A Dockerfile holds three CMD lines. What runs when a container starts?
+     ANSWER D: Only the last one; the earlier ones are useless
+
+ 37. [cmd] Where in a Dockerfile may CMD be written?
+     ANSWER A: Anywhere after the FROM line
+
+ 38. [cmd] An image sets CMD, and a user types a command after the image name at start. What happens?
+     ANSWER D: The typed command replaces the one set by CMD
+
+ 39. [cmd] Does CMD create a filesystem layer?
+     ANSWER C: No, because it only records metadata
+
+ 40. [cmd] Which form of CMD avoids starting a shell inside the container?
+     ANSWER D: The JSON array form
+
+ 41. [cmd] A Dockerfile ends with CMD sleep 20, and the container is started with no extra words. What runs?
+     ANSWER C: sleep 20
+
+ 42. [cmd] A container is started from an image whose default command is a shell, and no terminal is attached. What happens?
+     ANSWER C: The shell starts, finds no input, and the container exits
+
+ 43. [cmd] A team wants an image a user can easily override at start. Which instruction fits?
+     ANSWER B: CMD
+
+ 44. [cmd] An image carries no CMD and no ENTRYPOINT. What decides what runs at start?
+     ANSWER B: The command typed by the person who starts it
+
+ 45. [entrypoint] What does ENTRYPOINT set for an image?
+     ANSWER A: A fixed command that the container always starts with
+
+ 46. [entrypoint] An image sets ENTRYPOINT, and a user types extra words at start. What happens to them?
+     ANSWER B: They are appended as arguments to the ENTRYPOINT
+
+ 47. [entrypoint] A Dockerfile holds two ENTRYPOINT lines. Which one applies?
+     ANSWER B: The last one, because it replaces the earlier value
+
+ 48. [entrypoint] Which instruction turns an image into a wrapper around one tool?
+     ANSWER A: ENTRYPOINT
+
+ 49. [entrypoint] An image has ENTRYPOINT and CMD together. What role does CMD then play?
+     ANSWER A: It supplies the default arguments for the ENTRYPOINT
+
+ 50. [entrypoint] An image has ENTRYPOINT ["sleep"] and a user runs it with 30. What does the container run?
+     ANSWER D: sleep 30
+
+ 51. [entrypoint] An image sets ENTRYPOINT and is started with no extra words. What runs?
+     ANSWER A: The ENTRYPOINT on its own
+
+ 52. [entrypoint] Which process does an Ubuntu image start when the user sets nothing?
+     ANSWER C: bash
+
+ 53. [entrypoint] A user types a word after an image name. What decides whether the word is added or replaces the default?
+     ANSWER A: Whether the image set ENTRYPOINT or CMD
+
+ 54. [environment] A container must receive a different database address in each environment. What is the simplest mechanism?
+     ANSWER B: An environment variable set at start
+
+ 55. [cmd vs entrypoint] An image sets both ENTRYPOINT and CMD, and the user types nothing. What runs?
+     ANSWER B: The ENTRYPOINT, with the CMD words as its arguments
+
+ 56. [environment] An image sets a value with ENV. Can the person who starts the container change it?
+     ANSWER D: Yes, by passing another value at start
+
+ 57. [cmd vs entrypoint] Which pairing gives a fixed tool with changeable arguments?
+     ANSWER B: ENTRYPOINT for the tool, CMD for the arguments
+
+ 58. [cmd vs entrypoint] An image must behave like the command ping, so users type only an address. How is it built?
+     ANSWER B: ENTRYPOINT names ping, and the address is appended
+
+ 59. [cmd vs entrypoint] Which statement about CMD and ENTRYPOINT is correct?
+     ANSWER D: Both store metadata, and neither adds a filesystem layer
+
+ 60. [cmd vs entrypoint] A user must be able to open a shell in an image for debugging. Which design helps most?
+     ANSWER C: Set CMD, so the shell can replace it at start
+
+ 61. [cmd vs entrypoint] An image sets ENTRYPOINT ["python"] and CMD ["app.py"]. The user adds other.py at start. What runs?
+     ANSWER D: python other.py
+
+ 62. [cmd vs entrypoint] An image sets only CMD ["python", "app.py"]. The user adds bash at start. What runs?
+     ANSWER B: bash
+
+ 63. [environment] Which flag passes an environment variable into a container at start?
+     ANSWER C: -e
+
+ 64. [environment] Which flag gives a container a name you choose?
+     ANSWER B: --name
+
+ 65. [environment] Which flag starts a container in the background?
+     ANSWER A: -d
+
+ 66. [environment] Official database images are usually configured without editing any file. How?
+     ANSWER C: Through environment variables read at start
+
+ 67. [environment] A MySQL container needs a root password at first start. How is it normally supplied?
+     ANSWER A: As an environment variable passed at run time
+
+ 68. [environment] What is the difference between ENV and -e?
+     ANSWER D: ENV bakes a default into the image; -e sets it at start
+
+ 69. [environment] Why is passing a password with -e considered weak?
+     ANSWER B: The value shows up in the process list and in inspect output
+
+ 70. [environment] In a reference such as mysql:8, what does the part after the colon give?
+     ANSWER C: The tag, which selects the version
+
+ 71. [registries] A pull is started and some layers are already on the host. What is downloaded?
+     ANSWER D: Only the layers that are missing
+
+ 72. [registries] Which statement about registries is correct?
+     ANSWER B: A registry may be public or private
+
+ 73. [registries] Which command uploads a local image to a registry?
+     ANSWER D: docker push
+
+ 74. [registries] Which command downloads an image from a registry?
+     ANSWER B: docker pull
+
+ 75. [registries] What does docker push send to the registry?
+     ANSWER D: The image layers and its metadata
+
+ 76. [image names] What does tagging an existing image do?
+     ANSWER A: It adds another name that points at the same image
+
+ 77. [image names] One image is pushed under two different tags. What does the registry keep?
+     ANSWER A: One set of layers, under two names
+
+ 78. [image names] Which part of registry.example.net:5000/team/app:v2 is the tag?
+     ANSWER D: v2
+
+ 79. [image names] Which command gives an image that already exists a second name?
+     ANSWER A: docker tag
+
+ 80. [image names] A reference names no registry at all. Which registry does the client use?
+     ANSWER C: Docker Hub
+
+ 81. [image names] Which part of registry.example.net:5000/team/app:v2 names the repository?
+     ANSWER B: team/app
+
+ 82. [image names] Two tags point at the same image ID. How much disk does the second tag use?
+     ANSWER D: Almost none, because only a name is added
+
+ 83. [registries] What has to be true before docker push will send an image to a private registry?
+     ANSWER A: The image name must carry that registry address
+
+ 84. [registries] Where does a pulled image live on the machine that pulled it?
+     ANSWER B: In the local image store of the engine
+
+ 85. [network drivers] Which network driver does a container use when none is named?
+     ANSWER C: bridge
+
+ 86. [network drivers] Which driver gives a container no network interface except loopback?
+     ANSWER B: none
+
+ 87. [network drivers] Which driver puts the container directly on the network stack of the host?
+     ANSWER B: host
+
+ 88. [network drivers] Which command creates a new user-defined network?
+     ANSWER D: docker network create
+
+ 89. [network drivers] Which flag attaches a container to a chosen network at start?
+     ANSWER C: --network
+
+ 90. [default bridge] What interface does a container get on the default bridge network?
+     ANSWER C: A virtual ethernet interface, plus its own loopback
+
+ 91. [default bridge] What connects the interface of a container to the Docker bridge?
+     ANSWER D: A veth pair
+
+ 92. [default bridge] What is the usual name of the Docker bridge on a Linux host?
+     ANSWER C: docker0
+
+ 93. [default bridge] Which subnet does the default bridge normally use?
+     ANSWER A: 172.17.0.0/16
+
+ 94. [default bridge] Each container on the bridge gets an address. Where does that address come from?
+     ANSWER D: The private subnet of the network it joined
+
+ 95. [port forwarding] A container is started with --publish 8080:80. Where does traffic enter?
+     ANSWER C: At port 8080 on the host
+
+ 96. [port forwarding] A container is started with --publish 8080:80. Where does traffic arrive?
+     ANSWER B: At port 80 inside the container
+
+ 97. [port forwarding] What does the engine set up on a Linux host when a port is published?
+     ANSWER C: Packet forwarding rules in the kernel
+
+ 98. [registries] What must a developer do before another team can pull their image?
+     ANSWER A: Push it to a registry both teams reach
+
+ 99. [port forwarding] Which statement about the host driver and port publishing is correct?
+     ANSWER B: A container on the host driver needs no publish rule
+
+100. [port forwarding] A container publishes port 80 to host port 8080. Which address does a client on another machine use?
+     ANSWER A: The address of the host, on port 8080

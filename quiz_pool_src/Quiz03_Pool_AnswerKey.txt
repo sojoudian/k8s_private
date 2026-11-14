@@ -1,0 +1,305 @@
+CLO835 Fall 2026 - Quiz 3 pool - Pods, Labels, Namespaces, ReplicaSets, Deployments, Rollouts, Services, Ingress, Volumes
+100 questions. Blackboard draws 20 of them at random, 5 points each.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 25, 'B': 25, 'C': 25, 'D': 25}
+======================================================================
+
+  1. [pods] Which object does Kubernetes place on a node?
+     ANSWER D: A Pod
+
+  2. [pods] Two containers run together in one Pod. What do both of them use?
+     ANSWER A: One network address
+
+  3. [pods] Two containers sit in one Pod and must talk over TCP. Which address does one of them use for the other?
+     ANSWER B: The loopback address 127.0.0.1
+
+  4. [pods] A Pod holds three containers. Where do these containers run?
+     ANSWER A: All three run on one node
+
+  5. [pods] An application in a Pod needs to serve much more traffic. What is the normal answer in Kubernetes?
+     ANSWER B: Run more replicas of that Pod
+
+  6. [pods] A node fails. Can the Pods of that node move to a healthy node?
+     ANSWER A: No, a Pod never moves, and a fresh Pod takes its place
+
+  7. [pods] Every container in a Pod stops with an exit code of zero. Which phase does the Pod reach?
+     ANSWER A: Succeeded
+
+  8. [pods] A container in a Pod stops with an error and does not start again. Which phase does the Pod reach?
+     ANSWER C: Failed
+
+  9. [pods] Which statement about a restart is true in Kubernetes?
+     ANSWER C: A Pod cannot restart, but a container inside it can
+
+ 10. [pods] An application writes a log file. A second program must read that file and send it away. Which design fits Kubernetes?
+     ANSWER C: Put the second program in a sidecar container beside the application
+
+ 11. [pods] A task must finish before the application starts. Which kind of container does that task?
+     ANSWER A: An init container
+
+ 12. [pods] A web tier, an application tier and a database tier must scale apart from each other. How do you split them?
+     ANSWER A: Three Pods, one for each tier
+
+ 13. [pods] Which question tells you that two programs belong in one Pod?
+     ANSWER C: Must they always scale together?
+
+ 14. [pods] Containers in one Pod share a lot. What does each of them still keep for itself?
+     ANSWER A: Its own file system
+
+ 15. [pods] Which Linux namespaces do the containers of one Pod share?
+     ANSWER D: The network, IPC and UTS namespaces
+
+ 16. [pods] How many containers can one Pod hold?
+     ANSWER C: One or more
+
+ 17. [manifest] A manifest declares a Pod. Which value does the kind field hold?
+     ANSWER D: Pod
+
+ 18. [manifest] Which API version belongs in a Pod manifest?
+     ANSWER A: v1
+
+ 19. [manifest] A container entry of a Pod manifest holds a name field and an image field. What does the name field hold?
+     ANSWER D: The name of that container inside the Pod
+
+ 20. [manifest] Which section of a manifest holds the name and the labels of an object?
+     ANSWER D: metadata
+
+ 21. [manifest] Which section of a Pod manifest lists the containers and their ports?
+     ANSWER C: spec
+
+ 22. [manifest] You forget which fields a Pod accepts. Which command prints that information?
+     ANSWER C: kubectl explain pod
+
+ 23. [manifest] A Pod listens on port 8080 and has no Service. Which command opens port 8888 on your own machine and sends it to that Pod?
+     ANSWER D: kubectl port-forward
+
+ 24. [manifest] A Pod named web holds two containers, nginx and agent. Which command prints the log of the first container only?
+     ANSWER D: kubectl logs web -c nginx
+
+ 25. [labels] What is a label in Kubernetes?
+     ANSWER A: A key and a value that you attach to an object
+
+ 26. [labels] In which section of a manifest do you write a label?
+     ANSWER B: In the metadata section
+
+ 27. [labels] Which command lists only the Pods that carry tier=frontend?
+     ANSWER D: kubectl get pods --selector tier=frontend
+
+ 28. [labels] How many labels can one object carry?
+     ANSWER B: As many as you need
+
+ 29. [labels] What does a namespace give to the objects inside it?
+     ANSWER C: A scope for their names
+
+ 30. [labels] Which object does a namespace never hold?
+     ANSWER C: A node
+
+ 31. [labels] Two namespaces each need a Service named cart. Is that allowed?
+     ANSWER D: Yes, because the name must be unique only inside one namespace
+
+ 32. [labels] A Service named cart lives in the namespace dev. Which full name does the cluster name server answer for it?
+     ANSWER C: cart.dev.svc.cluster.local
+
+ 33. [labels] A Pod in the namespace dev asks for the short name cart. Which object does it reach?
+     ANSWER C: The Service cart of the namespace dev
+
+ 34. [labels] A stable version and a trial version of one application must run side by side. How do you tell their Pods apart?
+     ANSWER C: Give them the same key with two different values
+
+ 35. [replicaset] What does a ReplicaSet hold steady?
+     ANSWER D: The number of running Pods that match its selector
+
+ 36. [replicaset] A ReplicaSet asks for three replicas, and four matching Pods are running. What does the controller do?
+     ANSWER B: It deletes one Pod
+
+ 37. [replicaset] The selector of a ReplicaSet holds matchLabels with tier: frontend. Which Pods does the object count?
+     ANSWER B: Every Pod that carries that label
+
+ 38. [replicaset] Beside the replica count, which two parts does a ReplicaSet always need?
+     ANSWER A: A selector and a Pod template
+
+ 39. [replicaset] A node goes offline and takes two Pods of a ReplicaSet with it. What comes next?
+     ANSWER D: The controller starts two Pods on the other nodes
+
+ 40. [replicaset] How do you take a ReplicaSet from three Pods to five Pods?
+     ANSWER A: Change the replica count in its manifest and apply it
+
+ 41. [replicaset] The selector of a ReplicaSet does not match the labels of its own Pod template. What is the result?
+     ANSWER B: The API server refuses the manifest
+
+ 42. [replicaset] Why does a ReplicaSet raise the availability of an application?
+     ANSWER B: It starts a new Pod when one Pod is lost
+
+ 43. [replicaset] Which part of Kubernetes creates and deletes the Pods of a ReplicaSet?
+     ANSWER B: A controller in the control plane
+
+ 44. [replicaset] You must move an application to a new image version. Why is a ReplicaSet alone the wrong tool?
+     ANSWER B: It keeps identical Pods and has no update procedure
+
+ 45. [replicaset] Three Pods belong to one ReplicaSet. What do all three hold in common?
+     ANSWER D: The same image, the same command and the same labels
+
+ 46. [deployment] Which object stands above a ReplicaSet?
+     ANSWER D: A Deployment
+
+ 47. [deployment] A Deployment must run five Pods. Which object does it create to do that?
+     ANSWER A: A ReplicaSet
+
+ 48. [deployment] You change the image in a Deployment and apply the file. What does the Deployment create?
+     ANSWER C: A ReplicaSet for the new version
+
+ 49. [deployment] A rolling update is running. What happens to the ReplicaSet of the old version?
+     ANSWER A: It scales down while the new one scales up
+
+ 50. [deployment] Which update strategy does a Deployment use when the manifest names none?
+     ANSWER B: RollingUpdate
+
+ 51. [deployment] Which update strategy stops all old Pods before it starts the new ones?
+     ANSWER B: Recreate
+
+ 52. [deployment] A rolling update replaces every Pod of a web application. What does a user of that application see?
+     ANSWER C: The application answers through the whole update
+
+ 53. [deployment] Which command tells you whether an update has finished?
+     ANSWER C: kubectl rollout status
+
+ 54. [deployment] Which command lists the revisions of a Deployment?
+     ANSWER D: kubectl rollout history
+
+ 55. [deployment] A new version is bad. Which command brings back the version from before?
+     ANSWER B: kubectl rollout undo
+
+ 56. [deployment] What does a Deployment write down each time it rolls out a change?
+     ANSWER B: A revision
+
+ 57. [deployment] Why does a Deployment keep a history of its changes?
+     ANSWER B: So that you can go back to an older version
+
+ 58. [deployment] Which command changes the image of a running Deployment without an edit of the file?
+     ANSWER A: kubectl set image
+
+ 59. [deployment] You scale a Deployment from two replicas to six. Which object actually changes the Pod count?
+     ANSWER B: Its ReplicaSet
+
+ 60. [deployment] Which ability does a Deployment add that a ReplicaSet does not have?
+     ANSWER C: It moves an application to a new version and back again
+
+ 61. [deployment] A Deployment named web runs Pods whose names carry an extra random part. Which object owns those Pods?
+     ANSWER B: The ReplicaSet of the current revision
+
+ 62. [deployment] You delete one Pod of a Deployment by hand. What happens?
+     ANSWER A: A new Pod appears to hold the count
+
+ 63. [service] Why is the address of a single Pod a poor address for a client?
+     ANSWER B: A Pod is short lived, and the address changes with it
+
+ 64. [service] What does a Service give to a group of Pods?
+     ANSWER A: One steady address and name
+
+ 65. [service] How does a Service know which Pods belong to it?
+     ANSWER D: It matches labels with a selector
+
+ 66. [service] A Service manifest names no type. Which type does the object get?
+     ANSWER B: ClusterIP
+
+ 67. [service] A database must accept calls from the application Pods and from nowhere else. Which Service type fits?
+     ANSWER A: ClusterIP
+
+ 68. [service] Which Service type opens the same high port on every node of the cluster?
+     ANSWER A: NodePort
+
+ 69. [service] Which port numbers does Kubernetes use by default when it opens a port on each node?
+     ANSWER D: 30000 to 32767
+
+ 70. [service] Which Service type asks the cloud platform for an address outside the cluster?
+     ANSWER B: LoadBalancer
+
+ 71. [service] Which Service type points at a name outside the cluster and proxies nothing?
+     ANSWER D: ExternalName
+
+ 72. [service] You create a Service that opens a port on every node. Which address does the cluster also give it?
+     ANSWER C: An internal address that only Pods and nodes can reach
+
+ 73. [service] A Pod can learn the address of a Service without a name server. Which way does Kubernetes also offer?
+     ANSWER D: Environment variables inside the container
+
+ 74. [service] A Service manifest holds port 80 and targetPort 8080. What does targetPort 8080 mean?
+     ANSWER D: The number that the program inside the container listens on
+
+ 75. [service] A container declares a port and gives it the name http. What can the Service write in targetPort?
+     ANSWER B: The name http
+
+ 76. [service] Which part of Kubernetes writes the packet rules on each node for a Service?
+     ANSWER A: kube-proxy
+
+ 77. [service] A client on node A calls a Service address. Every matching Pod runs on node B. What happens?
+     ANSWER A: The rules on node A send the call to node B
+
+ 78. [service] A Pod must find the address that belongs to a Service name. Which way does it use?
+     ANSWER A: It asks the name server of the cluster
+
+ 79. [service] Which resource sends HTTP traffic to different Services by host name and by path?
+     ANSWER A: An Ingress
+
+ 80. [service] An Ingress reads the host header and the path of a request. At which layer does it work?
+     ANSWER C: The application layer
+
+ 81. [service] You write an Ingress manifest and apply it, but nothing answers. What is missing?
+     ANSWER A: A controller for that resource in the cluster
+
+ 82. [service] A rule in an Ingress manifest names a backend. Which object does that backend name?
+     ANSWER C: A Service
+
+ 83. [service] Which command creates a Service for a Deployment in one line?
+     ANSWER C: kubectl expose
+
+ 84. [service] A cluster runs on plain machines with no cloud platform. A user outside must reach a web application. Which Service type works?
+     ANSWER B: NodePort
+
+ 85. [volume] Where do you declare a volume for a Pod?
+     ANSWER C: In the Pod specification
+
+ 86. [volume] Two containers of one Pod must read and write the same files. What do you add?
+     ANSWER B: One volume, mounted in both of them
+
+ 87. [volume] How long does an empty directory volume stay in the cluster?
+     ANSWER C: As long as its Pod
+
+ 88. [volume] A container of a Pod stops and starts again. What happens to the files in the volume of that Pod?
+     ANSWER D: They are still there
+
+ 89. [volume] A Pod with an empty directory volume is deleted. What happens to that volume?
+     ANSWER A: It goes away with the Pod
+
+ 90. [volume] Which volume type puts a directory of the worker node into the Pod?
+     ANSWER D: hostPath
+
+ 91. [volume] Which volume type gives the Pod a new directory with nothing in it?
+     ANSWER C: emptyDir
+
+ 92. [volume] Which volume type mounts a share from a file server over the network?
+     ANSWER A: nfs
+
+ 93. [volume] Which volume type brings settings from a Kubernetes object into a container?
+     ANSWER B: configMap
+
+ 94. [volume] Which volume type lets a Pod use storage that a claim has asked for?
+     ANSWER C: persistentVolumeClaim
+
+ 95. [volume] Does the command kubectl get volumes work?
+     ANSWER C: No, because a volume is not an API object of its own
+
+ 96. [volume] Which piece of storage is an API object that you can list with kubectl?
+     ANSWER B: A PersistentVolume
+
+ 97. [volume] A Pod needs a disk that lives longer than the Pod. How does the Pod reach that disk?
+     ANSWER D: Through a claim that the Pod names
+
+ 98. [volume] What does a StorageClass do?
+     ANSWER D: It creates the storage when a claim asks for it
+
+ 99. [volume] A web server container must serve files from a Git repository. Which design works in a current cluster?
+     ANSWER D: An init container copies the files into an empty volume that both containers mount
+
+100. [volume] Where does the mount path of a volume appear in a Pod manifest?
+     ANSWER D: In the container entry that uses the volume

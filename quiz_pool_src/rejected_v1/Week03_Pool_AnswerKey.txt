@@ -1,0 +1,302 @@
+CLO835 Fall 2026 - Week 03 - Docker Networking, Storage and Security - question pool (100 questions)
+==================================================================
+
+  1. [slide  3] What does the Docker networking topic cover this week?
+     ANSWER B: How containers talk to each other and to the outside world
+
+  2. [slide  3] Which three items does the networking topic list?
+     ANSWER D: Drivers, DNS-based service discovery, and the CNM versus CNI models
+
+  3. [slide  3] What does the persistent storage topic start from?
+     ANSWER B: Why containers lose data on delete by default
+
+  4. [slide  3] Which three ways to keep data alive does the storage topic list?
+     ANSWER C: Volumes, bind mounts and tmpfs
+
+  5. [slide  4] How does the deck describe a Docker network in one line?
+     ANSWER D: A virtual switch for containers
+
+  6. [slide  4] Which two everyday things does the deck compare a Docker network to?
+     ANSWER D: A VLAN or a Wi-Fi SSID
+
+  7. [slide  4] Which three things does each Docker network have of its own?
+     ANSWER D: A subnet, a DNS zone and a scope
+
+  8. [slide  4] What are the two possible scopes of a Docker network?
+     ANSWER C: Local to one host, or global across many
+
+  9. [slide  4] What happens to a container that names no network at start?
+     ANSWER D: It joins a default network, usually the bridge network
+
+ 10. [slide  4] How many networks can one container be on?
+     ANSWER B: Zero, one, or many
+
+ 11. [slide  4] Which command attaches a running container to another network?
+     ANSWER B: docker network connect
+
+ 12. [slide  4] On which networks can containers find each other by name?
+     ANSWER A: User-defined networks
+
+ 13. [slide  4] What does per-network DNS remove the need for?
+     ANSWER B: Hard-coded IP addresses
+
+ 14. [slide  5] What does the bridge driver do?
+     ANSWER D: It is the default, and it gives an isolated virtual switch on one host
+
+ 15. [slide  5] When should you use the bridge driver?
+     ANSWER B: For most local development
+
+ 16. [slide  5] What does the host driver do?
+     ANSWER A: It shares the host network stack, with no isolation
+
+ 17. [slide  5] When should you use the host driver?
+     ANSWER C: When you need the fastest path
+
+ 18. [slide  5] What does the overlay driver do?
+     ANSWER B: It builds a virtual network spanning Swarm or cluster nodes
+
+ 19. [slide  5] When should you use the overlay driver?
+     ANSWER B: When containers run across machines
+
+ 20. [slide  5] What does the macvlan driver do?
+     ANSWER D: It gives each container a MAC address on the physical network
+
+ 21. [slide  5] When should you use the macvlan driver?
+     ANSWER D: When containers need real LAN IP addresses
+
+ 22. [slide  5] What does the none driver do?
+     ANSWER A: It gives no interfaces at all, except loopback
+
+ 23. [slide  5] When should you use the none driver?
+     ANSWER B: For maximum isolation and for batch jobs
+
+ 24. [slide  5] Which driver in the table has a multi-host scope?
+     ANSWER C: overlay
+
+ 25. [slide  5] What is the rule of thumb on the drivers slide?
+     ANSWER C: Use bridge for local development, overlay for multi-host, and host only with a measured reason
+
+ 26. [slide  6] What does docker network ls do?
+     ANSWER A: It lists the networks on this host
+
+ 27. [slide  6] What does docker network create do?
+     ANSWER B: It makes a new user-defined network
+
+ 28. [slide  6] What does docker network inspect show?
+     ANSWER B: The driver, the subnet and the attached containers
+
+ 29. [slide  6] What does docker network connect do?
+     ANSWER B: It attaches an existing container to a network
+
+ 30. [slide  6] What does docker network disconnect do?
+     ANSWER D: It detaches a container from a network
+
+ 31. [slide  6] What does docker network rm do?
+     ANSWER C: It removes an unused network
+
+ 32. [slide  6] How much of the daily network work do these verbs cover, according to the deck?
+     ANSWER C: 99%
+
+ 33. [slide  6] In the sample output of docker network ls, which driver does the network named bridge use?
+     ANSWER D: bridge
+
+ 34. [slide  6] In the sample output, which driver does the network named none use?
+     ANSWER C: null
+
+ 35. [slide  7] What do user-defined networks have built in?
+     ANSWER C: DNS
+
+ 36. [slide  7] Two containers share one user-defined network. How can they reach each other?
+     ANSWER A: By container name
+
+ 37. [slide  7] Which three things does built-in DNS make unnecessary?
+     ANSWER B: Hard-coded IP addresses, /etc/hosts entries and an orchestrator
+
+ 38. [slide  7] Which network does NOT give name-based DNS?
+     ANSWER D: The default bridge network
+
+ 39. [slide  7] Where does name-based DNS work?
+     ANSWER B: Only on networks you create yourself
+
+ 40. [slide  7] What does the gotcha box tell you to do before linking applications?
+     ANSWER C: Always create a user-defined network first
+
+ 41. [slide  7] In the example, which image does the container named redis run?
+     ANSWER B: redis:7
+
+ 42. [slide  8] What does CNM stand for, and what is it based on?
+     ANSWER A: Container Network Model, and it is driver-based
+
+ 43. [slide  8] What does CNI stand for, and what is it based on?
+     ANSWER C: Container Network Interface, and it is plugin-based
+
+ 44. [slide  8] What topology does the Docker CNM model use?
+     ANSWER C: Many isolated networks per host
+
+ 45. [slide  8] What topology does the Kubernetes CNI model use?
+     ANSWER A: A single flat cluster network, where every pod is reachable
+
+ 46. [slide  8] How is service discovery scoped in the Docker CNM model?
+     ANSWER C: Built-in DNS, scoped per network
+
+ 47. [slide  8] How is service discovery scoped in the Kubernetes CNI model?
+     ANSWER C: Cluster DNS, scoped per namespace
+
+ 48. [slide  8] What is the isolation default in the Docker CNM model?
+     ANSWER A: Isolation is on by default, and bridging needs explicit work
+
+ 49. [slide  8] What is the isolation default in the Kubernetes CNI model?
+     ANSWER C: Isolation is off by default, and needs NetworkPolicy resources
+
+ 50. [slide  8] Which library provides the Docker CNM drivers?
+     ANSWER C: libnetwork
+
+ 51. [slide  9] How does the deck describe an image?
+     ANSWER D: A stack of read-only layers
+
+ 52. [slide  9] Which four instructions append a layer?
+     ANSWER B: FROM, RUN, COPY and ADD
+
+ 53. [slide  9] What does the container add on top of the image layers?
+     ANSWER A: A thin writable layer
+
+ 54. [slide  9] In copy-on-write, where does a READ come from?
+     ANSWER D: From the lowest layer that has the file
+
+ 55. [slide  9] In copy-on-write, what does the FIRST write to a file do?
+     ANSWER C: It copies the file up into the read-write layer
+
+ 56. [slide  9] In copy-on-write, what does removing the container do?
+     ANSWER C: It removes the read-write layer
+
+ 57. [slide  9] Which base image is layer 1 in the slide example?
+     ANSWER B: python:3.12-slim
+
+ 58. [slide  9] Which instruction forms layer 2 in the slide example?
+     ANSWER C: WORKDIR /app
+
+ 59. [slide  9] Which instruction forms layer 3, the dependencies layer, in the example?
+     ANSWER A: RUN pip install -r requirements.txt
+
+ 60. [slide 10] In the scenario, where does MySQL write the new row?
+     ANSWER C: /var/lib/mysql
+
+ 61. [slide 10] Where does /var/lib/mysql live when no storage is mounted?
+     ANSWER C: In the read-write layer of the container
+
+ 62. [slide 10] What is the result of the scenario, after docker rm and a restart?
+     ANSWER D: The user is gone
+
+ 63. [slide 10] What is the fix for the ephemeral storage problem?
+     ANSWER A: Mount storage from outside the container
+
+ 64. [slide 10] How does the deck describe volumes?
+     ANSWER D: Managed by Docker, and best for most cases
+
+ 65. [slide 10] How does the deck describe bind mounts?
+     ANSWER D: They map a host path directly, and they are good for development
+
+ 66. [slide 11] Where does a Docker volume live on the host?
+     ANSWER A: In the Docker-managed area under /var/lib/docker/volumes
+
+ 67. [slide 11] Where does a bind mount live?
+     ANSWER C: At any host path you choose
+
+ 68. [slide 11] Where does a tmpfs mount live?
+     ANSWER B: In host RAM only
+
+ 69. [slide 11] Which command creates a volume?
+     ANSWER C: docker volume create
+
+ 70. [slide 11] Which form creates a bind mount in the table?
+     ANSWER A: docker run -v /host:/ctr
+
+ 71. [slide 11] Which flag creates a tmpfs mount?
+     ANSWER A: --tmpfs /ctr/path
+
+ 72. [slide 11] Which of the three survives container deletion, according to the table?
+     ANSWER D: Volumes and bind mounts survive, tmpfs does not
+
+ 73. [slide 11] Which of the three survives a host reboot, according to the table?
+     ANSWER C: Volumes and bind mounts survive, tmpfs does not
+
+ 74. [slide 11] Which option is portable across hosts, and why?
+     ANSWER C: Volumes, through volume drivers
+
+ 75. [slide 11] Why is a bind mount NOT portable across hosts?
+     ANSWER C: It is tied to a host path
+
+ 76. [slide 11] Which option is best for production data such as databases and application state?
+     ANSWER A: Volumes
+
+ 77. [slide 12] How does the deck label the -v form?
+     ANSWER A: Legacy
+
+ 78. [slide 12] How does the deck label the --mount form?
+     ANSWER A: Modern
+
+ 79. [slide 12] How does the table describe the verbosity of -v?
+     ANSWER B: Short and quick to type
+
+ 80. [slide 12] How does the table describe the verbosity of --mount?
+     ANSWER A: An explicit key and value form
+
+ 81. [slide 12] Which mount types does --mount support?
+     ANSWER D: bind, volume and tmpfs
+
+ 82. [slide 12] Which mount types does -v support?
+     ANSWER D: bind and volume
+
+ 83. [slide 12] What does -v do when the host path does not exist?
+     ANSWER B: It creates the path silently
+
+ 84. [slide 12] What does --mount do when the host path does not exist?
+     ANSWER B: It fails fast with a clear error
+
+ 85. [slide 12] What is -v recommended for?
+     ANSWER A: Quick demos
+
+ 86. [slide 13] Which principle does the four pillars slide rest on?
+     ANSWER D: Defence in depth, where skipping a layer makes the others work harder
+
+ 87. [slide 13] What is the risk under the IMAGE pillar?
+     ANSWER B: A vulnerable base, a malicious package, or an untrusted publisher
+
+ 88. [slide 13] What should you do under the IMAGE pillar?
+     ANSWER D: Use slim official bases, scan with Trivy or docker scan, pin by digest, and sign with Cosign
+
+ 89. [slide 13] What is the risk under the RUNTIME pillar?
+     ANSWER B: The container runs as root and escapes to the host
+
+ 90. [slide 13] What should you do under the RUNTIME pillar?
+     ANSWER D: Set USER to a non-root account, use --read-only, --cap-drop=ALL and --security-opt=no-new-privileges
+
+ 91. [slide 13] What is the risk under the SECRETS pillar?
+     ANSWER B: Passwords or API keys baked into images, or leaked through environment variables
+
+ 92. [slide 13] What should you do under the SECRETS pillar?
+     ANSWER D: Never COPY a .env file, use BuildKit --secret, and inject at run time from a secret manager
+
+ 93. [slide 13] What is the risk under the NETWORK pillar?
+     ANSWER D: Containers reachable from anywhere, and an exposed daemon socket
+
+ 94. [slide 13] What should you do under the NETWORK pillar?
+     ANSWER A: Use user-defined networks, publish only what is needed, put TLS on dockerd, and never share /var/run/docker.sock
+
+ 95. [slide 13] Which socket must you never share with a container?
+     ANSWER D: /var/run/docker.sock
+
+ 96. [slide 13] Which practice makes an image reference point at one exact build?
+     ANSWER B: Pinning by digest
+
+ 97. [slide 14] What is the first key takeaway?
+     ANSWER C: Networking is a virtual switch, and user-defined networks unlock DNS-based service discovery
+
+ 98. [slide 14] What is the second key takeaway?
+     ANSWER B: Storage outlives containers only outside them
+
+ 99. [slide 14] Which mount form does the takeaway slide prefer for new code?
+     ANSWER A: --mount
+
+100. [slide 14] Why are containers not virtual machines, according to the takeaways?
+     ANSWER A: They share the host kernel

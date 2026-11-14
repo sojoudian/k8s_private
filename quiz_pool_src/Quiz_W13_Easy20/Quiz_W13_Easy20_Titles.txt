@@ -1,0 +1,20 @@
+clo835-e13-001 api server phases
+clo835-e13-002 users
+clo835-e13-003 request without credentials
+clo835-e13-004 authorization order
+clo835-e13-005 rolebinding scope
+clo835-e13-006 view role
+clo835-e13-007 two bindings
+clo835-e13-008 system masters
+clo835-e13-009 certificate subject
+clo835-e13-010 eks identities
+clo835-e13-011 csr condition
+clo835-e13-012 certificate lifetime
+clo835-e13-013 certificate request
+clo835-e13-014 serviceaccount user
+clo835-e13-015 role verbs
+clo835-e13-016 resource names
+clo835-e13-017 api paths
+clo835-e13-018 cacert flag
+clo835-e13-019 service call
+clo835-e13-020 persistentvolume access

@@ -1,0 +1,226 @@
+CLO835 Fall 2026 - Easy quiz - Docker Networking, Storage, Security and Kubernetes Introduction
+20 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 5, 'B': 5, 'C': 5, 'D': 5}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [networks] Two containers run on the default bridge network. One container calls the other by its container name. What is the result?
+     A. The name resolves to the address of the host
+   * B. The name does not resolve
+     C. The name resolves after a restart of the Docker daemon
+     D. The name resolves to the private address of the other container
+     ANSWER B
+     WHY: The default bridge network has no name service. A network that you create yourself gives each container a DNS name.
+     IF A: A container name never points at the host.
+     IF C: A restart does not add a name service to the default bridge.
+     IF D: Name resolution works on a user-defined network only.
+
+  2. [networks] You create the network app-net. Which option puts a new container on that network at start?
+     A. --hostname app-net
+     B. --net-alias app-net
+   * C. --network app-net
+     D. --link app-net
+     ANSWER C
+     WHY: The --network option names the network for the new container.
+     IF A: The --hostname option sets the host name inside the container.
+     IF B: The --net-alias option adds a second name inside a network.
+     IF D: The --link option joins two containers; it is also old.
+
+  3. [networks] A container must use the network interfaces of the host directly, with no address translation. Which driver fits?
+   * A. The host driver
+     B. The macvlan driver
+     C. The bridge driver
+     D. The overlay driver
+     ANSWER A
+     WHY: The host driver shares the network stack of the host, so the traffic takes no bridge and no translation.
+     IF B: The macvlan driver gives the container its own address on the physical network, through its own interface.
+     IF C: The bridge driver builds a private switch with translation.
+     IF D: The overlay driver joins containers across more than one host.
+
+  4. [networks] A container listens on port 80 on a network that you created. A browser on another machine must reach it. What do you do?
+     A. Add the container name to the host file of the other machine
+     B. Give the container a second address
+   * C. Publish the port with -p on the host
+     D. Create a second network for the browser
+     ANSWER C
+     WHY: A port stays private until you publish it to the host.
+     IF A: A name helps inside the network only; the port stays closed.
+     IF B: A second address stays inside the host.
+     IF D: A second network adds no path from outside the host.
+
+  5. [storage] You run a database in a container and you mount nothing. You delete the container, then you start a new one from the same image. What happens to the rows?
+     A. The rows stay in the area that Docker manages
+     B. The rows come back, because the image holds them
+   * C. The rows are gone with the write layer of the old container
+     D. The rows come back after a restart of the Docker daemon
+     ANSWER C
+     WHY: A container writes to its own layer. The delete of the container removes that layer and the data in it.
+     IF A: Docker keeps data in its managed area for a volume only.
+     IF B: An image is read-only; it never takes the new rows.
+     IF D: A restart does not bring back a layer that Docker removed.
+
+  6. [storage] A container holds a password file in a tmpfs mount. The host restarts. What happens to the file?
+     A. It stays until you remove the container
+     B. It stays, because Docker copies it to the disk
+     C. It stays in the area that Docker manages for volumes
+   * D. It is gone, because a tmpfs mount lives in memory
+     ANSWER D
+     WHY: A tmpfs mount uses the memory of the host, so it holds the data for the life of the container only.
+     IF A: The data goes away with the memory, before you remove anything.
+     IF B: Docker writes no copy of a tmpfs mount.
+     IF C: A tmpfs mount takes no space in the volume area.
+
+  7. [storage] A bind mount names a host path that is missing. How do the -v option and the --mount option behave?
+     A. Each option stops with an error
+     B. Each option makes the path in silence
+   * C. -v makes the path, and --mount stops with an error
+     D. -v stops with an error, and --mount makes the path
+     ANSWER C
+     WHY: The old -v option makes a missing host path in silence. The --mount option stops at once, so a typing mistake is visible.
+     IF A: The -v option makes no error for a missing path.
+     IF B: The --mount option makes no path for you.
+     IF D: The two options behave the other way round.
+
+  8. [storage] A database container needs data that stays after you delete the container, and Docker must manage the storage area. Which mount fits?
+     A. A tmpfs mount
+     B. No mount, because the image keeps the data
+     C. A bind mount
+   * D. A volume
+     ANSWER D
+     WHY: Docker makes and manages a volume, and the volume stays after the container goes away.
+     IF A: A tmpfs mount holds the data in memory only.
+     IF B: An image is read-only, so it keeps no new data.
+     IF C: A bind mount ties the data to a path of one host.
+
+  9. [security] A colleague asks you to mount the file /var/run/docker.sock into an application container. Why is that dangerous?
+     A. The container runs slower
+     B. The container loses its network interface
+     C. The daemon stops when the container stops
+   * D. The container gets full control of the Docker daemon
+     ANSWER D
+     WHY: The socket is the control channel of the daemon. A process that reaches it can start any container on the host and read any file.
+     IF A: Speed is not the problem here.
+     IF B: The mount adds a file; it changes no network interface.
+     IF C: The daemon does not follow the life of the container.
+
+ 10. [security] Which Dockerfile instruction makes the main process run with the rights of a normal account?
+   * A. USER appuser
+     B. LABEL user=appuser
+     C. RUN chmod -R 777 /app
+     D. ENV USER=appuser
+     ANSWER A
+     WHY: The USER instruction sets the account for the instructions after it and for the process in the container.
+     IF B: A label is metadata for people and tools only.
+     IF C: Open file rights make the container weaker, not stronger.
+     IF D: An environment variable holds a name; it changes no account.
+
+ 11. [orchestration] Containers already run on one machine. Which job does Kubernetes add?
+   * A. It places containers across many machines and replaces the failed ones
+     B. It builds the container images
+     C. It stores the images in a registry
+     D. It writes the Dockerfile for the application
+     ANSWER A
+     WHY: Kubernetes is a cluster manager. It places the work, it watches it, and it brings the cluster back to the state that you declare.
+     IF B: A build tool makes the images.
+     IF C: A registry stores the images.
+     IF D: A developer writes the Dockerfile.
+
+ 12. [orchestration] A worker node fails while it runs several pods of a deployment. What does the cluster do with that work?
+     A. It stops the application until the node returns
+   * B. It starts replacement pods on the nodes that work
+     C. It waits for an administrator to start the pods again
+     D. It moves the failed node to a new address
+     ANSWER B
+     WHY: A controller compares the state that you declare with the state of the cluster, and it fills the missing copies.
+     IF A: The other nodes keep the application alive.
+     IF C: The cluster repairs this case without a person.
+     IF D: A new address does not repair a node that is down.
+
+ 13. [kubectl] Which file gives kubectl the address of the cluster and the credentials for it?
+     A. /var/lib/kubelet/config.yaml
+     B. ~/.docker/config.json
+   * C. ~/.kube/config
+     D. /etc/kubernetes/manifests
+     ANSWER C
+     WHY: The kubeconfig file holds the clusters, the users and the contexts. The KUBECONFIG variable can point at another file.
+     IF A: That file configures the agent on a node.
+     IF B: That file holds the registry logins for Docker.
+     IF D: That folder holds the manifests of the control plane pods.
+
+ 14. [kubectl] Which command sends the manifest file app.yaml to the cluster?
+   * A. kubectl apply -f app.yaml
+     B. kubectl push app.yaml
+     C. kubectl describe app.yaml
+     D. kubectl get -f app.yaml
+     ANSWER A
+     WHY: The apply command posts the file to the API server, and the cluster moves to the state in the file.
+     IF B: The kubectl program has no push command.
+     IF C: The describe command prints the detail of one object.
+     IF D: The get command reads objects; it changes nothing.
+
+ 15. [architecture] Which part of the control plane answers every kubectl command?
+     A. The controller manager
+   * B. The API server
+     C. The scheduler
+     D. The key value store
+     ANSWER B
+     WHY: The API server is the front door of the cluster. Every tool, every controller and every agent talks to it.
+     IF A: The controller manager watches objects; it answers no client.
+     IF C: The scheduler places pods; it answers no client.
+     IF D: The key value store keeps the data behind the API server.
+
+ 16. [architecture] A new pod waits with no node. Which part of the control plane chooses the node for it?
+     A. The kube-proxy
+     B. The kubelet
+     C. The controller manager
+   * D. The scheduler
+     ANSWER D
+     WHY: The scheduler reads the free resources, the rules and the taints, and it binds the pod to one node.
+     IF A: The kube-proxy writes the network rules for the services.
+     IF B: The kubelet runs on a node and starts the work after the choice.
+     IF C: The controller manager keeps the counts, not the placement.
+
+ 17. [k8s networking] Two pods run on different nodes of one cluster. How do they reach each other?
+     A. Through the address of the node and a port map
+     B. Through an address translation rule on each node
+     C. Through a proxy process on the control plane
+   * D. Directly by pod address, with no address translation
+     ANSWER D
+     WHY: The Kubernetes network model asks for one flat address space. A network plugin makes it real.
+     IF A: A port map belongs to a published port, not to pod traffic.
+     IF B: The model forbids translation between pods.
+     IF C: The control plane carries no pod traffic.
+
+ 18. [k8s networking] How does a cluster stop two nodes from giving one address to two different pods?
+     A. It gives each pod the address of its node
+   * B. It gives each node its own subnet
+     C. It keeps one address list in the key value store
+     D. It translates the addresses between the nodes
+     ANSWER B
+     WHY: Each node receives a part of the pod address range, and the network plugin routes between those parts.
+     IF A: A pod needs its own address, not the address of the node.
+     IF C: The nodes hand out addresses themselves, from their own range.
+     IF D: Translation between pods is against the network model.
+
+ 19. [kubeadm] The lab builds a cluster with kubeadm on three EC2 machines. Where does the control plane run?
+   * A. On the master node, as static Pods
+     B. On each of the two workers
+     C. In a Docker container on your laptop
+     D. In a service that AWS manages for you
+     ANSWER A
+     WHY: kubeadm init starts the API server, etcd, the scheduler and the controller manager as static Pods on the master node.
+     IF B: The workers join with kubeadm join and run only the kubelet and your Pods.
+     IF C: kubeadm builds the cluster on real machines, not in a container on a laptop.
+     IF D: A managed service such as EKS runs the control plane for you; kubeadm does not.
+
+ 20. [kubectl] Which command asks for five copies of the deployment web?
+     A. kubectl resize deploy web --count=5
+   * B. kubectl scale deploy web --replicas=5
+     C. kubectl run web --replicas=5
+     D. kubectl edit deploy web --replicas=5
+     ANSWER B
+     WHY: The scale command changes the number of copies in the object, and the controller starts or stops pods until the number agrees.
+     IF A: The kubectl program has no resize command.
+     IF C: The run command makes one new pod.
+     IF D: The edit command opens the object in an editor and takes no count.

@@ -1,0 +1,303 @@
+CLO835 Fall 2026 - Week 01 - Docker Introduction - question pool (100 questions)
+Every question stands on its own. No question needs a slide.
+======================================================================
+
+  1. [containers vs VMs] A container and a virtual machine both isolate an application. What does a container NOT bring of its own?
+     ANSWER A: A guest kernel, because it uses the kernel of the host
+
+  2. [containers vs VMs] Ten containers and ten virtual machines run one small web app each. Why do the containers start faster?
+     ANSWER A: No guest operating system has to boot inside them
+
+  3. [containers vs VMs] A hypervisor and a container engine play the same role for different things. What does a container engine manage?
+     ANSWER B: Containers on one shared kernel
+
+  4. [containers vs VMs] Why is a container image normally much smaller than a virtual machine image?
+     ANSWER D: It carries no kernel and no full operating system install
+
+  5. [containers vs VMs] Which statement about container portability is correct?
+     ANSWER A: A Linux image needs a Linux kernel on whatever host runs it
+
+  6. [kernel features] Which Linux kernel feature limits how much CPU and memory a container may use?
+     ANSWER D: cgroups
+
+  7. [kernel features] Which Linux kernel feature hides the processes of the host from a container?
+     ANSWER D: Namespaces
+
+  8. [kernel features] A container is capped at 512 MB of memory and cannot see host processes. Which features deliver those two effects, in that order?
+     ANSWER B: cgroups, then namespaces
+
+  9. [kernel features] Which group of resources do cgroups control?
+     ANSWER B: CPU, memory, block input and output, and network
+
+ 10. [kernel features] Which view of the system does a namespace isolate?
+     ANSWER D: Process trees, network stack, user IDs and mounted filesystems
+
+ 11. [kernel features] Two containers on one host each show PID 1 for their own main process. Why?
+     ANSWER C: Each one has its own PID namespace
+
+ 12. [kernel features] A process inside a container lists the mounted filesystems and sees only its own. Which feature does that?
+     ANSWER A: Namespace isolation
+
+ 13. [containers vs VMs] Which description of containers is correct?
+     ANSWER C: Light, fast to start, and tied to the kernel family of the host
+
+ 14. [containers vs VMs] Which description of virtual machines is correct?
+     ANSWER C: Heavier than containers, and each one boots its own kernel
+
+ 15. [kernel features] LXC is often named as the ancestor of Docker. What kind of virtualization is it?
+     ANSWER B: Operating system level virtualization
+
+ 16. [kernel features] One container consumes all the memory of the host and starves the others. Which control was missing?
+     ANSWER A: A cgroup memory limit
+
+ 17. [containers vs VMs] A security team says a container is weaker than a virtual machine as an isolation boundary. What is the main reason?
+     ANSWER A: A flaw in the shared kernel can reach every container
+
+ 18. [kernel features] Which pair of kernel features does a container runtime combine to build a container?
+     ANSWER C: cgroups for limits and namespaces for isolation
+
+ 19. [docker architecture] What does installing Docker on a machine actually install?
+     ANSWER B: A background engine and a command line client
+
+ 20. [docker architecture] What kind of program is the Docker Engine?
+     ANSWER B: A daemon that runs in the background
+
+ 21. [docker architecture] How does the docker command reach the Docker Engine?
+     ANSWER C: Through an API offered by the engine
+
+ 22. [docker architecture] Besides the docker command, what else can drive the Docker Engine?
+     ANSWER B: Any program or client library that speaks its API
+
+ 23. [docker architecture] A developer stops the Docker daemon. What happens to the docker command?
+     ANSWER A: It fails, because it has nothing to talk to
+
+ 24. [what is docker] Which description of Docker is correct?
+     ANSWER C: An open source project that automates deploying apps in containers
+
+ 25. [what is docker] A container image bundles everything the software needs to run. Which set is included?
+     ANSWER A: Code, runtime, system tools and system libraries
+
+ 26. [what is docker] What does bundling the whole userland into the image guarantee?
+     ANSWER B: The software behaves the same in every environment
+
+ 27. [docker architecture] Which statement about the Docker daemon is correct?
+     ANSWER D: It creates, starts and stops containers on the host
+
+ 28. [docker architecture] A build server has no graphical desktop. Can it still run Docker?
+     ANSWER B: Yes, because the engine and the client both work in a terminal
+
+ 29. [docker architecture] Two laptops run the same image and get the same result. Which Docker property explains that?
+     ANSWER A: The image carries the full userland the app depends on
+
+ 30. [docker architecture] Which component actually holds and runs the container processes?
+     ANSWER D: The engine on the host
+
+ 31. [why containers] Which pair describes a monolithic application?
+     ANSWER D: One large unit, with its parts tightly coupled
+
+ 32. [why containers] Which pair describes a microservice architecture?
+     ANSWER D: Many small services, deployed and scaled on their own
+
+ 33. [why containers] An older delivery model used long cycles and one environment. What replaced it?
+     ANSWER D: Fast, repeated releases across several environments
+
+ 34. [why containers] A monolith is scaled by moving it to a bigger machine. What is that called?
+     ANSWER B: Scaling up
+
+ 35. [why containers] A service is scaled by running more copies of it behind a load balancer. What is that called?
+     ANSWER C: Scaling out
+
+ 36. [why containers] Which problem does a container image solve for a team with many language stacks?
+     ANSWER B: Each app carries its own dependencies, so they cannot clash
+
+ 37. [why containers] A new developer needs a day to install the stack for a project. How does an image change that?
+     ANSWER B: The environment is already built, so it only has to be pulled
+
+ 38. [why containers] Which phrase describes the problem that a portable artifact removes?
+     ANSWER B: It works on my machine
+
+ 39. [why containers] Before containers, a team passed a tarball and an instruction page to operations. What was the usual result?
+     ANSWER B: Friction and delay, because the environments differed
+
+ 40. [why containers] After containers, what does operations receive at every delivery?
+     ANSWER C: A runnable artifact with its dependencies inside
+
+ 41. [separation of concerns] Under a container operating model, who owns what is inside the container?
+     ANSWER C: The developer, who owns the code and its libraries
+
+ 42. [separation of concerns] Under a container operating model, who owns what is outside the container?
+     ANSWER C: The administrator, who owns logging, monitoring and networking
+
+ 43. [separation of concerns] A platform team runs the hosts and a product team writes the app. Which task belongs to the product team?
+     ANSWER D: Choosing the libraries the application links against
+
+ 44. [separation of concerns] A platform team runs the hosts and a product team writes the app. Which task belongs to the platform team?
+     ANSWER C: Collecting and shipping the logs of every container
+
+ 45. [separation of concerns] Why can an administrator treat many different applications the same way?
+     ANSWER C: Every one of them starts, stops and moves as a container
+
+ 46. [separation of concerns] An administrator owns everything outside the container. What does the developer then stop worrying about?
+     ANSWER D: Which exact Linux server the workload will land on
+
+ 47. [images] What are the two parts of a container image?
+     ANSWER B: A set of files and a block of metadata
+
+ 48. [images] What do the files inside an image become when a container starts?
+     ANSWER C: The root filesystem of the container
+
+ 49. [images] Which of these is stored as image metadata rather than as a file?
+     ANSWER B: The default command to run at start
+
+ 50. [images] An image sets an environment variable for every container started from it. Where does that live?
+     ANSWER B: In the metadata of the image
+
+ 51. [images] How is an image structured on disk?
+     ANSWER D: As layers stacked one on top of another
+
+ 52. [images] What can a single image layer do to the content below it?
+     ANSWER B: Add, change and remove files
+
+ 53. [images] Two images are built from the same base. What does the host store only once?
+     ANSWER C: The layers the two images share
+
+ 54. [images] What does layer sharing save?
+     ANSWER C: Disk space, transfer time and memory
+
+ 55. [images] Which Dockerfile instructions create a new filesystem layer?
+     ANSWER B: RUN, COPY and ADD
+
+ 56. [images] A Dockerfile sets ENV and LABEL between two RUN lines. What do those two instructions change?
+     ANSWER A: Only the metadata of the image
+
+ 57. [images] Why is a container image described as immutable?
+     ANSWER A: Its layers cannot be edited once they are built
+
+ 58. [images] A team needs one extra package in an existing image. What is the correct way to get it?
+     ANSWER C: Build a new image that adds a layer on top
+
+ 59. [images] A developer starts a container, installs a tool, and wants to keep it. What produces a reusable result?
+     ANSWER C: Turning the change into a new layer of a new image
+
+ 60. [images] An image adds a runtime, a server, the dependencies and the app code with separate RUN and COPY lines. What does each line add?
+     ANSWER B: One filesystem layer each
+
+ 61. [images] Where does application configuration usually come from in a container platform?
+     ANSWER C: It is injected at run time by the platform
+
+ 62. [images] Which statement about an image filesystem is correct?
+     ANSWER C: It is read only once the image is built
+
+ 63. [images] A 900 MB image and a 910 MB image share the same base. How much extra disk does the second one need?
+     ANSWER A: Roughly the size of the layers it does not share
+
+ 64. [why containers] Operations used to rebuild an environment from written instructions. What replaces those instructions?
+     ANSWER B: One artifact that already holds the dependencies
+
+ 65. [images] A team moves a tag to point at a newer image. What happens to a container that is already running?
+     ANSWER C: It keeps using the image it was created from
+
+ 66. [images] Why can an image be pulled quickly when a similar image is already on the host?
+     ANSWER B: Only the missing layers have to be downloaded
+
+ 67. [container vs image] What is the difference between an image and a container?
+     ANSWER C: An image is read only; a container adds a writable layer
+
+ 68. [container vs image] Which command starts a container from an image?
+     ANSWER A: docker run
+
+ 69. [container vs image] Why does a container start without copying the whole image?
+     ANSWER A: The engine uses copy-on-write instead of a full copy
+
+ 70. [copy-on-write] A container reads a file that exists in three layers. Which copy does it get?
+     ANSWER C: The one in the highest layer that holds the file
+
+ 71. [copy-on-write] A container writes to a file that came from a read only layer. What happens first?
+     ANSWER B: The file is copied up into the writable layer
+
+ 72. [copy-on-write] A container is removed. What happens to the data it wrote with no volume mounted?
+     ANSWER C: It is removed with the writable layer
+
+ 73. [container vs image] Three containers run from one image. How many copies of the image layers are on disk?
+     ANSWER D: One, because the layers are shared and read only
+
+ 74. [images] Where can a freshly built image be kept?
+     ANSWER C: On the host that built it, or in a registry
+
+ 75. [container vs image] Which statement about a stopped container is correct?
+     ANSWER B: Its writable layer still exists until it is removed
+
+ 76. [container vs image] What exactly is a container, in one line?
+     ANSWER D: A set of isolated processes on a writable copy of an image
+
+ 77. [registries] What is a container registry?
+     ANSWER B: A store that holds images for upload and download
+
+ 78. [registries] Which role does a registry play in the Docker toolchain?
+     ANSWER D: Distribution of images between hosts and teams
+
+ 79. [image names] What does tagging an image do to the name it already has?
+     ANSWER D: Nothing, because a tag is added beside it
+
+ 80. [image names] What does an image tag point at?
+     ANSWER A: A specific image, by its identifier
+
+ 81. [image names] Where does the registry address live in a full image reference?
+     ANSWER C: In the reference itself, before the repository name
+
+ 82. [image names] The short name ubuntu resolves to which full reference?
+     ANSWER D: docker.io/library/ubuntu
+
+ 83. [image names] An image is named registry.example.net:5000/team/app. What is registry.example.net:5000?
+     ANSWER C: The registry host and port
+
+ 84. [image names] Which name shows an image published by a user or an organization on Docker Hub?
+     ANSWER C: maziar/kubia
+
+ 85. [image names] Which image reference is NOT hosted on Docker Hub?
+     ANSWER D: registry.example.com:5000/app
+
+ 86. [registries] A team must keep its images off the public internet. What should it use?
+     ANSWER D: A private registry it controls
+
+ 87. [dockerfile] What is a Dockerfile?
+     ANSWER D: A text file of instructions that assemble an image
+
+ 88. [dockerfile] Which command turns a Dockerfile into an image?
+     ANSWER B: docker build
+
+ 89. [dockerfile] What two inputs does an image build take?
+     ANSWER C: A Dockerfile and a build context
+
+ 90. [dockerfile] In which order are the instructions of a Dockerfile applied?
+     ANSWER A: In the order they are written
+
+ 91. [dockerfile] Which instruction must open a Dockerfile, apart from comments and ARG?
+     ANSWER D: FROM
+
+ 92. [dockerfile] Which instruction may legally appear before FROM in a Dockerfile?
+     ANSWER C: ARG
+
+ 93. [dockerfile] How does a Dockerfile mark a comment?
+     ANSWER C: A line that starts with a hash sign
+
+ 94. [build cache] When does the builder reuse a cached layer?
+     ANSWER B: When the instruction and its inputs have not changed
+
+ 95. [build cache] A developer edits line 2 of a ten line Dockerfile. Which layers must be rebuilt?
+     ANSWER C: Line 2 and everything after it
+
+ 96. [build cache] Why do experienced authors copy the dependency list before the source code?
+     ANSWER A: The dependency layer stays cached while the code changes
+
+ 97. [run instruction] How many ways can the RUN instruction be written?
+     ANSWER B: Two
+
+ 98. [run instruction] What does the shell form of RUN do with the command?
+     ANSWER A: It passes it to a shell with /bin/sh -c
+
+ 99. [run instruction] Which images need the exec form of RUN rather than the shell form?
+     ANSWER D: Images that carry no /bin/sh
+
+100. [run instruction] What does the exec form of RUN avoid?
+     ANSWER B: Shell expansion of the string

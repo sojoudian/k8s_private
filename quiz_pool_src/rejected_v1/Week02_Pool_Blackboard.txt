@@ -1,0 +1,100 @@
+MC	How does the Week 2 deck define a Dockerfile?	A runtime log of a container	incorrect	A text file of build instructions	correct	A binary archive of image layers	incorrect	A manifest stored in the registry	incorrect
+MC	How do images build, according to the deck?	In layers, where each FROM stacks on a parent	correct	In reverse, from the application down to the base	incorrect	In parallel, one layer per CPU core	incorrect	In one single flat archive	incorrect
+MC	What does a BASE image start from?	A running container	incorrect	A parent image	incorrect	An official Ubuntu image	incorrect	scratch	correct
+MC	What does a PARENT image do?	It replaces the base completely	incorrect	It removes packages from a base	incorrect	It copies the application files	incorrect	It extends a base with extra packages	correct
+MC	What does the Custom Webapp image add?	It copies the application files on top	correct	It adds the kernel modules	incorrect	It creates the base layer	incorrect	It installs the operating system	incorrect
+MC	Which instruction opens the Dockerfile of the BASE image in the example?	FROM debian:buster-slim	incorrect	FROM ubuntu:latest	incorrect	FROM scratch	correct	FROM httpd	incorrect
+MC	Which instruction places the root file system into the BASE image in the example?	RUN tar -xJf rootfs.tar.xz	incorrect	COPY rootfs.tar.xz /	incorrect	VOLUME /rootfs	incorrect	ADD rootfs.tar.xz /	correct
+MC	Which base does the httpd PARENT Dockerfile use in the example?	alpine:latest	incorrect	debian:buster-slim	correct	ubuntu:latest	incorrect	scratch	incorrect
+MC	Which value does HTTPD_PREFIX hold in the example?	/var/www/html	incorrect	/opt/apache	incorrect	/usr/local/apache2	correct	/usr/share/httpd	incorrect
+MC	Which instruction sets the working directory in the httpd example?	VOLUME	incorrect	WORKDIR	correct	RUN cd	incorrect	ENV PWD	incorrect
+MC	Which parent does the Custom Webapp Dockerfile build on?	scratch	incorrect	debian:buster-slim	incorrect	httpd	correct	nginx	incorrect
+MC	What does the EXPOSE instruction tell Docker?	Which ports are to be published in this image	correct	Which ports to block on the host firewall	incorrect	Which ports the registry listens on	incorrect	Which ports the host already uses	incorrect
+MC	By default, what is the state of every port?	Blocked by the kernel	incorrect	Public	incorrect	Chosen at random	incorrect	Private	correct
+MC	Is EXPOSE on its own enough to make a port public?	Yes, but only on a user-defined network	incorrect	No, declaring a port with EXPOSE is not enough to make it public	correct	Yes, EXPOSE always makes the port public	incorrect	No, because EXPOSE closes the port	incorrect
+MC	What does the deck say the Dockerfile does NOT control?	Which command starts the container	incorrect	On which port a service gets exposed	correct	Which files are copied in	incorrect	Which base image is used	incorrect
+MC	Which example declares one single port in the deck?	EXPOSE 8080	correct	EXPOSE all	incorrect	EXPOSE 80 443	incorrect	EXPOSE 53/tcp 53/udp	incorrect
+MC	How does the deck show two ports declared in one EXPOSE line?	EXPOSE [80, 443]	incorrect	EXPOSE 80,443	incorrect	EXPOSE 80 443	correct	EXPOSE 80;443	incorrect
+MC	Which example in the deck declares the protocol with the port number?	EXPOSE 53 tcp udp	incorrect	EXPOSE 53/tcp 53/udp	correct	EXPOSE tcp:53 udp:53	incorrect	EXPOSE 53 --proto tcp	incorrect
+MC	EXPOSE 8080 appears in a Dockerfile, and the container is started with no port flag. Is port 8080 reachable from outside the host?	Yes, but only from another container	incorrect	No, because EXPOSE on its own does not make a port public	correct	Yes, because EXPOSE publishes the port	incorrect	No, because EXPOSE blocks the port	incorrect
+MC	What happens when you start a container with docker run -p <port>?	The container refuses to start without EXPOSE	incorrect	Only ports declared with EXPOSE are accepted	incorrect	That port becomes public, even if it was not declared with EXPOSE	correct	That port becomes private	incorrect
+MC	Does -p require the port to be declared with EXPOSE first?	Yes, but only for TCP ports	incorrect	No, because -p ignores the port number	incorrect	Yes, -p fails without a matching EXPOSE	incorrect	No, -p works even if the port was not declared with EXPOSE	correct
+MC	What does docker run -P, with no port number, do?	It makes all ports declared with EXPOSE public	correct	It publishes only the first EXPOSE line	incorrect	It makes every port of the container public	incorrect	It makes all ports private	incorrect
+MC	Who can reach a public port?	Other containers and anything outside the host	correct	Only other containers	incorrect	Only the Docker daemon	incorrect	Only processes on the host	incorrect
+MC	What is true of a private port?	It is reachable only after a restart	incorrect	It is not reachable from outside	correct	It is reachable from outside through NAT	incorrect	It is reachable from the registry	incorrect
+MC	Which flag publishes the EXPOSE ports without naming any port number?	--publish-all-private	incorrect	--expose	incorrect	-P	correct	-p	incorrect
+MC	What does CMD define?	The port the container listens on	incorrect	A command that always runs, whatever the user types	incorrect	The base image of the build	incorrect	A default command to run when none is given	correct
+MC	Where may CMD appear in a Dockerfile?	At any point in the file	correct	Only as the first instruction	incorrect	Only directly after FROM	incorrect	Only as the last instruction	incorrect
+MC	What happens when a Dockerfile holds more than one CMD?	All of them run in order	incorrect	Each CMD replaces and overrides the previous one	correct	The first one wins	incorrect	The build fails with an error	incorrect
+MC	What does the deck conclude about multiple CMD lines?	You cannot write them at all	incorrect	They run in parallel	incorrect	You can write them, but it is useless	correct	They are merged into one command	incorrect
+MC	Which CMD line appears in the example Dockerfile on the slide?	CMD ["sleep"]	incorrect	CMD bash	incorrect	CMD sleep 10	incorrect	CMD sleep 20	correct
+MC	Which instruction comes before CMD in the example Dockerfile on the slide?	COPY . /app	incorrect	ENTRYPOINT ["sleep"]	incorrect	EXPOSE 80	incorrect	RUN apt-get update	correct
+MC	What does ENTRYPOINT define?	A base command, and its parameters, for the container	correct	The user that owns the image	incorrect	The working directory of the build	incorrect	A default command that any argument replaces	incorrect
+MC	What happens to the command line arguments when ENTRYPOINT is set?	They are appended to the ENTRYPOINT parameters	correct	They are passed to the Docker daemon	incorrect	They replace the ENTRYPOINT completely	incorrect	They are ignored	incorrect
+MC	Where may ENTRYPOINT appear, and what happens if it appears twice?	It may appear anywhere, and the later one replaces the previous value	correct	Both values are kept and run in order	incorrect	It must be the first instruction	incorrect	It may appear only once, or the build fails	incorrect
+MC	Which ENTRYPOINT line appears in the example Dockerfile on the slide?	ENTRYPOINT sleep 20 in shell form	incorrect	ENTRYPOINT /bin/sh -c sleep	incorrect	ENTRYPOINT with sleep written in JSON form	correct	ENTRYPOINT bash	incorrect
+MC	Which question does the deck put to the class about ENTRYPOINT?	Why ENTRYPOINT must be the last instruction	incorrect	Why ENTRYPOINT is slower than CMD	incorrect	Why JSON syntax was used for the ENTRYPOINT	correct	Why ENTRYPOINT cannot take parameters	incorrect
+MC	Which base image does the ENTRYPOINT example Dockerfile use?	scratch	incorrect	ubuntu	correct	alpine	incorrect	debian	incorrect
+MC	Which process does an Ubuntu container start by default?	bash	correct	sleep	incorrect	sh	incorrect	init	incorrect
+MC	You give a command at run time, and the Dockerfile uses CMD. What happens?	The original CMD instruction is replaced	correct	The container fails to start	incorrect	The command is appended to the CMD	incorrect	The command is ignored	incorrect
+MC	You give a parameter at run time, and the Dockerfile uses ENTRYPOINT. What happens?	The parameter is ignored	incorrect	The parameter is appended to the ENTRYPOINT instruction	correct	The build is repeated with the new parameter	incorrect	The parameter replaces the ENTRYPOINT	incorrect
+MC	Which instruction should you use when a run-time command must REPLACE the default?	CMD	correct	RUN	incorrect	EXPOSE	incorrect	ENTRYPOINT	incorrect
+MC	Which instruction should you use when a run-time parameter must be ADDED to a fixed command?	RUN	incorrect	CMD	incorrect	ENTRYPOINT	correct	LABEL	incorrect
+MC	Which image does the deck use to show environment variables?	The MySQL image on DockerHub	correct	The Ubuntu image on DockerHub	incorrect	The Redis image on DockerHub	incorrect	The NGINX image on DockerHub	incorrect
+MC	In the example command, what is some-mysql?	The image tag	incorrect	The MySQL root password	incorrect	The name of the MySQL database	incorrect	The name you assign to your container	correct
+MC	In the example command, what is my-secret-pw?	The host directory to mount	incorrect	The name of the image	incorrect	The name of the container	incorrect	The password set for the MySQL root user	correct
+MC	In the example command, what does tag specify?	The network driver	incorrect	The container name	incorrect	The MySQL version you want	correct	The host port	incorrect
+MC	Which environment variable does the example set?	MYSQL_ROOT_PASSWORD	correct	MYSQL_USER_PASSWORD	incorrect	MYSQL_DATABASE	incorrect	MYSQL_HOST	incorrect
+MC	Which flag starts the MySQL container in the background in the example?	-p	incorrect	-d	correct	-e	incorrect	--name	incorrect
+MC	Which flag passes an environment variable to the container?	-e	correct	-p	incorrect	-v	incorrect	-d	incorrect
+MC	What do Docker registries hold?	Networks	incorrect	Volumes	incorrect	Images	correct	Running containers	incorrect
+MC	How does the deck describe a registry?	A build server that compiles images	incorrect	A daemon that runs containers	incorrect	A public or private store used to upload or download images	correct	A local cache that cannot be shared	incorrect
+MC	Whose images does a registry serve?	Only the official images of Docker Inc	incorrect	Only images smaller than one gigabyte	incorrect	Only the images built on that host	incorrect	Images created and shared by you or by other registry users	correct
+MC	Which component of Docker is the registry?	The distribution component	correct	The runtime component	incorrect	The build component	incorrect	The networking component	incorrect
+MC	What does the deck compare Docker image tags to?	DNS records	incorrect	Database primary keys	incorrect	Git tags and branches	correct	File system symbolic links	incorrect
+MC	What does a tag point at?	A specific image ID	correct	A Dockerfile	incorrect	A registry account	incorrect	A running container	incorrect
+MC	What does tagging an image do to the existing name?	Nothing, because tagging adds another tag instead of renaming	correct	It renames the image and removes the old name	incorrect	It deletes the old tag	incorrect	It creates a copy of every layer	incorrect
+MC	Where does the registry address live when you push an image?	In the Dockerfile	incorrect	In the tag	correct	In an environment variable	incorrect	In a separate configuration file	incorrect
+MC	Which example of a tag with a registry address does the deck give?	registry.example.net:5000/image	correct	image@registry.example.net	incorrect	index.docker.io/image:5000	incorrect	5000.registry.example.net/image	incorrect
+MC	The short name ubuntu is in fact which full name?	docker/ubuntu, that is registry.docker.com/docker/ubuntu	incorrect	ubuntu/ubuntu, that is index.docker.io/ubuntu/ubuntu	incorrect	official/ubuntu, that is hub.docker.com/official/ubuntu	incorrect	library/ubuntu, that is index.docker.io/library/ubuntu	correct
+MC	Which command publishes a tagged image to a registry?	docker save	incorrect	docker push	correct	docker commit	incorrect	docker build	incorrect
+MC	Which tag name does the deck use in the publishing example?	v1.0	incorrect	week2-clo835	incorrect	clo835-week2	correct	latest	incorrect
+MC	What is step 1 of the Flask web application exercise?	Create the Dockerfile	incorrect	Build the Docker image	incorrect	Clone the application repository	correct	Push the image to a registry	incorrect
+MC	Which repository does the Flask exercise clone?	github.com/sojoudian/clo835-week2	incorrect	github.com/docker/flask-sample	incorrect	github.com/sojoudian/simple-webapp-flask	correct	github.com/seneca/clo835	incorrect
+MC	What is step 2 of the Flask exercise?	Manually create a script that results in a running application inside vanilla Ubuntu containers	correct	Publish the image to Docker Hub	incorrect	Write the Dockerfile straight away	incorrect	Build the image with docker build	incorrect
+MC	What is step 3 of the Flask exercise?	Convert the script to a Kubernetes manifest	incorrect	Convert the script to a Compose file	incorrect	Convert the script to a Makefile	incorrect	Convert the script to a Dockerfile	correct
+MC	What is step 4 of the Flask exercise?	Push the image to the registry	incorrect	Build the Docker image using the Dockerfile	correct	Test the application locally	incorrect	Clone the repository	incorrect
+MC	What is step 5 of the Flask exercise?	Write the script	incorrect	Build the image	incorrect	Test the application locally	correct	Test the application in production	incorrect
+MC	What is step 6, the last step, of the Flask exercise?	Open a pull request	incorrect	Publish the image, by pushing it to a registry	correct	Write the documentation	incorrect	Delete the local image	incorrect
+MC	Which network driver does Docker use by default?	host	incorrect	overlay	incorrect	bridge	correct	null	incorrect
+MC	Which driver does the deck list beside bridge and host?	ipvlan	incorrect	overlay	incorrect	null	correct	macvlan	incorrect
+MC	Which three drivers ship with Docker, according to the deck?	bridge, ipvlan and null	incorrect	host, overlay and none	incorrect	bridge, overlay and macvlan	incorrect	bridge, null and host	correct
+MC	Which command creates a new network?	docker run --new-net	incorrect	docker network add	incorrect	docker create network	incorrect	docker network create	correct
+MC	Which flag selects the network when a container starts?	--subnet	incorrect	--bridge	incorrect	--net	correct	--driver	incorrect
+MC	What manages each network?	The registry	incorrect	A container	incorrect	A driver	correct	A volume	incorrect
+MC	Which interface does a container get by default on the bridge network?	A virtual eth0 interface	correct	A physical eth0 interface	incorrect	No interface at all	incorrect	A macvlan interface	incorrect
+MC	Which second interface does the container always have?	Its own private lo loopback interface	correct	A bridge interface	incorrect	A tunnel interface	incorrect	A second eth1 interface	incorrect
+MC	What provides the virtual interface of the container?	A veth pair	correct	A macvlan sub-interface	incorrect	A network namespace alias	incorrect	A tap device	incorrect
+MC	What is the default name of the Docker bridge?	docker0	correct	br0	incorrect	bridge0	incorrect	dockerbr	incorrect
+MC	Which option changes the name of the Docker bridge?	--net	incorrect	--subnet	incorrect	--bridge	correct	--bip	incorrect
+MC	Which subnet does Docker use by default on the bridge network?	10.244.0.0/16	incorrect	192.168.0.0/16	incorrect	172.17.0.0/16	correct	172.20.0.0/16	incorrect
+MC	Which option changes the default bridge subnet?	--bridge	incorrect	--bip	correct	--subnet	incorrect	--ip-range	incorrect
+MC	What else can a container own on the default bridge?	Its own kernel modules	incorrect	Its own physical network card	incorrect	Its own host firewall	incorrect	Its own routes and iptables rules	correct
+MC	Where are the container addresses allocated from?	The public address range of the host	incorrect	A private, internal subnet	correct	A range chosen by the registry	incorrect	The DHCP pool of the office LAN	incorrect
+MC	How do you start a container on the host driver?	docker run --net host	correct	docker run --net bridge	incorrect	docker run -p host	incorrect	docker run --network none	incorrect
+MC	What does a container on the host driver see?	The network interfaces of the host	correct	Only the loopback interface	incorrect	Only its own veth interface	incorrect	A copy of the bridge interface	incorrect
+MC	What can a host-driver container bind to?	Only the loopback address	incorrect	Only the ports declared with EXPOSE	incorrect	Any address and any port	correct	Only ports above 1024	incorrect
+MC	Which three steps does host networking avoid?	The registry, the daemon and the CLI	incorrect	DNS, NAT and iptables	incorrect	The kernel, the driver and the socket	incorrect	NAT, the bridge and the veth pair	correct
+MC	What performance does the deck claim for the host driver?	Better than native performance	incorrect	Half of native performance	incorrect	The same as the bridge driver	incorrect	Native performance	correct
+MC	Which use cases does the deck give for the host driver?	Batch jobs that need no network	incorrect	Containers that need a MAC on the physical LAN	incorrect	Performance sensitive applications such as VOIP, gaming and streaming	correct	Multi-host clusters	incorrect
+MC	What other name does the deck give to port forwarding?	Port mapping	correct	Port tunnelling	incorrect	Port binding	incorrect	Port masking	incorrect
+MC	How does the deck define port forwarding?	Data addressed to one socket is redirected to another by an intermediary	correct	Data is encrypted between two hosts	incorrect	Data is queued until the port is free	incorrect	Data is copied from one container to another	incorrect
+MC	Which two examples of an intermediary does the deck give?	A registry or a daemon	incorrect	A network router or a proxy process	correct	A switch or a hub	incorrect	A kernel module or a device driver	incorrect
+MC	Which command does the slide title use to show port mapping?	docker build with the --port flag	incorrect	docker network create with --subnet	incorrect	docker push with a tag	incorrect	docker run with the -p flag and 80:8080	correct
+MC	How many common ways to implement port forwarding does the deck list?	Two	correct	One	incorrect	Four	incorrect	Three	incorrect
+MC	What is the first way to redirect network data?	By encrypting the packets	incorrect	By duplicating the packets	incorrect	By modifying the destination address of the packets	correct	By dropping the packets and asking for a retry	incorrect
+MC	What is the second way to redirect network data?	By moving the server to another host	incorrect	By changing the DNS record of the server	incorrect	By putting a firewall in front of the client	incorrect	By putting a proxy between the client and the server	correct
+MC	Which command does the deck use to show container port forwarding?	docker run --publish 80:8080 nginx	incorrect	docker run --expose 8080 nginx	incorrect	docker network create --publish 8080 nginx	incorrect	docker run --publish 8080:80 nginx	correct
+MC	In that example, which direction does the forwarding take?	From the host 0.0.0.0:80 to the container on port 8080	incorrect	From the container 0.0.0.0:8080 to the host on port 80	incorrect	From the host 0.0.0.0:8080 to the container IP on port 80	correct	From the registry to the container on port 8080	incorrect
+MC	What does the deck conclude about port publishing in Docker Engine?	Port publishing is always slower than kernel forwarding	incorrect	Port publishing needs a proxy process in every case	incorrect	Port publishing works only on user-defined networks	incorrect	There is not much difference between port publishing and kernel space port forwarding	correct
+MC	What kind of port forwarding does --publish create?	A DNS alias	incorrect	A regular port forwarding	correct	An encrypted tunnel	incorrect	A load balanced route	incorrect

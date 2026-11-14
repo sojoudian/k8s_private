@@ -1,0 +1,59 @@
+Q1. Which statement matches the Kubernetes network model?
+    A) Cross-node pod traffic is always NAT'd at the node boundary.
+    B) Only pods sharing a Service can reach each other across nodes.
+    C) Kubernetes mandates Calico as the CNI for production clusters.
+  * D) Pods reach each other without NAT and each pod knows its own IP.
+
+Q2. Which component watches the API and brings pods back up when they fail?
+    A) Scheduler — assigns new pods to nodes by resource fit.
+  * B) Controller Manager — reconciles desired state and replaces lost pods.
+    C) Kubelet — local agent that talks to the container runtime.
+    D) kube-proxy — programs node iptables rules for Services.
+
+Q3. What role does etcd play in a Kubernetes cluster?
+  * A) Distributed key/value store that holds the cluster's full state.
+    B) REST API that kubectl and controllers communicate with.
+    C) Daemon on each node that actually launches container processes.
+    D) Scheduler component that ranks nodes by available resources.
+
+Q4. On the kubeadm cluster of the lab, why does the security group open TCP 30000-32767 on every node?
+    A) To let the two workers join the master with kubeadm join.
+    B) To let kubectl reach the API server from your laptop.
+  * C) To let a browser reach a NodePort Service on any node.
+    D) To let Flannel carry pod traffic between the nodes.
+
+Q5. kubectl v1.35 talks to a cluster running v1.35. Why insist on matching MINOR?
+    A) kubectl refuses to start if MAJOR differs from the API server.
+    B) etcd would silently corrupt entries written by a mismatched kubectl.
+    C) Pods will fail to start until kubectl is patched to cluster minor.
+  * D) The supported skew between kubectl and API server is only one minor.
+
+Q6. Which statement about a Kubernetes Pod is correct?
+  * A) Containers in a pod share an IP, volumes, and one node.
+    B) Each container in a pod is assigned its own pod-network IP.
+    C) A pod can be scheduled across multiple nodes for HA.
+    D) A pod must contain exactly one container — no sidecars.
+
+Q7. kubectl get services shows nginx-http NodePort 80:31873/TCP. What is 31873?
+    A) The port nginx listens on inside the container itself.
+  * B) A port opened on every node that forwards to targetPort 80.
+    C) The ClusterIP port, reachable only from inside the cluster.
+    D) The kubectl proxy port used to access the dashboard UI.
+
+Q8. You run kubectl run nginx ... then kubectl delete pod nginx. What happens?
+    A) Kubernetes recreates the pod automatically — pods are self-healing.
+    B) The Scheduler picks another node and recreates the pod there.
+  * C) It stays deleted — bare kubectl run does not create a controller.
+    D) etcd rolls the pod back from its most recent stored snapshot.
+
+Q9. kubectl set image deployment/nginx-deploy nginx=nginx:1.27 — what happens?
+    A) Only the local image cache is refreshed; running pods are untouched.
+  * B) New pods on 1.27 are created as old pods are gradually removed.
+    C) All five running pods are killed first, then five new pods boot.
+    D) The current local nginx image is pushed to Docker Hub as 1.27.
+
+Q10. Two pods on different nodes both got 10.244.0.2. What does a CNI fix?
+    A) NATs pod IPs at every node boundary to hide the duplicate IPs.
+    B) Restarts whichever pod has the conflicting IP until it changes.
+  * C) Gives each node a distinct pod sub-range and routes between them.
+    D) Replaces the API Server's networking module with a custom one.

@@ -1,0 +1,226 @@
+CLO835 Fall 2026 - Easy quiz - Authentication and RBAC
+20 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 5, 'B': 5, 'C': 5, 'D': 5}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [clo835-e13-001 api server phases] The certificate authority (CA) of the cluster signed a client certificate for the user ana. No binding names ana, and ana has no permission on Pods. No namespace shop exists, and admission control rejects each new object in a missing namespace. ana runs kubectl run web --image=maziar/kubia:v1 -n shop. What does ana get, and why?
+   * A. Forbidden, because authorization denies ana before admission control sees the request
+     B. NotFound, because admission control runs before authorization
+     C. BadRequest, because admission control checks the namespace before authentication
+     D. Forbidden, because admission control checks ana before authorization
+     ANSWER A
+     WHY: The API server checks a request in this order: authentication, then authorization, then admission control. The certificate of ana passes authentication. No authorizer allows the request of ana, so the API server returns 403 Forbidden, and admission control never sees the request.
+     IF B: Admission control runs after authorization, and only for a request that authorization allows. An administrator gets NotFound for this command.
+     IF D: Admission control runs after authorization, and only for a request that authorization allows. Here authorization denies the request first.
+     IF C: Authentication runs first. The check of the namespace is part of admission control, and admission control runs last.
+
+  2. [clo835-e13-002 users] On the master node of a kubeadm cluster, the kubeconfig file holds the users kubernetes-admin and dev-user. The certificate authority (CA) of the cluster signed the certificate of dev-user after kubectl certificate approve dev-user. You run kubectl get users. What does the command show?
+     A. dev-user, because kubectl certificate approve creates a User object
+     B. kubernetes-admin and dev-user, the users of the kubeconfig file
+   * C. An error, because the API server has no type users
+     D. No resources found
+     ANSWER C
+     WHY: Kubernetes stores no users. The API server has no User object and no type users, so kubectl get users fails. It shows the error: the server doesn't have a resource type "users". A user is only a name in a credential, for example the CN of a client certificate.
+     IF B: kubectl config get-users shows the users of the kubeconfig file. kubectl get users asks the API server, and the API server has no type users.
+     IF A: kubectl certificate approve lets the cluster CA sign the certificate. It creates no User object, because Kubernetes has no User object.
+     IF D: kubectl shows No resources found for a known type with no objects. The API server knows no type users.
+
+  3. [clo835-e13-003 request without credentials] A kubeadm cluster runs with the default settings. On the master node, you run curl -k https://localhost:6443/api/v1/namespaces/default/pods with no token and no client certificate. What does the API server return?
+     A. 401 Unauthorized, because the request has no credentials
+   * B. 403 Forbidden for the user system:anonymous
+     C. 403 Forbidden for the user system:unauthenticated
+     D. A PodList of default, because the API server skips authorization with -k
+     ANSWER B
+     WHY: Anonymous authentication is active by default. The API server gives a request with no credentials the user system:anonymous and the group system:unauthenticated. No authorizer allows this user to list Pods, so the API server returns 403 Forbidden.
+     IF A: 401 is the answer for credentials that the API server rejects. A request with no credentials becomes the user system:anonymous, and the API server returns 403, because no authorizer allows the request.
+     IF C: system:unauthenticated is the group of an anonymous request. The message names the user, system:anonymous.
+     IF D: -k only stops curl from verifying the certificate of the API server. The API server still checks the request.
+
+  4. [clo835-e13-004 authorization order] The API server runs with --authorization-mode=Node,RBAC,Webhook. A RoleBinding in the namespace dev binds a Role with get and list on Pods to the user joe. The webhook denies each request of joe. joe runs kubectl get pods -n dev. Which authorizer decides this request?
+     A. Node: the API server lets the first mode of the flag decide
+   * B. RBAC: it gives an allow, so the API server stops the check there
+     C. The webhook: the API server gives a deny priority over an allow
+     D. All three: the API server needs each authorizer to allow it
+     ANSWER B
+     WHY: The API server asks the authorizers in the order of the flag. The first allow or deny decides, and no other authorizer runs. Node has no opinion on a request of joe. RBAC allows it, so the webhook gets no question.
+     IF C: The first allow or deny decides. The webhook is after RBAC in the list, so the API server does not ask it.
+     IF A: The Node authorizer decides only on requests of kubelets. For joe, it has no opinion, and the next authorizer runs.
+     IF D: One allow is enough. The API server stops at the first authorizer that allows or denies the request.
+
+  5. [clo835-e13-005 rolebinding scope] A RoleBinding in the namespace dev binds the default ClusterRole edit to the user ben. ben has no other permission on Pods. The cluster also has the namespaces default, kube-system and prod. In which namespaces can ben list Pods?
+   * A. Only in dev, because the RoleBinding is in the namespace dev
+     B. In dev and in default only
+     C. In every namespace except kube-system
+     D. In every namespace, because the RoleBinding names a ClusterRole for the whole cluster
+     ANSWER A
+     WHY: A RoleBinding gives the rules of a ClusterRole only in the namespace of the RoleBinding. So ben can list Pods in dev, and the API server denies the same request in each other namespace.
+     IF B: The namespace default gets no special permissions. The RoleBinding in dev gives nothing in default.
+     IF D: A ClusterRole is only a set of rules. The binding decides where the rules apply, and a RoleBinding applies them in its own namespace.
+     IF C: kube-system gets no special rule here. The RoleBinding gives nothing outside dev.
+
+  6. [clo835-e13-006 view role] A RoleBinding in the namespace qa binds the default ClusterRole view to the user lee. The user lee has no other permission in qa. The namespace qa has the Deployment web with its Pods, the ConfigMap settings and the Secret db. Which command of lee gets the answer Forbidden?
+     A. kubectl get configmaps -n qa
+     B. kubectl get deployments -n qa
+     C. kubectl get pods -n qa
+   * D. kubectl get secrets -n qa
+     ANSWER D
+     WHY: The ClusterRole view gives read access to most objects of a namespace, but not to Secrets. A Secret can hold the token of a ServiceAccount, so read access to Secrets would give more permissions.
+     IF A: view can read the ConfigMaps of qa. Of these four types, view excludes only Secrets.
+     IF B: view can read the Deployments of qa. Of these four types, view excludes only Secrets.
+     IF C: view can read the Pods of qa. Of these four types, view excludes only Secrets.
+
+  7. [clo835-e13-007 two bindings] In the namespace dev, the RoleBinding admin-binding binds the Role pod-admin to the user sam. pod-admin gives create, update and delete on Pods. The newer RoleBinding reader-binding binds the Role pod-reader to sam, and pod-reader gives get and list on Pods. Which verbs on Pods can sam use in dev, and why?
+     A. No verb, because two Roles with different rules conflict
+     B. Only get and list, because RBAC uses the newer binding and ignores the older binding
+     C. Only create, update and delete, because RBAC uses the older binding and ignores the newer binding
+   * D. All five verbs, because RBAC adds the rules of every binding
+     ANSWER D
+     WHY: RBAC rules only add permissions, and RBAC has no deny rule. The user sam gets the rules of both bindings, so sam can use all five verbs.
+     IF B: A newer RoleBinding replaces no older binding. RBAC adds the rules of both.
+     IF A: Two RBAC rules cannot conflict, because each rule only adds permissions.
+     IF C: An older RoleBinding blocks no newer binding. RBAC adds the rules of both.
+
+  8. [clo835-e13-008 system masters] The user ops-lead is a member of the group system:masters. An administrator deletes the ClusterRoleBinding cluster-admin. Now no binding names ops-lead or system:masters. The node workernode2 exists, and ops-lead runs kubectl delete node workernode2. What is the result, and why?
+   * A. Deleted, because the group system:masters bypasses each check of the authorization modes
+     B. NotFound for workernode2, because ops-lead can see no node without a binding
+     C. Forbidden, because the RBAC check now denies each request of the group system:masters
+     D. Forbidden, because only super-admin.conf gives the power of system:masters
+     ANSWER A
+     WHY: The group system:masters bypasses all authorization checks, also RBAC and Webhook. No binding can limit this access, so the API server deletes the node.
+     IF D: Each credential with the group system:masters bypasses authorization. super-admin.conf is only one example of such a credential.
+     IF B: The request passes authorization, and the node exists, so the API server deletes it.
+     IF C: RBAC does not check system:masters. The group has full access with no binding.
+
+  9. [clo835-e13-009 certificate subject] The certificate authority (CA) of the cluster signs a client certificate with the subject /CN=kim/O=ops/O=audit. No object with the name ops or audit exists in the cluster. Which user name and which groups does the API server get from this certificate?
+     A. The user kim in the group ops, from the first O field
+     B. The user kim in the group audit, from the last O field
+   * C. The user kim in the group ops and in the group audit
+     D. The user kim with no group, because a group must exist as an object
+     ANSWER C
+     WHY: The API server takes the user name from the common name (CN), and one group from each organization (O) field. A group is no object in the API server, so ops and audit need no object.
+     IF A: Each O field gives one group, so the second O field adds the group audit.
+     IF B: Each O field gives one group, so the first O field also adds the group ops.
+     IF D: A group is only a name in the certificate. The API server needs no object for it.
+
+ 10. [clo835-e13-010 eks identities] A team creates a new Amazon EKS cluster. The IAM role ci-deployer must run kubectl commands on this cluster. Which method does AWS recommend for this?
+     A. A mapRoles item for ci-deployer in aws-auth
+     B. A client certificate for ci-deployer that the EKS cluster signs
+   * C. An access entry for ci-deployer
+     D. An RBAC binding that names ci-deployer, with no other change
+     ANSWER C
+     WHY: AWS recommends the access entry. You manage each access entry with the EKS API, the AWS CLI or the AWS console. The aws-auth ConfigMap is deprecated.
+     IF A: AWS marks the aws-auth ConfigMap as deprecated, and it recommends the access entry in its place.
+     IF B: Amazon EKS authenticates an IAM role through AWS IAM, and an access entry maps it to Kubernetes. A client certificate is no IAM identity.
+     IF D: RBAC decides what a user can do. Without an access entry or an aws-auth item, the API server cannot map the IAM role to a Kubernetes user.
+
+ 11. [clo835-e13-011 csr condition] You create the certificate signing request (CSR) qa-user with the signer kubernetes.io/kube-apiserver-client and the usage client auth. Nobody approves or denies it. Two minutes later, you run kubectl get csr qa-user. What does the CONDITION column show?
+     A. Approved,Issued
+     B. Denied
+     C. Failed
+   * D. Pending
+     ANSWER D
+     WHY: kube-controller-manager never approves a request for the signer kubernetes.io/kube-apiserver-client. The request stays Pending until an administrator approves or denies it. After 24 hours, Kubernetes deletes a Pending request.
+     IF A: Approved,Issued comes only after kubectl certificate approve. No controller approves this signer.
+     IF B: Denied comes only after kubectl certificate deny.
+     IF C: Failed means that the signer could not sign the certificate of an approved request. Nobody approved this request.
+
+ 12. [clo835-e13-012 certificate lifetime] The file dev-user-csr.yaml sets expirationSeconds: 86400 in the certificate signing request (CSR) dev-user. You apply it, and you run kubectl certificate approve dev-user. How long is the signed certificate of dev-user valid?
+   * A. 24 hours
+     B. 1 year
+     C. 86400 hours
+     D. 86400 days
+     ANSWER A
+     WHY: expirationSeconds gives the lifetime in seconds. 86400 seconds are 24 hours, so kubectl get csr shows REQUESTEDDURATION 24h, and the certificate expires one day later.
+     IF B: One year is the default lifetime of the signer, for a CSR with no expirationSeconds.
+     IF C: The value is in seconds, not in hours.
+     IF D: The value is in seconds, not in days.
+
+ 13. [clo835-e13-013 certificate request] You create dev-user.key with openssl genrsa, and dev-user.csr with openssl req and this key. The file dev-user-csr.yaml holds a certificate signing request (CSR) for dev-user, and kubectl apply sends it to the API server. Which data does the request field of this CSR hold?
+     A. Only the subject of dev-user.csr, as base64 text
+   * B. The content of dev-user.csr, as base64 text
+     C. The content of dev-user.key and dev-user.csr, as base64 text
+     D. The content of dev-user.key, as base64 text
+     ANSWER B
+     WHY: The request field holds the file dev-user.csr as base64 text. This file holds the subject and the public key, and openssl req signs it with dev-user.key. No API object holds the private key dev-user.key.
+     IF D: The private key never goes to the API server. The request field holds dev-user.csr, with the public key.
+     IF C: The private key never goes to the API server. The request field holds only dev-user.csr.
+     IF A: The request field holds all of dev-user.csr, and this file also holds the public key and a signature.
+
+ 14. [clo835-e13-014 serviceaccount user] The Pod curl-sa runs in the namespace week13 as the ServiceAccount clo835. No Role and no binding names clo835 yet. The Pod sends a request to list the Services of week13 with curl and the token of clo835. The API server returns 403 Forbidden. Which user does the message name?
+     A. system:serviceaccount:clo835
+     B. system:serviceaccount:clo835:week13
+   * C. system:serviceaccount:week13:clo835
+     D. system:serviceaccounts:week13
+     ANSWER C
+     WHY: The token of a ServiceAccount gives the user name system:serviceaccount:, then the namespace, then the name of the ServiceAccount. The 403 message names system:serviceaccount:week13:clo835.
+     IF A: The user name of a ServiceAccount also has its namespace, week13, before the name clo835.
+     IF B: The namespace comes first, and the name of the ServiceAccount comes last.
+     IF D: system:serviceaccounts:week13 is the group of all ServiceAccounts of week13. The message names the user.
+
+ 15. [clo835-e13-015 role verbs] In the namespace sales, the RoleBinding devuser-developer-binding binds the Role developer to dev-user. The Role gives list, get, create and update on Pods. No other binding gives dev-user a permission on Pods. The Pod web runs in sales, and no Pod api exists. dev-user runs each command with --context=dev-user@kubernetes -n sales. Which command gets the answer Forbidden?
+   * A. kubectl delete pod web
+     B. kubectl get pod web
+     C. kubectl get pods
+     D. kubectl run api --image=maziar/kubia:v1
+     ANSWER A
+     WHY: RBAC allows only the verbs of the rules. The Role developer has no verb delete, so kubectl delete pod web gets Forbidden.
+     IF C: kubectl get pods uses the verb list, and the Role gives list.
+     IF B: kubectl get pod web uses the verb get, and the Role gives get.
+     IF D: kubectl run uses the verb create, and the Role gives create.
+
+ 16. [clo835-e13-016 resource names] No binding in the namespace dev applies to dev-user yet. You create a Role in dev with one rule and the verbs ["create"], and a RoleBinding in dev that binds this Role to dev-user. Which rule lets dev-user run kubectl --context=dev-user@kubernetes create configmap app-config --from-literal=APP_COLOR=blue -n dev?
+     A. apiGroups [""] and resources ["ConfigMap"]
+   * B. apiGroups [""] and resources ["configmaps"]
+     C. apiGroups ["core"] and resources ["ConfigMap"]
+     D. apiGroups ["core"] and resources ["configmaps"]
+     ANSWER B
+     WHY: RBAC matches the name in the API path: configmaps, in lowercase and in the plural. ConfigMaps are in the core group, and RBAC writes the core group as the empty string "".
+     IF A: ConfigMap is the kind. RBAC compares the rule with the name configmaps of the API path, so this rule matches nothing.
+     IF D: RBAC writes the core group as the empty string, not as core. This rule matches no API group.
+     IF C: This rule has two mistakes: ConfigMap is the kind, and RBAC writes the core group as the empty string.
+
+ 17. [clo835-e13-017 api paths] On the master node of a kubeadm cluster with the default settings, you run curl -k with no token and no client certificate. You ask the API server for the paths /api, /apis, /apis/apps and /version. Which path returns its data?
+     A. /api
+     B. /apis
+     C. /apis/apps
+   * D. /version
+     ANSWER D
+     WHY: The default ClusterRole system:public-info-viewer lets every client read /version, also a client with no credentials. The discovery paths /api, /apis and /apis/apps need an authenticated user.
+     IF A: /api shows the versions of the core group. Only an authenticated user can read it.
+     IF B: /apis shows the named API groups. Only an authenticated user can read it.
+     IF C: /apis/apps shows the versions of the group apps. Only an authenticated user can read it.
+
+ 18. [clo835-e13-018 cacert flag] The Pod curl-sa runs as the ServiceAccount clo835. In curl-sa, you send a request to https://kubernetes.default.svc with the header Authorization: Bearer and the token of clo835. The command has no --cacert flag with the file ca.crt, and no -k flag. What is the result?
+     A. The API server rejects the request, because it needs ca.crt to check the Pod
+     B. curl sends the request with no TLS, and the token goes as plain text
+     C. The request works, because the token alone is enough for HTTPS
+   * D. curl rejects the certificate of the API server, and the request gets no answer
+     ANSWER D
+     WHY: ca.crt holds the certificate of the cluster certificate authority (CA). curl uses it to verify the API server. Without it, curl cannot trust the certificate of the API server, so curl stops before it sends the HTTP request.
+     IF C: The token proves who the Pod is. curl must also trust the server, and for this it needs ca.crt.
+     IF A: ca.crt is no credential. curl uses it to verify the API server.
+     IF B: curl never changes HTTPS to plain HTTP. It stops when it cannot trust the server.
+
+ 19. [clo835-e13-019 service call] The Pod curl-sa in the namespace week13 runs as the ServiceAccount clo835. After the Pod starts, you create in week13 the Role service-reader and the RoleBinding service-reader-binding. The Role gives get and list on Services, and the RoleBinding binds it to clo835. The namespace week13 has no Service. The Pod sends GET https://kubernetes.default.svc/api/v1/namespaces/week13/services with curl and the token of clo835. What does the API server return?
+     A. A Status with "code": 403, because curl-sa must restart to get the new permissions
+   * B. A ServiceList with "items": [], because week13 has no Service
+     C. The text "No resources found in week13 namespace."
+     D. A Status with "code": 404, because week13 has no Service
+     ANSWER B
+     WHY: The Role service-reader lets clo835 list Services. The API server returns a ServiceList, and its items list is empty, because week13 has no Service.
+     IF C: No resources found is a message of kubectl. The API server returns JSON.
+     IF D: A list request returns a list, also an empty one. 404 is the answer for one object that does not exist.
+     IF A: RBAC checks each request again. The new RoleBinding works for the next request, with the same token.
+
+ 20. [clo835-e13-020 persistentvolume access] The ClusterRole pv-reader gives get and list on PersistentVolumes. kubectl api-resources shows NAMESPACED false for the kind PersistentVolume. Which binding lets the ServiceAccount clo835 of the namespace week13 list the PersistentVolumes of the cluster?
+     A. A RoleBinding in week13 that binds pv-reader to clo835
+     B. A ClusterRoleBinding that binds a Role with a rule for PersistentVolumes to clo835
+   * C. A ClusterRoleBinding that binds pv-reader to clo835
+     D. A RoleBinding in week13 that binds a Role with a rule for PersistentVolumes to clo835
+     ANSWER C
+     WHY: A PersistentVolume has no namespace. A RoleBinding gives its rules only in its own namespace, so only a ClusterRoleBinding to a ClusterRole gives access to PersistentVolumes.
+     IF A: A RoleBinding gives its rules only in its own namespace, and a PersistentVolume is in no namespace, so kubectl auth can-i shows no.
+     IF B: A ClusterRoleBinding can name only a ClusterRole. The API server rejects a roleRef to a Role.
+     IF D: A Role works in one namespace only, and a PersistentVolume is in no namespace, so this Role gives no access to it.

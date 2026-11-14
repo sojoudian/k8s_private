@@ -1,0 +1,69 @@
+CLO835 Week 8 Quiz — Managed K8s / Amazon EKS (10 questions, EASY)
+Source: Week08/Week08_lecture_style_v3.pptx
+Grading: 10 points per question = 100 total.
+NOTE: the Blackboard upload format has no points field — every question imports at
+its default value. After importing, open the test in Blackboard Ultra and set each
+question to 10 points (or set the test total to 100 with equal weighting).
+
+Q1. In Amazon EKS, who is responsible for running and maintaining the Kubernetes control plane (API server, scheduler, etcd)?
+    A) The student's Cloud9 instance
+  * B) AWS
+    C) The worker nodes in your account
+    D) The cluster administrator, over SSH
+
+Q2. According to the lecture, what does the EKS control plane alone cost?
+    A) It is free; you only pay for the worker nodes
+    B) 0.10 USD per month for the whole cluster
+  * C) 0.10 USD per hour (about 73.00 USD per month)
+    D) 73.00 USD per hour
+
+Q3. SSH access to the EKS master nodes is not available. How do you interact with the EKS control plane?
+  * A) Through kubectl and the Kubernetes API
+    B) Through EC2 Instance Connect on the masters
+    C) Through a remote desktop session to the API server
+    D) By logging in to the etcd hosts directly
+
+Q4. Which of the following is NOT one of the EKS worker node options mentioned in the lecture?
+    A) Managed node groups
+    B) Self-managed EC2 instances
+    C) AWS Fargate
+  * D) On-premises Raspberry Pi nodes
+
+Q5. In EKS, where does etcd (the cluster data store) run?
+    A) On every worker node in your VPC
+  * B) Inside the AWS-managed control plane, replicated across multiple Availability Zones
+    C) On the student's Cloud9 instance
+    D) Inside each application pod
+
+Q6. What does the Amazon VPC CNI plugin give the pods in an EKS cluster?
+  * A) Real IP addresses from the VPC
+    B) IP addresses from a private 10.244.0.0 overlay network
+    C) No IP addresses; pods share the node's ports only
+    D) Public IPv4 addresses assigned from the internet
+
+Q7. In EKS access control, what is the split of duties between AWS IAM and Kubernetes RBAC?
+    A) IAM decides what you can do inside the cluster; RBAC decides who you are in AWS
+    B) Both IAM and RBAC are only used for billing and cost control
+  * C) IAM decides who you are; RBAC decides what you can do in the cluster
+    D) RBAC replaces IAM completely on EKS
+
+Q8. What is the purpose of the command "aws eks update-kubeconfig --name clo835"?
+    A) It upgrades the EKS cluster control plane to a newer Kubernetes version
+    B) It creates a brand new EKS cluster named clo835
+    C) It deletes the local kubeconfig file
+  * D) It configures kubectl to connect to the clo835 cluster
+
+Q9. When eksctl creates an EKS cluster, which AWS service does it use under the hood to provision the resources?
+  * A) AWS CloudFormation
+    B) AWS Elastic Beanstalk
+    C) Amazon S3 static hosting
+    D) Amazon Route 53 hosted zones
+
+Q10. According to the Volume Lifecycle slide, what happens to a volume when its pod is destroyed?
+    A) It is automatically backed up to Amazon S3 before deletion
+    B) It survives forever, independent of the pod
+  * C) It is destroyed or detached together with the pod
+    D) It is moved to a random pod in another namespace
+
+Answer summary: 1-B, 2-C, 3-A, 4-D, 5-B, 6-A, 7-C, 8-D, 9-A, 10-C
+Position balance: A×3, B×2, C×3, D×2

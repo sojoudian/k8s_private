@@ -1,0 +1,226 @@
+CLO835 Fall 2026 - Easy quiz - PersistentVolumes, StorageClasses and StatefulSets
+20 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 5, 'B': 5, 'C': 5, 'D': 5}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [clo835-e10-001 hostpath] A Pod mounts the node directory /var/log through a hostPath volume, and the mount sets no readOnly field. A container writes to a file in that directory. What is the result?
+     A. The write fails, because a hostPath mount is read-only by default
+     B. The write goes to a copy in the container, not to the node
+     C. The kubelet undoes the change when the Pod stops
+   * D. The file on the node changes, and the change stays
+     ANSWER D
+     WHY: A hostPath volume gives the Pod the real directory of the node, and a mount is read-write unless it sets readOnly: true. The change stays on the node after the Pod stops. For this reason, mount only the necessary path, with readOnly: true.
+     IF A: A volume mount is read-write unless it sets readOnly: true.
+     IF B: A hostPath volume is the node directory itself, not a copy.
+     IF C: The kubelet changes no hostPath data; the file stays on the node.
+
+  2. [clo835-e10-002 access modes] A claim has the access mode ReadWriteOnce. Two Pods on the same node use this claim. What happens?
+     A. The first Pod runs, and the second Pod stays Pending
+   * B. Each Pod runs and can write to the same volume
+     C. Each Pod runs and sees a different empty volume
+     D. Each Pod runs, but the second Pod can only read the volume
+     ANSWER B
+     WHY: ReadWriteOnce limits the volume to one node, not to one Pod. Many Pods on that node can mount it for reading and writing. ReadWriteOncePod limits the volume to one Pod.
+     IF A: This is the behavior of ReadWriteOncePod, which allows one Pod in the whole cluster.
+     IF D: No access mode gives write access to one Pod and read access to the next Pod.
+     IF C: One claim gives one volume, so both Pods see the same files.
+
+  3. [clo835-e10-003 binding] The StorageClass fast has volumeBindingMode: Immediate. The only Available PersistentVolume (PV) of this class has 5Gi and ReadWriteOnce. A claim of the class fast asks for 2Gi with ReadWriteOnce. What happens to the claim?
+   * A. It binds to the 5Gi PV
+     B. It stays Pending
+     C. Kubernetes divides the PV and gives it a 2Gi part
+     D. The provisioner of the class creates a new 2Gi PV for it
+     ANSWER A
+     WHY: Kubernetes binds a claim to a PV with at least the requested size, the same access mode and the same class. The 5Gi PV matches, and the claim gets the whole PV.
+     IF B: A larger PV is a match, so the claim does not wait for an exact size.
+     IF C: One claim binds to the whole PV; Kubernetes does not divide a PV.
+     IF D: A matching PV exists, so Kubernetes binds the claim to it; a provisioner acts only when no PV matches.
+
+  4. [clo835-e10-004 class name] A cluster has a default StorageClass. A claim sets storageClassName: "" and asks for 3Gi. All PersistentVolumes (PVs) with no class are Bound to other claims. What happens to the new claim?
+     A. It binds to a free PV of the default StorageClass
+     B. The API server rejects it, because the class name is empty
+   * C. It stays Pending with no new PV
+     D. The default StorageClass creates a 3Gi PV for it
+     ANSWER C
+     WHY: An empty storageClassName turns off dynamic provisioning for the claim. The claim binds only to a PV with no class, so it waits in Pending until such a PV is free.
+     IF D: The default class serves a claim with no storageClassName field, not a claim with an empty name.
+     IF B: An empty class name is valid; it has the meaning: no class.
+     IF A: A claim with an empty class name binds only to a PV with no class.
+
+  5. [clo835-e10-005 reclaim policy] A provisioner created the PersistentVolume (PV) of a claim, with the reclaim policy Delete. The provisioner still runs. No Pod uses the claim. You delete the claim. What happens to the PV?
+     A. The PV stays until an administrator approves the deletion
+   * B. The provisioner deletes the storage and the PV
+     C. The provisioner makes the PV Available for the next claim
+     D. The provisioner deletes the PV and keeps the storage
+     ANSWER B
+     WHY: Delete is the default policy of a dynamic PV. When you delete the claim, the provisioner deletes the storage, and then it deletes the PV. If no provisioner runs, the PV stays.
+     IF D: The Delete policy deletes the storage as well as the PV.
+     IF C: No current policy makes a PV Available again; Recycle did that, and it is deprecated.
+     IF A: No approval step exists; the provisioner deletes the storage and then the PV.
+
+  6. [clo835-e10-006 expansion] A StorageClass has allowVolumeExpansion: true. A Bound claim of this class has 10Gi. You change the request of the claim to 5Gi. What happens?
+     A. The volume becomes 5Gi, and the data stays
+     B. The API server rejects the change, because the claim is Bound
+     C. The volume becomes 5Gi, and Kubernetes deletes the data
+   * D. The API server rejects the change, because a claim can only grow
+     ANSWER D
+     WHY: allowVolumeExpansion lets a claim grow. A request that is smaller than the current capacity is invalid, so the API server rejects the change, and the claim stays at 10Gi.
+     IF A: A volume can grow, but it cannot shrink.
+     IF C: Kubernetes never shrinks a volume, so it deletes no data for a smaller request.
+     IF B: A Bound claim accepts a larger request; only a smaller request is invalid.
+
+  7. [clo835-e10-007 dns name] The StatefulSet mysql runs in the namespace shop. Its serviceName is the headless Service mysql-h. Which DNS name does the Pod mysql-0 get?
+     A. mysql-0.mysql-h.default.svc.cluster.local
+   * B. mysql-0.mysql-h.shop.svc.cluster.local
+     C. mysql-0.shop.svc.cluster.local
+     D. mysql-h.mysql-0.shop.svc.cluster.local
+     ANSWER B
+     WHY: The DNS name of a Pod of a StatefulSet is the Pod name, then the headless Service, then the namespace, then svc.cluster.local.
+     IF C: The name needs the headless Service between the Pod name and the namespace.
+     IF D: The Pod name comes first, then the name of the Service.
+     IF A: The Pod runs in the namespace shop, not in default.
+
+  8. [clo835-e10-008 updates] A StatefulSet has 4 Pods, web-0 to web-3. Its rolling update has partition: 2. You change the image. Which Pods get the new image?
+     A. web-0 and web-1
+     B. web-0 to web-3
+   * C. web-2 and web-3
+     D. web-3 only
+     ANSWER C
+     WHY: With partition: N, only the Pods with an ordinal of N or higher get the update. The Pods web-2 and web-3 change, and web-0 and web-1 stay on the old image.
+     IF A: The partition protects the low ordinals, not the high ordinals.
+     IF B: Without a partition all Pods change; partition: 2 keeps web-0 and web-1 on the old image.
+     IF D: partition: 2 starts at ordinal 2, so web-2 changes too.
+
+  9. [clo835-e10-009 scale down] A StatefulSet has 3 Pods, and each Pod has a claim from the volume claim template. The manifest uses only the default settings. You scale the StatefulSet to 1 replica. What happens to the claims of the Pods that the scale down deletes?
+   * A. Kubernetes keeps them Bound, with their data
+     B. Kubernetes moves their data into the claim of the Pod that stays
+     C. Kubernetes keeps the claims and deletes their data
+     D. Kubernetes deletes them with the Pods
+     ANSWER A
+     WHY: The default retention policy is Retain for a delete and for a scale down. The claims stay, so a later scale up gives each Pod its old data again.
+     IF D: Deletion with the Pods needs the policy whenScaled: Delete.
+     IF B: Each claim belongs to one ordinal; Kubernetes moves no data between claims.
+     IF C: A scale down does not change the data in a claim.
+
+ 10. [clo835-e10-010 binding mode] A StorageClass has volumeBindingMode: WaitForFirstConsumer. You create a claim of this class, and no Pod uses it yet. What is the status of the claim, and why?
+     A. Bound, because the matching PV waits for the first Pod
+     B. Pending, because it waits for a matching PV
+     C. Failed, because no Pod uses the claim
+   * D. Pending, because it waits for a Pod
+     ANSWER D
+     WHY: With WaitForFirstConsumer, Kubernetes binds the claim or provisions a PV only when a Pod uses it, so that the PV is on the node of the Pod. Until then, Pending is normal.
+     IF C: Failed is a phase of a PV after a failed reclaim; this claim waits in Pending.
+     IF B: The claim waits for a Pod, not for a matching PV.
+     IF A: With WaitForFirstConsumer, Kubernetes binds the claim only after a Pod uses it.
+
+ 11. [clo835-e10-011 node affinity] The cluster has the workers workernode1 and workernode2. The hostPath PersistentVolume (PV) data-pv has a nodeAffinity rule for workernode1. You cordon workernode1. A new Pod uses the claim of data-pv. What happens to the Pod?
+   * A. It stays Pending until you uncordon workernode1
+     B. It runs on workernode2 with a copy of the data
+     C. The API server rejects the new Pod
+     D. It runs on workernode1 and ignores the cordon
+     ANSWER A
+     WHY: The nodeAffinity of the PV allows only workernode1, and a cordoned node gets no new Pods from the scheduler. The scheduler finds no node, so the Pod waits in Pending until you uncordon workernode1.
+     IF C: The API server accepts the Pod; the scheduler then finds no node for it.
+     IF B: The kubelet copies no volume data between nodes.
+     IF D: The scheduler puts no new Pod on a cordoned node, also when the PV of the Pod is on that node.
+
+ 12. [clo835-e10-012 pv phase] The PersistentVolume (PV) data-pv has the reclaim policy Retain. You delete the Pod that uses its claim, and then the claim. What does kubectl get pv data-pv show in the STATUS column?
+     A. Available
+     B. Bound
+   * C. Released
+     D. Failed
+     ANSWER C
+     WHY: With Retain, the PV and its data stay after you delete the claim. The PV becomes Released. It still names the old claim, so no new claim can bind to it until an administrator deletes or reuses it.
+     IF A: A Released PV does not become Available by itself; an administrator must delete or reuse it.
+     IF B: A PV is Bound only while its claim exists.
+     IF D: Failed means that an automatic reclaim failed; Retain does no automatic reclaim.
+
+ 13. [clo835-e10-013 pod order] You apply the StatefulSet kubia with replicas: 2 and the default Pod management policy. When does Kubernetes create the Pod kubia-1?
+     A. Before kubia-0, from the highest ordinal
+     B. At the same time as kubia-0
+     C. As soon as kubia-0 is Running, before it is Ready
+   * D. After kubia-0 is Running and Ready
+     ANSWER D
+     WHY: With the default policy OrderedReady, Kubernetes creates the Pods in order. It waits until kubia-0 is Running and Ready, and then it creates kubia-1.
+     IF B: Creation at the same time needs podManagementPolicy: Parallel.
+     IF A: The reverse order applies to a scale down and to an update.
+     IF C: Kubernetes waits until kubia-0 is Ready, not only Running.
+
+ 14. [clo835-e10-014 claim names] The StatefulSet kubia has a volume claim template with the name data. Which claim does the Pod kubia-1 use?
+     A. data-1
+   * B. data-kubia-1
+     C. kubia-1-data
+     D. kubia-data-1
+     ANSWER B
+     WHY: A claim name is the template name, then the Pod name: data, then kubia-1.
+     IF A: The claim name holds the Pod name, not only the ordinal.
+     IF C: The template name comes first, and the Pod name follows it.
+     IF D: The claim name holds the full Pod name kubia-1 after the template name.
+
+ 15. [clo835-e10-015 pod identity] Nobody changed the StatefulSet kubia or its Pods. You delete its Pod kubia-0, and the StatefulSet replaces it. Which property of the new Pod can be different from the old Pod?
+     A. Its ordinal
+     B. Its labels
+   * C. Its IP address
+     D. Its claim
+     ANSWER C
+     WHY: The new Pod gets the same name, the same claim and the same DNS name. It can get a new IP address, so clients use the DNS name.
+     IF A: The new Pod has the ordinal 0 again, as its name kubia-0 shows.
+     IF D: The new Pod uses the same claim, data-kubia-0, and its data.
+     IF B: The labels come from the Pod template and the ordinal, and neither changed.
+
+ 16. [clo835-e10-016 headless service] Which field in a Service manifest makes the Service headless?
+     A. type: Headless
+     B. publishNotReadyAddresses: true
+   * C. clusterIP: None
+     D. sessionAffinity: None
+     ANSWER C
+     WHY: A headless Service has the field clusterIP: None. It gets no cluster IP address, and its DNS name returns the IP address of each Ready Pod.
+     IF A: Headless is not a Service type; the types are ClusterIP, NodePort, LoadBalancer and ExternalName.
+     IF B: publishNotReadyAddresses adds the Pods that are not Ready to the DNS records; it does not remove the cluster IP address.
+     IF D: sessionAffinity controls which Pod gets the requests of one client; it does not remove the cluster IP address.
+
+ 17. [clo835-e10-017 peer discovery] What does the output of nslookup -type=SRV for the headless Service of a StatefulSet show?
+     A. The name of each node, with a NodePort
+   * B. The DNS name and the port of each Ready Pod
+     C. The IP address of each node, with no port
+     D. One record that names the Service and its port
+     ANSWER B
+     WHY: Kubernetes creates an SRV record for each named port of a headless Service. Each record names the DNS name and the port of one Ready Pod, so a peer can find all the members with one query.
+     IF C: The SRV records point to the Pods, not to the nodes, and each record holds a port.
+     IF D: One record for the whole Service is the result for a normal Service, not for a headless Service.
+     IF A: The SRV records of a headless Service point to Pods, not to nodes.
+
+ 18. [clo835-e10-018 proxy] kubectl proxy runs on port 8001 of the master. A curl request to localhost:8001 reaches a Pod through the API server, and the curl command names no token. Why does the API server accept it?
+   * A. kubectl proxy adds the credentials of the kubeconfig file
+     B. kubectl proxy turns off authentication on the API server
+     C. curl reads the token of the kubeconfig file by itself
+     D. The API server does no authentication for a request to a Pod
+     ANSWER A
+     WHY: kubectl proxy listens on a local port. It sends each request to the API server with the credentials of the kubeconfig file.
+     IF D: A request to a Pod through the API server is an API request, so the API server checks its credentials.
+     IF B: kubectl proxy changes nothing on the API server; it only adds credentials to each request.
+     IF C: curl knows nothing about the kubeconfig file.
+
+ 19. [clo835-e10-019 default class] You build a new cluster with kubeadm, and you install no storage add-on. What does kubectl get storageclass show?
+     A. local-path (default)
+     B. standard (default)
+     C. error: the server doesn't have a resource type "storageclass"
+   * D. No resources found
+     ANSWER D
+     WHY: kubeadm installs no provisioner and no StorageClass. An administrator adds them later, for example the local-path provisioner.
+     IF B: The class standard comes from a provisioner that you install.
+     IF C: StorageClass is a built-in API type. A new cluster has the type, but no object of it.
+     IF A: local-path comes with some small distributions, not with kubeadm.
+
+ 20. [clo835-e10-020 troubleshooting] A claim stays Pending. Which command shows the reason?
+   * A. kubectl describe pvc NAME
+     B. kubectl logs pvc/NAME
+     C. kubectl get pvc NAME
+     D. kubectl get pv
+     ANSWER A
+     WHY: kubectl describe shows the Events of the claim at the end of the output. The Events give the reason, for example that no PV matches or that the claim waits for a Pod.
+     IF B: A claim has no logs; only containers have logs.
+     IF C: The table shows the status, but not the reason.
+     IF D: The PV list shows the volumes, but not why a claim waits.

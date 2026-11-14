@@ -1,0 +1,125 @@
+# Lab Week 13: Authentication and RBAC
+
+## Submission Instructions
+
+Submit a report demonstrating your completion and understanding of all 7 sections of Lab Week 13.
+
+The lab recording demonstrates the steps required to complete this assignment. You may follow the recording step by step. However, your submission must include your own screenshots, actual command outputs, and explanations for all required tasks.
+
+## 1. Build the Cluster and Verify Its Status
+
+The Week 13 Terraform configuration builds three Ubuntu 26.04 EC2 instances, as in Weeks 04 to 12: one master node and two worker nodes. kubeadm forms the Kubernetes cluster at boot.
+
+You must:
+
+- Update the repo with git fetch and git reset --hard origin/master.
+- Run terraform init and terraform apply.
+- Run terraform output public_ips and terraform output private_ips, and show the addresses of all three nodes.
+- Show an SSH session connected to the master node.
+- Run kubectl get nodes -o wide and show all three nodes in the Ready state.
+- Run kubectl get pods -n kube-system and show the control-plane Pods in the Running state.
+
+## 2. Create a User with a Signed Certificate
+
+Kubernetes stores no users. The cluster CA signs a certificate, and the certificate names the user and the group. Copy the commands of each step from localMachine.sh. Run them on the master node.
+
+You must:
+
+- Create dev-user.key and dev-user.csr with the openssl genrsa and openssl req commands.
+- Create dev-user-csr.yaml with the cat > command.
+- Apply the manifest.
+- Approve the dev-user request with kubectl certificate approve dev-user.
+- Run kubectl get csr dev-user and show Approved,Issued.
+- Write the certificate to dev-user.crt with the kubectl get csr command and base64 -d.
+- Run the openssl x509 command, and show the subject and the end date.
+- Explain why Kubernetes does not store users.
+- Explain what the CN and O fields of the certificate mean.
+
+## 3. Show That dev-user Is Authenticated, Not Authorized
+
+Authentication finds who you are. Authorization decides what you can do. The first Explain item asks about a lecture topic. The lab does not show admission control.
+
+You must:
+
+- Create the week13 namespace.
+- Add the dev-user credentials and the dev-user@kubernetes context with kubectl config set-credentials and kubectl config set-context.
+- Run the two curl commands on port 6443, and show the version and the 403 Forbidden answer.
+- Run the kubectl proxy command, and show the first lines of the APIGroupList.
+- Run kubectl --context=dev-user@kubernetes auth whoami, and show the user and the groups.
+- Run kubectl --context=dev-user@kubernetes get pods, and show the Forbidden error.
+- Explain the order of the three phases of a request in the API server.
+- Explain the difference between authentication and authorization.
+- Explain why the curl command for /apis gets 403 Forbidden, and the kubectl proxy request passes.
+- Explain why the auth whoami command passes and the get pods command fails.
+
+## 4. Create a Role, a RoleBinding and a Binding for a Group
+
+The Role says what. The RoleBinding says who.
+
+You must:
+
+- Create developer-role.yaml and display its contents.
+- Apply the manifest with kubectl apply -f developer-role.yaml -n week13.
+- Run the kubectl run web command as dev-user, and show the answer pod/web created.
+- Run the kubectl delete pod web command as dev-user, and show the Forbidden error.
+- Create the developers-view RoleBinding with the kubectl create rolebinding command.
+- Run the kubectl get services command as dev-user, and show the answer No resources found.
+- Explain the difference between a Role and a RoleBinding.
+- Explain why the Role names configmaps and not ConfigMap.
+- Explain how dev-user gets the permissions of the default ClusterRole view.
+
+## 5. Call the API from a Pod with Its Token
+
+A Pod runs as a ServiceAccount, and Kubernetes mounts its token in the Pod.
+
+You must:
+
+- Create the clo835 ServiceAccount.
+- Create curl-sa.yaml and display its contents.
+- Apply the manifest.
+- Run kubectl wait, and show that the curl-sa Pod is Ready.
+- Run the curl command in the Pod with kubectl exec, and show the Forbidden answer.
+- Explain how the Pod proves its identity to the API server.
+- Explain why the API server answers Forbidden.
+
+## 6. Give the ServiceAccount a Role and a ClusterRole
+
+A Role and its RoleBinding work in one namespace. An object with no namespace, such as a PersistentVolume, needs a ClusterRole and a ClusterRoleBinding.
+
+You must:
+
+- Create service-reader.yaml and display its contents.
+- Apply the manifest with kubectl apply -f service-reader.yaml -n week13.
+- Run the same curl command, and show the ServiceList.
+- Run kubectl auth can-i list services for the default namespace, and show no.
+- Run the kubectl api-resources command, and show that NAMESPACED is false for persistentvolumes.
+- Create the pv-reader ClusterRole.
+- Create the pv-test RoleBinding.
+- Run kubectl auth can-i list persistentvolumes, and show no.
+- Create the pv-test ClusterRoleBinding.
+- Run the same kubectl auth can-i command, and show yes.
+- Explain why the ServiceAccount gets the answer no in the default namespace.
+- Explain why a PersistentVolume needs a ClusterRoleBinding and not a RoleBinding.
+
+## 7. Destroy the Cluster
+
+At the end of the lab, destroy all three EC2 instances. This also deletes every Kubernetes object and every file of the lab.
+
+You must:
+
+- Run terraform destroy in the Week13 directory on your own machine.
+- Include the final Terraform output, which shows the message Destroy complete!
+- State the number of resources Terraform destroyed.
+
+## Submission Requirements
+
+Your report must include all of the following:
+
+- Your name clearly visible in every screenshot.
+- Screenshots demonstrating the required commands and results in all 7 sections.
+- Actual output from the commands you executed.
+- Clear, detailed explanations of the commands, their purpose, and the results.
+- Highlighted or clearly visible output where appropriate.
+- Answers to every explanation question specified in the lab.
+
+Important: Use your own screenshots and outputs from your lab environment. Screenshots or outputs copied from the recording or another student's submission do not demonstrate your own work.

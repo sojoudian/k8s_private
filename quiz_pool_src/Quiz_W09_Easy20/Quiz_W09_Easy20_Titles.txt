@@ -1,0 +1,20 @@
+clo835-e09-001 responsibility
+clo835-e09-002 cost
+clo835-e09-003 worker options
+clo835-e09-004 networking
+clo835-e09-005 endpoint
+clo835-e09-006 storage
+clo835-e09-007 storage
+clo835-e09-008 permissions
+clo835-e09-009 certificates
+clo835-e09-010 provisioning
+clo835-e09-011 control plane
+clo835-e09-012 scheduling
+clo835-e09-013 cluster state
+clo835-e09-014 availability
+clo835-e09-015 identity
+clo835-e09-016 maintenance
+clo835-e09-017 maintenance
+clo835-e09-018 clean up
+clo835-e09-019 upgrades
+clo835-e09-020 nodes

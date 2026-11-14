@@ -1,0 +1,41 @@
+#!/bin/bash
+set -eux
+
+# CLO835 Week 02 - the manual demonstration machine.
+#
+# This script installs almost nothing on purpose.
+# The instructor performs each installation step live, in front of the students.
+# The students then see the same steps inside the Dockerfile.
+#
+# This script installs git only, and it refreshes the package index.
+# The refresh makes the live "apt-get install" step fast.
+#
+# This script does NOT install Docker.
+# This script does NOT install pip, flask, or the application.
+
+export DEBIAN_FRONTEND=noninteractive
+
+apt-get update -y
+apt-get install -y git
+
+cat > /etc/motd <<'MOTD'
+
+  CLO835 - Week 02 - The manual method
+  ------------------------------------
+  This machine has git only. Nothing else is prepared.
+
+  Perform these steps by hand:
+
+    1. Clone     git clone ${repo_url}
+    2. Create    cd simple-webapp-flask
+    3. Install   sudo apt-get install -y python3 python3-pip
+    4. Install   pip3 install flask
+    5. Run       python3 app.py            -> port ${app_port_manual}
+    6. Test      open http://<PUBLIC-IP>:${app_port_manual}/
+
+  The container method performs steps 3 to 5 from the Dockerfile,
+  and it uses port ${app_port_docker}.
+
+MOTD
+
+touch /var/lib/cloud/instance/CLO835_READY

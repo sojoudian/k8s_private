@@ -1,0 +1,302 @@
+CLO835 Fall 2026 - Week 02 - Docker Image Management - question pool (100 questions)
+==================================================================
+
+  1. [slide  5] How does the Week 2 deck define a Dockerfile?
+     ANSWER B: A text file of build instructions
+
+  2. [slide  5] How do images build, according to the deck?
+     ANSWER A: In layers, where each FROM stacks on a parent
+
+  3. [slide  5] What does a BASE image start from?
+     ANSWER D: scratch
+
+  4. [slide  5] What does a PARENT image do?
+     ANSWER D: It extends a base with extra packages
+
+  5. [slide  5] What does the Custom Webapp image add?
+     ANSWER A: It copies the application files on top
+
+  6. [slide  5] Which instruction opens the Dockerfile of the BASE image in the example?
+     ANSWER C: FROM scratch
+
+  7. [slide  5] Which instruction places the root file system into the BASE image in the example?
+     ANSWER D: ADD rootfs.tar.xz /
+
+  8. [slide  5] Which base does the httpd PARENT Dockerfile use in the example?
+     ANSWER B: debian:buster-slim
+
+  9. [slide  5] Which value does HTTPD_PREFIX hold in the example?
+     ANSWER C: /usr/local/apache2
+
+ 10. [slide  5] Which instruction sets the working directory in the httpd example?
+     ANSWER B: WORKDIR
+
+ 11. [slide  5] Which parent does the Custom Webapp Dockerfile build on?
+     ANSWER C: httpd
+
+ 12. [slide  8] What does the EXPOSE instruction tell Docker?
+     ANSWER A: Which ports are to be published in this image
+
+ 13. [slide  8] By default, what is the state of every port?
+     ANSWER D: Private
+
+ 14. [slide  8] Is EXPOSE on its own enough to make a port public?
+     ANSWER B: No, declaring a port with EXPOSE is not enough to make it public
+
+ 15. [slide  8] What does the deck say the Dockerfile does NOT control?
+     ANSWER B: On which port a service gets exposed
+
+ 16. [slide  8] Which example declares one single port in the deck?
+     ANSWER A: EXPOSE 8080
+
+ 17. [slide  8] How does the deck show two ports declared in one EXPOSE line?
+     ANSWER C: EXPOSE 80 443
+
+ 18. [slide  8] Which example in the deck declares the protocol with the port number?
+     ANSWER B: EXPOSE 53/tcp 53/udp
+
+ 19. [slide  8] EXPOSE 8080 appears in a Dockerfile, and the container is started with no port flag. Is port 8080 reachable from outside the host?
+     ANSWER B: No, because EXPOSE on its own does not make a port public
+
+ 20. [slide  9] What happens when you start a container with docker run -p <port>?
+     ANSWER C: That port becomes public, even if it was not declared with EXPOSE
+
+ 21. [slide  9] Does -p require the port to be declared with EXPOSE first?
+     ANSWER D: No, -p works even if the port was not declared with EXPOSE
+
+ 22. [slide  9] What does docker run -P, with no port number, do?
+     ANSWER A: It makes all ports declared with EXPOSE public
+
+ 23. [slide  9] Who can reach a public port?
+     ANSWER A: Other containers and anything outside the host
+
+ 24. [slide  9] What is true of a private port?
+     ANSWER B: It is not reachable from outside
+
+ 25. [slide  9] Which flag publishes the EXPOSE ports without naming any port number?
+     ANSWER C: -P
+
+ 26. [slide 11] What does CMD define?
+     ANSWER D: A default command to run when none is given
+
+ 27. [slide 11] Where may CMD appear in a Dockerfile?
+     ANSWER A: At any point in the file
+
+ 28. [slide 11] What happens when a Dockerfile holds more than one CMD?
+     ANSWER B: Each CMD replaces and overrides the previous one
+
+ 29. [slide 11] What does the deck conclude about multiple CMD lines?
+     ANSWER C: You can write them, but it is useless
+
+ 30. [slide 11] Which CMD line appears in the example Dockerfile on the slide?
+     ANSWER D: CMD sleep 20
+
+ 31. [slide 11] Which instruction comes before CMD in the example Dockerfile on the slide?
+     ANSWER D: RUN apt-get update
+
+ 32. [slide 12] What does ENTRYPOINT define?
+     ANSWER A: A base command, and its parameters, for the container
+
+ 33. [slide 12] What happens to the command line arguments when ENTRYPOINT is set?
+     ANSWER A: They are appended to the ENTRYPOINT parameters
+
+ 34. [slide 12] Where may ENTRYPOINT appear, and what happens if it appears twice?
+     ANSWER A: It may appear anywhere, and the later one replaces the previous value
+
+ 35. [slide 12] Which ENTRYPOINT line appears in the example Dockerfile on the slide?
+     ANSWER C: ENTRYPOINT with sleep written in JSON form
+
+ 36. [slide 12] Which question does the deck put to the class about ENTRYPOINT?
+     ANSWER C: Why JSON syntax was used for the ENTRYPOINT
+
+ 37. [slide 12] Which base image does the ENTRYPOINT example Dockerfile use?
+     ANSWER B: ubuntu
+
+ 38. [slide 13] Which process does an Ubuntu container start by default?
+     ANSWER A: bash
+
+ 39. [slide 13] You give a command at run time, and the Dockerfile uses CMD. What happens?
+     ANSWER A: The original CMD instruction is replaced
+
+ 40. [slide 13] You give a parameter at run time, and the Dockerfile uses ENTRYPOINT. What happens?
+     ANSWER B: The parameter is appended to the ENTRYPOINT instruction
+
+ 41. [slide 13] Which instruction should you use when a run-time command must REPLACE the default?
+     ANSWER A: CMD
+
+ 42. [slide 13] Which instruction should you use when a run-time parameter must be ADDED to a fixed command?
+     ANSWER C: ENTRYPOINT
+
+ 43. [slide 14] Which image does the deck use to show environment variables?
+     ANSWER A: The MySQL image on DockerHub
+
+ 44. [slide 14] In the example command, what is some-mysql?
+     ANSWER D: The name you assign to your container
+
+ 45. [slide 14] In the example command, what is my-secret-pw?
+     ANSWER D: The password set for the MySQL root user
+
+ 46. [slide 14] In the example command, what does tag specify?
+     ANSWER C: The MySQL version you want
+
+ 47. [slide 14] Which environment variable does the example set?
+     ANSWER A: MYSQL_ROOT_PASSWORD
+
+ 48. [slide 14] Which flag starts the MySQL container in the background in the example?
+     ANSWER B: -d
+
+ 49. [slide 14] Which flag passes an environment variable to the container?
+     ANSWER A: -e
+
+ 50. [slide 16] What do Docker registries hold?
+     ANSWER C: Images
+
+ 51. [slide 16] How does the deck describe a registry?
+     ANSWER C: A public or private store used to upload or download images
+
+ 52. [slide 16] Whose images does a registry serve?
+     ANSWER D: Images created and shared by you or by other registry users
+
+ 53. [slide 16] Which component of Docker is the registry?
+     ANSWER A: The distribution component
+
+ 54. [slide 17] What does the deck compare Docker image tags to?
+     ANSWER C: Git tags and branches
+
+ 55. [slide 17] What does a tag point at?
+     ANSWER A: A specific image ID
+
+ 56. [slide 17] What does tagging an image do to the existing name?
+     ANSWER A: Nothing, because tagging adds another tag instead of renaming
+
+ 57. [slide 17] Where does the registry address live when you push an image?
+     ANSWER B: In the tag
+
+ 58. [slide 17] Which example of a tag with a registry address does the deck give?
+     ANSWER A: registry.example.net:5000/image
+
+ 59. [slide 17] The short name ubuntu is in fact which full name?
+     ANSWER D: library/ubuntu, that is index.docker.io/library/ubuntu
+
+ 60. [slide 17] Which command publishes a tagged image to a registry?
+     ANSWER B: docker push
+
+ 61. [slide 17] Which tag name does the deck use in the publishing example?
+     ANSWER C: clo835-week2
+
+ 62. [slide 18] What is step 1 of the Flask web application exercise?
+     ANSWER C: Clone the application repository
+
+ 63. [slide 18] Which repository does the Flask exercise clone?
+     ANSWER C: github.com/sojoudian/simple-webapp-flask
+
+ 64. [slide 18] What is step 2 of the Flask exercise?
+     ANSWER A: Manually create a script that results in a running application inside vanilla Ubuntu containers
+
+ 65. [slide 18] What is step 3 of the Flask exercise?
+     ANSWER D: Convert the script to a Dockerfile
+
+ 66. [slide 18] What is step 4 of the Flask exercise?
+     ANSWER B: Build the Docker image using the Dockerfile
+
+ 67. [slide 18] What is step 5 of the Flask exercise?
+     ANSWER C: Test the application locally
+
+ 68. [slide 18] What is step 6, the last step, of the Flask exercise?
+     ANSWER B: Publish the image, by pushing it to a registry
+
+ 69. [slide 21] Which network driver does Docker use by default?
+     ANSWER C: bridge
+
+ 70. [slide 21] Which driver does the deck list beside bridge and host?
+     ANSWER C: null
+
+ 71. [slide 21] Which three drivers ship with Docker, according to the deck?
+     ANSWER D: bridge, null and host
+
+ 72. [slide 21] Which command creates a new network?
+     ANSWER D: docker network create
+
+ 73. [slide 21] Which flag selects the network when a container starts?
+     ANSWER C: --net
+
+ 74. [slide 21] What manages each network?
+     ANSWER C: A driver
+
+ 75. [slide 22] Which interface does a container get by default on the bridge network?
+     ANSWER A: A virtual eth0 interface
+
+ 76. [slide 22] Which second interface does the container always have?
+     ANSWER A: Its own private lo loopback interface
+
+ 77. [slide 22] What provides the virtual interface of the container?
+     ANSWER A: A veth pair
+
+ 78. [slide 22] What is the default name of the Docker bridge?
+     ANSWER A: docker0
+
+ 79. [slide 22] Which option changes the name of the Docker bridge?
+     ANSWER C: --bridge
+
+ 80. [slide 22] Which subnet does Docker use by default on the bridge network?
+     ANSWER C: 172.17.0.0/16
+
+ 81. [slide 22] Which option changes the default bridge subnet?
+     ANSWER B: --bip
+
+ 82. [slide 22] What else can a container own on the default bridge?
+     ANSWER D: Its own routes and iptables rules
+
+ 83. [slide 22] Where are the container addresses allocated from?
+     ANSWER B: A private, internal subnet
+
+ 84. [slide 23] How do you start a container on the host driver?
+     ANSWER A: docker run --net host
+
+ 85. [slide 23] What does a container on the host driver see?
+     ANSWER A: The network interfaces of the host
+
+ 86. [slide 23] What can a host-driver container bind to?
+     ANSWER C: Any address and any port
+
+ 87. [slide 23] Which three steps does host networking avoid?
+     ANSWER D: NAT, the bridge and the veth pair
+
+ 88. [slide 23] What performance does the deck claim for the host driver?
+     ANSWER D: Native performance
+
+ 89. [slide 23] Which use cases does the deck give for the host driver?
+     ANSWER C: Performance sensitive applications such as VOIP, gaming and streaming
+
+ 90. [slide 24] What other name does the deck give to port forwarding?
+     ANSWER A: Port mapping
+
+ 91. [slide 24] How does the deck define port forwarding?
+     ANSWER A: Data addressed to one socket is redirected to another by an intermediary
+
+ 92. [slide 24] Which two examples of an intermediary does the deck give?
+     ANSWER B: A network router or a proxy process
+
+ 93. [slide 24] Which command does the slide title use to show port mapping?
+     ANSWER D: docker run with the -p flag and 80:8080
+
+ 94. [slide 25] How many common ways to implement port forwarding does the deck list?
+     ANSWER A: Two
+
+ 95. [slide 25] What is the first way to redirect network data?
+     ANSWER C: By modifying the destination address of the packets
+
+ 96. [slide 25] What is the second way to redirect network data?
+     ANSWER D: By putting a proxy between the client and the server
+
+ 97. [slide 26] Which command does the deck use to show container port forwarding?
+     ANSWER D: docker run --publish 8080:80 nginx
+
+ 98. [slide 26] In that example, which direction does the forwarding take?
+     ANSWER C: From the host 0.0.0.0:8080 to the container IP on port 80
+
+ 99. [slide 26] What does the deck conclude about port publishing in Docker Engine?
+     ANSWER D: There is not much difference between port publishing and kernel space port forwarding
+
+100. [slide 26] What kind of port forwarding does --publish create?
+     ANSWER B: A regular port forwarding
