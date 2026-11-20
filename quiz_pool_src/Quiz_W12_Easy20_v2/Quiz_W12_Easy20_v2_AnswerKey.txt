@@ -1,0 +1,226 @@
+CLO835 Fall 2026 - Easy quiz - ConfigMaps and Secrets
+20 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 5, 'B': 5, 'C': 5, 'D': 5}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [clo835-e12-001 injected environment variable] A Pod sets no env field and no envFrom field. Its container runs printenv KUBERNETES_SERVICE_HOST. What does the command show?
+     A. The DNS name kubernetes.default.svc
+     B. The IP address of the master node
+     C. The IP address of the Pod itself
+   * D. The cluster IP address of the Service for the API server
+     ANSWER D
+     WHY: The kubelet injects environment variables for the Services of the namespace, and KUBERNETES_SERVICE_HOST for the API server. Its value is the cluster IP address of the Service kubernetes, for example 10.96.0.1 with the default Service subnet of kubeadm.
+     IF B: The API server runs on the master node. A Pod reaches it through the Service kubernetes, so the environment variable holds the cluster IP address of that Service.
+     IF C: The environment variable gives the address of the API server, not the address of the Pod.
+     IF A: kubernetes.default.svc is the DNS name of that Service; the environment variable holds its cluster IP address.
+
+  2. [clo835-e12-002 missing configmap] The ConfigMap app-config is missing. You create a Pod that gets app-config through envFrom, and the reference sets no optional field. What happens?
+     A. The API server accepts the Pod, creates an empty ConfigMap app-config, and the kubelet starts the container
+     B. The container starts, and app-config stays missing
+   * C. The API server accepts the Pod, and the kubelet does not start the container without app-config
+     D. The API server rejects the Pod, and no Pod exists
+     ANSWER C
+     WHY: The API server accepts the Pod, because it checks no reference to a ConfigMap. The kubelet does not start the container while the ConfigMap is missing, unless the reference sets optional: true.
+     IF D: The API server accepts the Pod. The kubelet checks the ConfigMap on the node, when it creates the container.
+     IF B: This is the behavior of optional: true. Without it, the kubelet does not start the container while the ConfigMap is missing.
+     IF A: The API server does not create the missing ConfigMap app-config; the kubelet waits until it exists.
+
+  3. [clo835-e12-003 configmap size] A team runs kubectl create configmap big --from-file=data.bin. The file data.bin holds 2 MiB of text. What is the result?
+     A. The API server divides the file into two ConfigMaps of 1 MiB each
+   * B. The API server rejects it, because a ConfigMap holds at most 1 MiB
+     C. The API server stores the whole ConfigMap, because a ConfigMap holds data of any size
+     D. The API server stores the first 1 MiB of the ConfigMap, and it rejects the rest of the file
+     ANSWER B
+     WHY: The API server checks the size of each ConfigMap, and it rejects a ConfigMap with more than 1 MiB of data. A Secret has the same limit.
+     IF D: The API server stores no part of an object that it rejects, so kubectl get configmap big shows NotFound.
+     IF A: Kubernetes never divides one object into two objects.
+     IF C: A ConfigMap and a Secret each hold at most 1 MiB.
+
+  4. [clo835-e12-004 configmap volume] The Pod config-volume mounts the whole ConfigMap app-config as a volume at /etc/app-config. The ConfigMap holds APP_COLOR=blue. You change APP_COLOR to green with kubectl patch. Nobody restarts the Pod. What does the file /etc/app-config/APP_COLOR show three minutes later?
+     A. The old value, because the files of the volume are read-only
+   * B. The new value green, because the kubelet updates the files of the volume
+     C. The old value and green, because the kubelet adds the new value to the file of the volume
+     D. An error, because the kubelet deletes the file of the volume
+     ANSWER B
+     WHY: The kubelet watches the ConfigMap, and it updates the files of the volume within about two minutes. The container then reads the new value while it runs.
+     IF A: The volume is read-only for the container, not for the kubelet, so the kubelet updates the files.
+     IF D: The kubelet writes the new file, and then it replaces the old file in one action, so the file is always there.
+     IF C: The kubelet replaces the content of the file, so the file holds only the new value.
+
+  5. [clo835-e12-005 secret manifest in git] A Secret manifest in a public Git repository holds the line DB_Password: cGFzc3dvcmQ= in its data field. What does a reader of the repository need to get the password?
+     A. The private key of the API server
+     B. Nothing, because cGFzc3dvcmQ= is the password
+   * C. The base64 decoder program on any computer
+     D. The base64 encryption key of the cluster
+     ANSWER C
+     WHY: The data field holds base64 text. base64 is an encoding, not encryption: anyone can decode it, with no key. Never put a Secret manifest in source control.
+     IF D: base64 is an encoding, not encryption. No key of the cluster protects the base64 text in this manifest.
+     IF A: The key of the API server protects the HTTPS connection, not the text in a file.
+     IF B: cGFzc3dvcmQ= is the base64 form of the password, so the reader needs a base64 decoder.
+
+  6. [clo835-e12-006 secret data] A Secret manifest holds the line DB_Password: paswrd in its data field, as plain text. You run kubectl apply -f with this manifest. What is the result?
+   * A. The API server rejects the Secret, and it stores nothing
+     B. The API server stores the Secret, and a Pod that uses the key does not start
+     C. The API server encodes paswrd to base64, and it stores the Secret
+     D. The Secret holds paswrd as it is, and a Pod gets paswrd
+     ANSWER A
+     WHY: Each value of the data field must be valid base64 text. paswrd is not valid base64, so the API server rejects the Secret. The stringData field takes plain text, and the API server encodes it.
+     IF D: The API server decodes each data value, and it stores no value that fails to decode.
+     IF C: Only the stringData field gets this encoding; the data field must hold base64 text already.
+     IF B: The API server checks the value when you apply the Secret, before a Pod uses it.
+
+  7. [clo835-e12-007 secret volume access] The Pod app runs on workernode1. It gets the Secret db only through a Secret volume. Which user can read the Secret value?
+     A. A user who reads the disk of workernode1 after the node stops
+   * B. A user who can run kubectl exec in the Pod app
+     C. A user who can read the kubelet log of workernode1
+     D. A user who can run kubectl describe pod app
+     ANSWER B
+     WHY: The kubelet stores the files of a Secret volume in tmpfs, in the memory of workernode1, not on its disk. tmpfs gives no protection inside the Pod: a user who can run kubectl exec can read each file of the volume.
+     IF D: kubectl describe pod shows the name of the Secret of the volume, not its values.
+     IF A: tmpfs is in memory, so the files of the Secret are not on the disk of workernode1.
+     IF C: The kubelet writes no Secret value to its log.
+
+  8. [clo835-e12-008 secret and application log] An application writes all of its environment variables to its log at start. Its Pod gets DB_Password from a Secret through secretKeyRef, so the log holds the password. Which change prevents this?
+   * A. Mount the Secret as a volume for the password, in place of secretKeyRef
+     B. Configure encryption at rest for the Secret data
+     C. Give the password with stringData, in place of data in the Secret
+     D. Give the password through secretRef, in place of secretKeyRef
+     ANSWER A
+     WHY: A file of a Secret volume is not an environment variable, so the application does not write it to its log with its environment variables. For this reason, a Secret volume is the better method.
+     IF D: secretRef also gives each key of the Secret as an environment variable, so the application still writes the password to its log.
+     IF B: Encryption at rest protects the data in etcd; the container still gets the plain value as an environment variable.
+     IF C: stringData changes only the manifest: the API server stores the value in data, and secretKeyRef still gives an environment variable.
+
+  9. [clo835-e12-009 token mount] A Pod sets automountServiceAccountToken: false. Its container runs ls /var/run/secrets/kubernetes.io/serviceaccount. What is the result?
+     A. The files ca.crt and namespace, because false stops only the token
+     B. The files ca.crt, namespace and token
+     C. An error, because no user except root can read the files
+   * D. An error, because the directory with ca.crt and the rest of the files does not exist
+     ANSWER D
+     WHY: When the Pod sets automountServiceAccountToken: false, the kubelet mounts no token volume, so the directory does not exist. A value in the Pod has priority over the value in its ServiceAccount.
+     IF B: The value false in the Pod stops the whole mount, so no file of the token volume exists.
+     IF C: The kubelet mounts no token volume at all, so no file exists for any user.
+     IF A: The kubelet mounts the three files together, or none of them.
+
+ 10. [clo835-e12-010 default serviceaccount] A process in a Pod sends a request to the API server to list the Pods of its namespace. It uses the token of the ServiceAccount default. Nobody gave this ServiceAccount more permissions. What is the result, and why?
+     A. The API server returns the Pods, because the token of the ServiceAccount belongs to that namespace
+     B. The API server returns only the Pod of the process, because the token identifies that Pod
+   * C. The API server rejects it, because the ServiceAccount of the token can only read API discovery data
+     D. The API server rejects it, because the token is no longer valid
+     ANSWER C
+     WHY: The ServiceAccount default has API discovery permissions only. A request to list Pods gets the answer 403 Forbidden.
+     IF D: The API server accepts the token and names the ServiceAccount in its answer; the missing permission causes the rejection.
+     IF A: The ServiceAccount default has no permission to list Pods, also in its own namespace.
+     IF B: The token identifies the ServiceAccount, and the API server gives no special access to the Pod of the process.
+
+ 11. [clo835-e12-011 args] The image maziar/fortune:args has ENTRYPOINT ["/bin/fortuneloop.sh"] and CMD ["10"]. You create a Pod from this image with args: ["2"] and no command field. What is the result?
+   * A. The container runs /bin/fortuneloop.sh 2
+     B. The container runs /bin/fortuneloop.sh 10
+     C. The container runs /bin/fortuneloop.sh 10 2
+     D. The API server rejects the Pod, because args needs a command field
+     ANSWER A
+     WHY: args replaces the CMD of the image, and the ENTRYPOINT stays. The container runs /bin/fortuneloop.sh 2, and its log shows: Configured to generate new fortune every 2 seconds.
+     IF B: CMD gives the value 10, and args replaces CMD.
+     IF C: args replaces CMD; Kubernetes does not add args after CMD.
+     IF D: A Pod can set args with no command field; the ENTRYPOINT of the image then runs.
+
+ 12. [clo835-e12-012 from file] The directory /home/ubuntu holds the file LOG_LEVEL with the text debug. In /home/ubuntu, you run kubectl create configmap app-config --from-file=LOG_LEVEL. The Pod config-env gets app-config through envFrom. The Pod has no other reference to app-config. You run kubectl exec config-env -- printenv LOG_LEVEL. What does the command show?
+     A. The text LOG_LEVEL
+     B. The path /home/ubuntu/LOG_LEVEL
+     C. No value, because envFrom injects only the keys of --from-literal
+   * D. The text debug
+     ANSWER D
+     WHY: --from-file creates one key from a file: the file name LOG_LEVEL is the key, and the file content debug is the value. envFrom injects each key as an environment variable.
+     IF A: The file name becomes the key, and the content of the file becomes the value.
+     IF B: --from-file reads the content of the file; the path is not the value.
+     IF C: envFrom injects each key, also a key from --from-file.
+
+ 13. [clo835-e12-013 configmap key] The ConfigMap app-config holds APP_COLOR=blue. The container of the Pod keyref sets the environment variable COLOR through valueFrom with configMapKeyRef (name app-config, key APP_COLOR). The Pod has no other reference to app-config. You run kubectl exec keyref -- printenv APP_COLOR. What does the command show?
+     A. An error, because the container does not start when COLOR differs from the key APP_COLOR
+   * B. Exit code 1 with no value, because the key gives its value to COLOR
+     C. blue
+     D. COLOR
+     ANSWER B
+     WHY: configMapKeyRef gives the value of one key to the environment variable that env names, here COLOR. The key APP_COLOR does not become an environment variable of its own, so printenv APP_COLOR finds nothing. kubectl exec then shows: command terminated with exit code 1.
+     IF C: Only envFrom injects each key as an environment variable; configMapKeyRef gives the value to COLOR only.
+     IF D: COLOR is the name of the environment variable, not the value of APP_COLOR.
+     IF A: The env name can differ from the key name; configMapKeyRef connects them, and the container starts.
+
+ 14. [clo835-e12-014 configmap environment] You apply the file config-env.yaml, which holds the manifest of the Pod config-env. The Pod gets APP_COLOR=blue from the ConfigMap app-config through envFrom. You change APP_COLOR to green with kubectl patch, but printenv APP_COLOR in config-env still shows blue. Which action makes it show green?
+     A. Run kubectl apply -f config-env.yaml again, with no change
+     B. Open a new shell in the Pod config-env with kubectl exec, and run printenv APP_COLOR in it
+   * C. Delete the Pod, and create it again from config-env.yaml
+     D. Wait five minutes, and run the printenv command again
+     ANSWER C
+     WHY: A container gets its environment variables when it starts. A new Pod from the same manifest starts a new container, and it gets green.
+     IF D: The kubelet updates the files of a ConfigMap volume, not the environment variables of a container that runs.
+     IF B: Each process gets the environment of the container start, so the new shell shows blue.
+     IF A: kubectl apply with no change leaves the Pod unchanged, so the container does not start again.
+
+ 15. [clo835-e12-015 secret type] You create a Secret with kubectl create secret generic app-secret --from-literal=DB_Host=mysql. What TYPE does kubectl get secrets show for app-secret?
+     A. base64
+     B. generic
+     C. kubernetes.io/tls
+   * D. Opaque
+     ANSWER D
+     WHY: kubectl create secret generic creates a Secret of the type Opaque, which holds any key/value pairs.
+     IF B: generic is the name of the kubectl subcommand; the type that it creates is Opaque.
+     IF C: kubernetes.io/tls is the type for a TLS certificate and its key.
+     IF A: base64 is the encoding of the values in the API; the TYPE column shows the type of the Secret.
+
+ 16. [clo835-e12-016 secret file] The Secret app-secret holds DB_Host=mysql, from --from-literal. The Pod secret-pod mounts app-secret as a volume at /etc/secret-volume. What does cat /etc/secret-volume/DB_Host show in the container?
+     A. bXlzcWw=
+     B. DB_Host=bXlzcWw=
+   * C. mysql
+     D. DB_Host=mysql
+     ANSWER C
+     WHY: Each key of the Secret is a file, and the kubelet writes the decoded value into it. The application needs no base64 decoder.
+     IF A: bXlzcWw= is the base64 form that the API shows; the file holds the decoded value.
+     IF D: The key is the name of the file, and the file holds only the value.
+     IF B: The key is the name of the file, and the file holds only the decoded value.
+
+ 17. [clo835-e12-017 token secret] You create the namespace week12, and Kubernetes adds kube-root-ca.crt to it. In week12, you create the Secret app-secret with kubectl create secret generic, and then the Pod secret-pod. secret-pod uses the ServiceAccount default, and the kubelet mounts its token into secret-pod. The cluster runs Kubernetes v1.35. Which Secrets does kubectl get secrets -n week12 list?
+     A. app-secret, a token Secret and kube-root-ca.crt
+     B. app-secret and a token Secret, and no other Secret
+     C. app-secret and kube-root-ca.crt only
+   * D. app-secret, and no other Secret
+     ANSWER D
+     WHY: The kubelet gets a token from the TokenRequest API, and it puts the token in a projected volume. Since v1.24, Kubernetes creates no Secret for a ServiceAccount token, and kube-root-ca.crt is a ConfigMap. So the list shows app-secret only.
+     IF B: Since v1.24, Kubernetes creates no token Secret for a ServiceAccount.
+     IF C: kube-root-ca.crt is a ConfigMap, not a Secret.
+     IF A: kube-root-ca.crt is a ConfigMap, and no Secret holds the token.
+
+ 18. [clo835-e12-018 environments] The namespace week12 has the ConfigMap app-config with APP_COLOR=blue. The namespace week12-dev has its own ConfigMap app-config with APP_COLOR=red. The namespace default has its own ConfigMap app-config with APP_COLOR=green. You apply the file config-env.yaml, which holds the manifest of the Pod config-env, in week12-dev. The Pod gets app-config through envFrom. Then you run kubectl exec config-env -n week12-dev -- printenv APP_COLOR. What does the command show?
+   * A. red, from the ConfigMap of the namespace week12-dev
+     B. green, because envFrom uses the ConfigMap of the namespace default
+     C. blue, from the ConfigMap of the namespace week12
+     D. An error, because configMapRef must also name the namespace week12-dev
+     ANSWER A
+     WHY: A Pod uses the ConfigMap of its own namespace. The same manifest gets red in week12-dev and blue in week12, so one manifest serves many environments.
+     IF C: A Pod uses no ConfigMap of another namespace.
+     IF B: envFrom uses the ConfigMap of the namespace of the Pod, not of the namespace default, so the container gets red.
+     IF D: configMapRef has no namespace field; the namespace of the Pod gives it.
+
+ 19. [clo835-e12-019 etcd storage] With etcdctl in the Pod etcd-masternode, you read /registry/secrets/week12-dev/app-secret. The Secret holds DB_Password=dev-pass. Nobody configured encryption at rest. What does the output hold?
+   * A. The value dev-pass, as plain bytes
+     B. The metadata, because etcd stores no Secret value
+     C. The base64 text ZGV2LXBhc3M= only
+     D. A hash of dev-pass, because etcd hashes each password
+     ANSWER A
+     WHY: By default, the API server writes a Secret to etcd as plain bytes. A user who can read etcd or its backup can read the value. Encryption at rest changes this.
+     IF C: etcd holds the data of the Secret as decoded bytes, so dev-pass is in the output.
+     IF D: A Pod needs the value, and a hash cannot return the value. Without encryption at rest, the API server writes the value as plain bytes.
+     IF B: etcd holds the whole object of the Secret, with its metadata and its data.
+
+ 20. [clo835-e12-020 env and envfrom] The ConfigMap app-config holds APP_COLOR=red. You create a Pod with one container that gets app-config through envFrom and configMapRef. The container also sets APP_COLOR to blue in its env field. You run printenv APP_COLOR in it with kubectl exec. What does the command show?
+     A. red, because the value of envFrom replaces the value of env
+   * B. blue, because env has priority over envFrom
+     C. An error, because the API server rejects one environment variable in env and in envFrom
+     D. blue and red, on two lines, because the container gets both values
+     ANSWER B
+     WHY: When env and envFrom set the same name, the value of env has priority over the value of envFrom. The container gets APP_COLOR=blue, so printenv shows blue.
+     IF A: The value of envFrom does not replace the value of env; the value of env has priority over the value of envFrom.
+     IF D: An environment variable has one value, so printenv shows one line for one name.
+     IF C: The API server accepts APP_COLOR in env and in envFrom, and the value of env has priority over the value of envFrom.

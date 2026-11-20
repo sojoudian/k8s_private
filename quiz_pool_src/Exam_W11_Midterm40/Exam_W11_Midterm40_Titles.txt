@@ -1,0 +1,40 @@
+clo835-m11-001 docker cli access as a normal user
+clo835-m11-002 environment variable in a docker run command
+clo835-m11-003 output of docker logs
+clo835-m11-004 keys ctrl p and ctrl q in a container
+clo835-m11-005 prompt inside a new container
+clo835-m11-006 docker run with no local image
+clo835-m11-007 container start on an amazon machine
+clo835-m11-008 terraform destroy in a lab directory
+clo835-m11-009 published port with no answer
+clo835-m11-010 permissions of an ssh key file
+clo835-m11-011 terraform apply asks for a value
+clo835-m11-012 docker run with the read only flag
+clo835-m11-013 docker run with the cap drop flag
+clo835-m11-014 second docker run of one web image
+clo835-m11-015 service of the type loadbalancer on aws
+clo835-m11-016 selector of an exposed deployment
+clo835-m11-017 image tag latest in a deployment
+clo835-m11-018 word before the equals sign in set image
+clo835-m11-019 kubectl scale on a pod
+clo835-m11-020 dry run of kubectl run
+clo835-m11-021 label selector with in
+clo835-m11-022 kubectl logs with two flags
+clo835-m11-023 ready column of a pod
+clo835-m11-024 kubectl logs with two containers
+clo835-m11-025 label change on a pod of a deployment
+clo835-m11-026 kubectl get with no namespace flag
+clo835-m11-027 revisions after rollout undo
+clo835-m11-028 paused rollout of a deployment
+clo835-m11-029 service with a selector that matches no pod
+clo835-m11-030 ports of a loadbalancer service
+clo835-m11-031 storage for a fargate pod
+clo835-m11-032 kubectl logs on amazon eks
+clo835-m11-033 pending claims of the ebs csi driver
+clo835-m11-034 batch pods on fargate
+clo835-m11-035 nfs volume in a pod manifest
+clo835-m11-036 scope of a persistentvolume
+clo835-m11-037 claim created before a storageclass
+clo835-m11-038 statefulset with ondelete
+clo835-m11-039 pod that uses a claim with no matching pv
+clo835-m11-040 storageclass with no binding mode field

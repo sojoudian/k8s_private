@@ -1,0 +1,20 @@
+clo835-e12-001 injected environment variable
+clo835-e12-002 missing configmap
+clo835-e12-003 configmap size
+clo835-e12-004 configmap volume
+clo835-e12-005 secret manifest in git
+clo835-e12-006 secret data
+clo835-e12-007 secret volume access
+clo835-e12-008 secret and application log
+clo835-e12-009 token mount
+clo835-e12-010 default serviceaccount
+clo835-e12-011 args
+clo835-e12-012 from file
+clo835-e12-013 configmap key
+clo835-e12-014 configmap environment
+clo835-e12-015 secret type
+clo835-e12-016 secret file
+clo835-e12-017 token secret
+clo835-e12-018 environments
+clo835-e12-019 etcd storage
+clo835-e12-020 env and envfrom

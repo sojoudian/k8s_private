@@ -9,7 +9,7 @@ import sys
 import xml.etree.ElementTree as ET
 import zipfile
 
-D = "/Users/maziar/Downloads/k8s_week3/quiz_pool_src/Quiz_W13_Easy20/"
+D = "/Users/maziar/Documents/c/r/k8s_private/quiz_pool_src/Quiz_W13_Easy20/"
 TXT = D + "Quiz_W13_Easy20_Blackboard.txt"
 KEY = D + "Quiz_W13_Easy20_AnswerKey.txt"
 ZIP = D + "Quiz_W13_Easy20_QTI21.zip"

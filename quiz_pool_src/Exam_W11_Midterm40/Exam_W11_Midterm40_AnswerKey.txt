@@ -1,0 +1,446 @@
+CLO835 Fall 2026 - Mid-term exam - Weeks 01 to 10
+40 questions. Every student gets all of them.
+Every question stands on its own. No question needs a slide.
+Correct answers per letter: {'A': 10, 'B': 10, 'C': 10, 'D': 10}
+The star marks the correct option. WHY gives the reason. IF gives the mistake behind a wrong option.
+======================================================================
+
+  1. [clo835-m11-001 docker cli access as a normal user] On an Amazon Linux EC2 machine, you install Docker and start it. As ec2-user, docker ps fails with permission denied on /var/run/docker.sock, and sudo docker ps works. What fixes this for ec2-user?
+   * A. Add ec2-user to the group docker, then start a new SSH session
+     B. Install Docker again with sudo yum install docker -y
+     C. Run docker login as ec2-user, then run docker ps
+     D. Start the Docker daemon again with sudo systemctl start docker
+     ANSWER A
+     WHY: The daemon socket belongs to root and to the group docker. A member of the group docker can use the socket. A new group applies at the next login, for example in a new SSH session.
+     IF D: The daemon already runs, because sudo docker ps works. The problem is the access to the socket.
+     IF C: docker login gives access to a registry. It gives no access to the local socket.
+     IF B: The installation is complete. A new installation does not change the groups of ec2-user.
+
+  2. [clo835-m11-002 environment variable in a docker run command] In a bash shell on your laptop, you run export K8S_COLOR=GREEN. Then you run docker run -e K8S_COLOR=BLUE ubuntu echo $K8S_COLOR. What does the container show in your terminal?
+   * A. GREEN
+     B. A blank line only
+     C. BLUE
+     D. The text $K8S_COLOR
+     ANSWER A
+     WHY: bash replaces $K8S_COLOR with GREEN before Docker gets the arguments. The container runs echo GREEN.
+     IF C: The container has K8S_COLOR=BLUE, but it never gets the text $K8S_COLOR.
+     IF B: bash has a value for K8S_COLOR, so the argument is GREEN.
+     IF D: The text has no single quotes, so bash expands it.
+
+  3. [clo835-m11-003 output of docker logs] The main process of the container web writes its start message to standard output (stdout). It writes each request to /var/log/app.log, a regular file in the container. What does docker logs web show?
+     A. The requests of /var/log/app.log, and no start message
+   * B. The start message only
+     C. The start message and the requests of /var/log/app.log
+     D. The output that each docker exec command sends to your terminal
+     ANSWER B
+     WHY: docker logs shows what the main process writes to stdout and stderr. A file in the container is not part of that stream.
+     IF C: docker logs reads no file of the container. It shows the stdout and stderr stream only.
+     IF A: The start message goes to stdout, so docker logs shows it. The file is not in the stream.
+     IF D: The output of docker exec goes to your terminal. docker logs shows the stream of the main process.
+
+  4. [clo835-m11-004 keys ctrl p and ctrl q in a container] You start a container with docker run -it, and its main process shows the date every second in your terminal. You press Ctrl+P, then Ctrl+Q. What happens to the container?
+     A. It stops, and Docker then ends its main process
+     B. It pauses, and docker ps shows it as Paused
+     C. It runs until you close the terminal
+   * D. It runs, even after you close the terminal
+     ANSWER D
+     WHY: Ctrl+P, Ctrl+Q detaches your terminal. A container runs with or without a client attached, so it continues to run with no terminal.
+     IF A: Detach does not stop the main process. The container stops only when its main process ends.
+     IF C: After the detach, the container has no link to your terminal. A closed terminal changes nothing.
+     IF B: Docker does not pause a container when you detach. docker ps shows it as Up.
+
+  5. [clo835-m11-005 prompt inside a new container] You run docker run -it ubuntu, and the prompt shows root@04c0bb0a6c07:/#. What is 04c0bb0a6c07?
+     A. The ID of the image ubuntu, which docker images shows
+     B. The MAC address of the eth0 interface of the container
+     C. A random name that Docker shows in the NAMES column
+   * D. The short ID of the container, which is also its host name
+     ANSWER D
+     WHY: Docker sets the host name of a new container to its short container ID. The same ID is in the CONTAINER ID column of docker ps.
+     IF A: The image ID is a different value. The prompt shows the ID of the container.
+     IF C: Docker gives a random name of two words, for example laughing_poincare, in the NAMES column. The prompt shows the ID.
+     IF B: A MAC address has six pairs of hex digits with colons, for example 02:42:ac:11:00:02. The prompt shows the host name, which is the short container ID.
+
+  6. [clo835-m11-006 docker run with no local image] A host has no copy of the image nginx, and it can reach Docker Hub. You run docker run -d nginx, with no docker pull before it. What happens?
+     A. Docker pulls nginx:latest, and it creates no container
+     B. Docker creates a container, and it waits for a pull
+   * C. Docker pulls the image, and then it starts a new container
+     D. The command fails, because no local image exists
+     ANSWER C
+     WHY: docker run pulls a missing image first. Then it creates the container and starts it. docker pull only downloads, and it creates no container.
+     IF D: A missing image is no error for docker run. It pulls the image from Docker Hub first.
+     IF A: That is the result of docker pull. docker run also creates and starts a container.
+     IF B: docker run does the pull itself. It waits for no other command.
+
+  7. [clo835-m11-007 container start on an amazon machine] You build an image with docker build on a Mac with Apple Silicon, and you push it to Docker Hub. An x86_64 (amd64) EC2 machine pulls the image and starts it. The container fails at start with exec format error. What is the cause?
+     A. The amd64 EC2 machine runs the image on an older Linux kernel than the Mac
+     B. The CMD uses the shell form, and the image has no bash
+     C. The tag on Docker Hub points at an older image
+   * D. The image holds arm64 programs, and the CPU of the EC2 machine is amd64
+     ANSWER D
+     WHY: docker build creates an image for the CPU type of the build machine, here arm64. An amd64 CPU cannot run arm64 programs, so the start fails with exec format error.
+     IF A: A difference of kernel versions gives other errors. Here, exec format error comes from a CPU type that does not match.
+     IF B: The shell form uses /bin/sh, not bash. A missing shell gives a different error.
+     IF C: An older image for the same CPU type starts. The error comes from the CPU type.
+
+  8. [clo835-m11-008 terraform destroy in a lab directory] You built the lab machine with terraform apply. Later, you delete the file terraform.tfstate, and the machine still runs. Then you run terraform destroy in the same directory. What happens?
+     A. Terraform finds the machine by its tags and deletes it
+   * B. Terraform completes and deletes nothing, and the machine stays in AWS
+     C. Terraform reads the .tf files and deletes the machine
+     D. Terraform fails, because no state file exists
+     ANSWER B
+     WHY: Terraform deletes only the objects that its state file records. With no state, the plan has 0 objects to destroy, and the machine stays in AWS. Delete it in the EC2 console, or import it into a new state.
+     IF C: The .tf files describe the objects that you want. Only the state file links them to the real AWS objects.
+     IF A: terraform destroy does not search AWS by tags. It uses the state file.
+     IF D: A missing state file is no error for terraform destroy. With no state, the destroy completes and deletes nothing.
+
+  9. [clo835-m11-009 published port with no answer] A Flask application in a container listens on 127.0.0.1:8080 only. You start the container with -p 8080:8080. On the host, curl http://localhost:8080 gets no answer. What is the cause?
+     A. The host firewall blocks the published port on localhost
+     B. The host port and the container port need two different numbers, for example -p 8081:8080
+   * C. The application listens on loopback, and Docker forwards to the container IP
+     D. The application listens on 127.0.0.1, so -p needs the form 127.0.0.1:8080:8080
+     ANSWER C
+     WHY: The container has its own loopback interface. Docker forwards the published port to the IP address of the container, so the application must listen on that address, for example on 0.0.0.0.
+     IF B: The two numbers can be equal. The host port and the container port are in different network namespaces.
+     IF A: Docker writes the firewall rules for a published port. The request reaches the container, and no program listens on eth0.
+     IF D: The address in -p is an address of the host. Docker still sends the traffic to the container IP.
+
+ 10. [clo835-m11-010 permissions of an ssh key file] In a bash shell on your macOS or Linux laptop, you run ssh -i lab.pem ubuntu@3.91.242.254. ssh rejects the key file lab.pem, because other users on your laptop can read it. Which command fixes this?
+     A. ssh-keygen -t rsa -f lab.pem
+     B. chmod +r lab.pem
+   * C. chmod 400 lab.pem
+     D. chmod 755 lab.pem
+     ANSWER C
+     WHY: ssh rejects a private key file of your user when other users have any permission on it. chmod 400 gives read permission to the owner only, so ssh accepts the key.
+     IF A: ssh-keygen creates a new key pair. AWS knows only the public key of the old key pair, so the new key fails.
+     IF B: +r adds the read permission for every user. Other users can still read lab.pem, so ssh still rejects the key.
+     IF D: 755 lets every user read the key, so ssh still rejects it.
+
+ 11. [clo835-m11-011 terraform apply asks for a value] In the directory of a lab, terraform apply shows var.key_name and Enter a value, and it waits. What does this tell you?
+     A. No EC2 key pair for key_name exists in the AWS account
+   * B. An input variable in the .tf files has no default
+     C. The AWS credentials in ~/.aws/credentials have expired
+     D. Terraform shows each setting of the lab when no state file exists
+     ANSWER B
+     WHY: Terraform asks for each input variable that has no default and no value from the command, a file or a TF_VAR_ environment variable. key_name has no default, so terraform apply and terraform destroy both ask for it.
+     IF C: Expired credentials give an authentication error from AWS, not a question for a value.
+     IF A: Terraform asks for the value before it calls AWS. A wrong key pair name gives an error later.
+     IF D: Terraform asks for key_name also when a state file exists, for example at terraform destroy. It shows only the input variables with no value.
+
+ 12. [clo835-m11-012 docker run with the read only flag] You start a container with docker run --read-only, and you mount no volume and no tmpfs. The image holds the directory /app. Its main process creates a new file /app/cache.txt. What happens?
+     A. The file goes into the writable layer of the container
+     B. The container does not start without a memory area from --tmpfs
+     C. The new file goes to a memory area that Docker adds for --read-only
+   * D. The write fails with a read-only file system error
+     ANSWER D
+     WHY: --read-only mounts the root file system of the container as read-only. This container has no volume and no tmpfs, so the write to /app fails.
+     IF A: With --read-only, the top layer of the container is also read-only.
+     IF C: --read-only adds no writable memory area at /app. Only a tmpfs mount, from --tmpfs or --mount type=tmpfs, gives one.
+     IF B: --read-only needs no tmpfs mount. The container starts, and only the write fails.
+
+ 13. [clo835-m11-013 docker run with the cap drop flag] You start an alpine container with --cap-drop=ALL and no --cap-add flag. Its main process runs as root. It creates the file /tmp/report.txt, and then it runs chown nobody /tmp/report.txt. What happens?
+   * A. The kernel rejects the change of owner with Operation not permitted
+     B. The user nobody now owns the file /tmp/report.txt, because root can chown
+     C. With no --cap-add, Docker rejects --cap-drop=ALL
+     D. The container fails at start, because it has no capability CHOWN
+     ANSWER A
+     WHY: --cap-drop=ALL drops every Linux capability, also for root. chown needs the capability CHOWN, so the kernel rejects the call with Operation not permitted.
+     IF B: In a container, root has only the capabilities that Docker gives it. With --cap-drop=ALL, root has none, so root stays the owner.
+     IF D: A container needs no capability to start. The container runs, and only the chown fails.
+     IF C: Docker accepts --cap-drop=ALL with no --cap-add flag. --cap-add only adds a capability again, when the process needs it.
+
+ 14. [clo835-m11-014 second docker run of one web image] The container webapp runs with -p 8000:8080. You built the image simple-webapp-flask:v2 on this host. You run docker run -d --name webapp -p 8081:8080 simple-webapp-flask:v2. What happens?
+     A. Docker starts the new container with the name webapp-1
+     B. The daemon blocks the new container, because webapp uses the container port 8080
+     C. Docker puts the new container in place of the old one
+   * D. Docker rejects the command, because another container has the name webapp
+     ANSWER D
+     WHY: A container name belongs to one container on the host. The running container holds the name webapp, so the daemon rejects the new run with a Conflict error. Delete the old container first, or choose a new name.
+     IF A: Docker adds no number to a name that you choose. Only an automatic name is random.
+     IF C: docker run replaces no container. Delete the old one yourself, for example with docker rm -f webapp.
+     IF B: Each container has its own network namespace, so both containers can use port 8080 inside. The host ports 8000 and 8081 differ.
+
+ 15. [clo835-m11-015 service of the type loadbalancer on aws] A self-managed Kubernetes cluster runs on EC2 machines, and it has no load balancer add-on. You create a Service of the type LoadBalancer, and AWS creates a load balancer for it. Which component of the cluster asks AWS for the load balancer?
+   * A. The cloud controller manager
+     B. The scheduler
+     C. The kubelet of each node, through the AWS API of its EC2 machine
+     D. The kube-proxy of each node
+     ANSWER A
+     WHY: The cloud controller manager is the part of the control plane that talks to the cloud API. Its service controller creates the load balancer of each Service of the type LoadBalancer.
+     IF D: kube-proxy writes the network rules of its node. It does not talk to the cloud API.
+     IF B: The scheduler places Pods on nodes. It creates no cloud object.
+     IF C: The kubelet runs the Pods of its node, and it creates no load balancer. The load balancer serves the whole Service.
+
+ 16. [clo835-m11-016 selector of an exposed deployment] You create a Deployment with kubectl create deployment store --image=nginx. Then you run kubectl expose deployment store --port=80. Which selector does the new Service get?
+   * A. app=store
+     B. deployment=store
+     C. name=store
+     D. run=store
+     ANSWER A
+     WHY: kubectl create deployment sets app=store on the Pod template and in its selector. kubectl expose copies the selector of the Deployment into the Service.
+     IF B: kubectl create deployment sets no label with the key deployment.
+     IF C: kubectl create deployment sets no label with the key name.
+     IF D: kubectl run sets run=NAME. kubectl create deployment sets app=NAME.
+
+ 17. [clo835-m11-017 image tag latest in a deployment] The Deployment web uses the image maziar/web:latest. You push a new image with the same tag maziar/web:latest. Then you run kubectl apply -f with the same manifest. What happens?
+     A. The Deployment starts a rollout, and no node pulls the new image
+     B. kubectl apply rejects the manifest, because the Deployment web already exists
+     C. The Deployment starts a rollout, and the Pods get the new image one at a time
+   * D. The Deployment starts no rollout, because the Pod template has no change
+     ANSWER D
+     WHY: A rollout starts only when the Pod template changes. The manifest names the same tag, so the Pod template stays the same, and no new Pod starts. The running containers continue to use the old image. A container that starts later pulls the new image, because the tag :latest gets imagePullPolicy: Always.
+     IF C: The Deployment compares the Pod template, not the image on Docker Hub. The template is the same.
+     IF B: kubectl create rejects an object that exists. kubectl apply updates the object that exists, and here the Pod template stays the same.
+     IF A: The Pod template has no change, so the Deployment creates no new ReplicaSet, and no new Pod starts.
+
+ 18. [clo835-m11-018 word before the equals sign in set image] You created a Deployment with kubectl create deployment nginx-deploy --image=nginx. In the command kubectl set image deployment/nginx-deploy nginx=nginx:1.27, what does the word nginx before the equals sign name?
+     A. The label of the Pods to update
+     B. The image repository of the Pods to update
+   * C. The container of the Pod template to update
+     D. The ReplicaSet of the Pods to update
+     ANSWER C
+     WHY: set image takes CONTAINER=IMAGE pairs. kubectl create deployment names the container after the image, so the container is nginx.
+     IF B: The new image comes after the equals sign. The name before it is a container.
+     IF D: set image names a container. The Deployment then creates a new ReplicaSet for the new Pod template.
+     IF A: set image selects no Pods by label. It changes a container in the Pod template.
+
+ 19. [clo835-m11-019 kubectl scale on a pod] You created the Pod pingpong with kubectl run pingpong --image alpine ping 127.0.0.1. Then you run kubectl scale pod pingpong --replicas=3. What happens?
+     A. The command succeeds, and a new ReplicaSet runs three Pods
+   * B. The command fails, and one pingpong Pod exists
+     C. The command succeeds, and kubectl starts two more Pods
+     D. The API server rejects the command, and the Pod pingpong stops
+     ANSWER B
+     WHY: A Pod has no replica count. Only an object such as a Deployment or a ReplicaSet scales, so the command fails.
+     IF C: kubectl scale copies no Pod. The command fails, because a Pod has no replica count.
+     IF A: kubectl scale creates no controller. You create a Deployment yourself.
+     IF D: A rejected command changes no object. The Pod pingpong continues to run.
+
+ 20. [clo835-m11-020 dry run of kubectl run] You run kubectl run kubia --image maziar/kubia --dry-run=client -o yaml. What does the command do?
+     A. kubectl creates the Pod, checks it, and then deletes it
+     B. The API server checks the Pod, and it stores nothing
+   * C. kubectl shows the manifest, and it sends no create request
+     D. It runs the Pod in a separate test namespace
+     ANSWER C
+     WHY: With --dry-run=client, kubectl only shows the object that it would send. -o yaml shows it as a manifest, which you can write to a file.
+     IF A: A client dry run sends no create request, so it creates no Pod.
+     IF D: A client dry run creates no object in any namespace.
+     IF B: That is --dry-run=server. With --dry-run=client, the API server gets no create request.
+
+ 21. [clo835-m11-021 label selector with in] Three Pods carry these labels: nginx has rel=canary, kubia has rel=beta, and web has rel=stable. You run kubectl get pods -l 'rel in (stable,beta)'. Which Pods does the command show?
+     A. web only
+   * B. kubia and web
+     C. nginx and kubia
+     D. nginx, kubia and web
+     ANSWER B
+     WHY: The set-based selector matches each Pod whose rel value is stable or beta: kubia and web. nginx has canary.
+     IF C: nginx has rel=canary, and canary is outside the set.
+     IF A: The set holds stable and beta, so kubia matches too.
+     IF D: The selector filters by value. canary is outside the set, so nginx does not match.
+
+ 22. [clo835-m11-022 kubectl logs with two flags] The Pod ticker runs ping 127.0.0.1, and its container writes one line every second. You run kubectl logs ticker --tail 1 --follow. What does kubectl show?
+     A. The newest line only, and then your prompt returns
+   * B. The newest line, and then each new line until you press Ctrl+C
+     C. Every line from the start, and then your prompt returns
+     D. Every line from the start, and then each new line until you press Ctrl+C
+     ANSWER B
+     WHY: --tail 1 shows only the newest line that the container wrote. --follow then shows each new line until you stop kubectl with Ctrl+C.
+     IF A: That is the result of --tail 1 alone. With --follow, kubectl continues to show the new lines.
+     IF C: That is the result of kubectl logs with no flag.
+     IF D: That is the result of --follow alone. --tail 1 starts at the newest line.
+
+ 23. [clo835-m11-023 ready column of a pod] The command kubectl get pod web shows READY 1/2. What does 1/2 tell you?
+   * A. One of its two containers is ready
+     B. Its first init container is done, and the second one runs
+     C. One container restarted once, and the Pod allows two restarts
+     D. The Pod is ready for one of the two Services that select it
+     ANSWER A
+     WHY: READY shows the number of ready containers of the Pod, then the number of its containers. Here one container is ready. READY counts no init container that runs to completion.
+     IF D: READY counts the containers of the Pod. A Service selects a Pod by its labels.
+     IF B: READY counts no init container that runs to completion. While such an init container runs, STATUS shows Init:1/2.
+     IF C: The RESTARTS column counts restarts. Kubernetes sets no limit of two restarts.
+
+ 24. [clo835-m11-024 kubectl logs with two containers] The Pod shop has no annotations. It lists two containers: app, then agent. You run kubectl logs shop with no -c flag. What does kubectl show?
+     A. The log of agent only
+     B. The logs of app and agent in time order
+   * C. The log of app only
+     D. An error that asks for the -c flag
+     ANSWER C
+     WHY: With no -c flag, kubectl takes the first container of the Pod, here app. It also shows the message Defaulted container "app" out of: app, agent.
+     IF B: With no -c flag and no --all-containers flag, kubectl logs shows the log of one container only.
+     IF A: kubectl takes the first container of the list, not the last.
+     IF D: Old kubectl versions did this. A current kubectl takes the first container.
+
+ 25. [clo835-m11-025 label change on a pod of a deployment] The Deployment kubia has the selector tier=web, and its ReplicaSet runs three Pods with this label. You change the label of one Pod to tier=debug with kubectl label --overwrite. What happens to the Pod with the label tier=debug?
+     A. The ReplicaSet deletes it, because the ReplicaSet still owns it
+     B. The ReplicaSet deletes it, because it is no longer in the Deployment
+   * C. It continues to run, and the ReplicaSet no longer owns it
+     D. It continues to run, and the ReplicaSet still owns it
+     ANSWER C
+     WHY: The Pod no longer matches the selector of the ReplicaSet, so the ReplicaSet releases it. The Pod continues to run, and its list of owners is empty.
+     IF D: The ReplicaSet owns only the Pods that match its selector, so it released this Pod.
+     IF A: The ReplicaSet owns only the Pods that match its selector. It released this Pod, and it deletes nothing.
+     IF B: The ReplicaSet releases a Pod that leaves its selector, and it deletes no Pod. The Pod continues to run with no owner.
+
+ 26. [clo835-m11-026 kubectl get with no namespace flag] You create the Deployment orders with the flag -n billing. Your kubeconfig context names no namespace. Then you run kubectl get deployment orders with no -n flag. What does kubectl show?
+     A. The Deployment orders, because kubectl searches every namespace
+   * B. A NotFound error from the API server, for the namespace default
+     C. An error, and kubectl asks you to add the -n flag
+     D. An empty table, with the column names only
+     ANSWER B
+     WHY: With no -n flag, kubectl uses the namespace of the context, here default. The Deployment orders is in the namespace billing, so the API server answers NotFound.
+     IF A: kubectl searches one namespace: the namespace of the -n flag, or else the namespace of the context.
+     IF C: kubectl asks for no flag. The API server answers NotFound, because the namespace default holds no Deployment orders.
+     IF D: A get with a name shows that object or a NotFound error. It shows no empty table.
+
+ 27. [clo835-m11-027 revisions after rollout undo] The Deployment kubia has revision 1 (image v1) and revision 2 (image v2). You run kubectl rollout undo deployment/kubia, and the rollout completes. Which revision numbers does the Deployment kubia have now?
+     A. Revisions 1 and 2, and revision 1 is the current one
+     B. Revisions 1 and 3, and revision 3 is the current one
+     C. Revisions 1, 2 and 3, and revision 3 is the current one
+   * D. Revisions 2 and 3, and revision 3 is the current one
+     ANSWER D
+     WHY: undo makes the old Pod template the newest revision. Kubernetes gives it the next number, 3, and revision 1 leaves the list.
+     IF A: The rollback is a new revision with a new number. Revision 1 does not stay.
+     IF B: Revision 2 stays in the list. Kubernetes gives the template of revision 1 the new number 3, so the number 1 leaves the list.
+     IF C: Revision 1 and the rollback hold one Pod template. Revision 1 leaves the list, and its template gets the number 3.
+
+ 28. [clo835-m11-028 paused rollout of a deployment] You run kubectl rollout pause deployment/kubia. Then you change the image of the Deployment kubia from v1 to v2. What happens to the Pods of kubia?
+     A. The Deployment replaces them with v2 Pods
+     B. kubectl rejects a change of the Pod template during the pause
+     C. They continue to run v1 until the pause time limit ends
+   * D. They continue to run v1 until you resume the Deployment
+     ANSWER D
+     WHY: A paused Deployment records each change of its Pod template, and it starts no rollout. kubectl rollout resume starts the rollout with the latest template.
+     IF A: The pause stops new rollouts. The Deployment replaces no Pod until the resume.
+     IF C: A pause has no time limit. Kubernetes does not check the progress deadline of a paused Deployment.
+     IF B: kubectl accepts changes to a paused Deployment. Only the rollout waits.
+
+ 29. [clo835-m11-029 service with a selector that matches no pod] The ClusterIP Service checkout has the selector tier=checkout, and no Pod has this label. A client Pod in the same namespace runs curl http://checkout. What happens?
+   * A. The name resolves to the Service address, and the connection fails
+     B. The Service starts a Pod with the label tier=checkout and then answers
+     C. The connection waits until a Pod with the label tier=checkout starts
+     D. The Service answers with the error 503, because it has no Pod
+     ANSWER A
+     WHY: The DNS name of a ClusterIP Service points at its cluster IP address, with or without Pods. The Service has no endpoints, so the connection fails.
+     IF C: A Service holds no connection for later. With no endpoints, the connection fails, and curl shows an error.
+     IF D: A Service has no process of its own, so it sends no HTTP answer. With no endpoints, the connection fails.
+     IF B: A Service creates no Pods. A Deployment or a ReplicaSet creates them.
+
+ 30. [clo835-m11-030 ports of a loadbalancer service] On Amazon EKS, you create the Service web. Its spec sets only a selector, type: LoadBalancer and port: 80. AWS gives it an external address. What does the PORT(S) column of kubectl get service web show?
+   * A. 80 and one node port on every node, for example 80:32143/TCP
+     B. Only 80/TCP, because a load balancer opens no other port
+     C. Only 32143/TCP, with no Service port
+     D. 80/TCP and 443/TCP, because a load balancer adds HTTPS
+     ANSWER A
+     WHY: By default, a LoadBalancer Service also gets a node port on every node and a ClusterIP. The load balancer often sends the traffic through that node port.
+     IF B: Kubernetes gives a LoadBalancer Service a node port by default.
+     IF D: The Service opens only the ports of its manifest. Port 443 needs its own entry.
+     IF C: The column shows the Service port first, then the node port.
+
+ 31. [clo835-m11-031 storage for a fargate pod] On Amazon EKS, a Pod runs on AWS Fargate, and it needs a PersistentVolume (PV). Which storage can this Pod use, and how?
+     A. An EFS file system, after you install a driver on Fargate
+     B. An EBS volume that the CSI (Container Storage Interface) driver mounts
+     C. An EBS volume that you attach to the Pod by hand
+   * D. An EFS file system, which Fargate mounts by itself for the Pod
+     ANSWER D
+     WHY: A Fargate Pod mounts an EFS file system with no driver installation. AWS cannot mount an EBS volume to a Fargate Pod.
+     IF A: You manage no Fargate node, so you install no driver on Fargate. Fargate mounts EFS by itself.
+     IF B: The EBS CSI driver serves Pods on EC2 nodes. A Fargate Pod cannot mount EBS.
+     IF C: AWS can attach no EBS volume to a Fargate Pod.
+
+ 32. [clo835-m11-032 kubectl logs on amazon eks] On Amazon EKS, you run kubectl logs for a Pod on an EC2 worker node. The control plane runs in a VPC that AWS owns. How does the control plane reach the kubelet of the node?
+     A. Through the AWS load balancer of the cluster API endpoint
+   * B. Through elastic network interfaces that AWS creates in your VPC
+     C. Through the public address of the node, outside your VPC
+     D. Through the NodePort range 30000-32767 of the node
+     ANSWER B
+     WHY: EKS puts AWS-managed elastic network interfaces (ENIs) into your VPC. The control plane uses them for kubectl logs and kubectl exec, and TLS protects the traffic.
+     IF C: The traffic stays on the ENIs in your VPC, and TLS protects it.
+     IF A: The load balancer carries the calls to the API server. The control plane reaches the kubelet through the ENIs.
+     IF D: The NodePort range serves Services. The kubelet uses its own port.
+
+ 33. [clo835-m11-033 pending claims of the ebs csi driver] On Amazon EKS, the EBS CSI (Container Storage Interface) driver add-on runs. Each new claim of the class gp3 has a Pod that names it, and each claim stays Pending. The Events show an AWS access error for CreateVolume. What must you fix?
+     A. The access mode of each claim, from ReadWriteOnce to ReadWriteMany
+   * B. The IAM permissions that the driver uses for each call to the EC2 API
+     C. The AWS access keys of the user who creates each claim
+     D. The kubeconfig of the driver, on each worker node
+     ANSWER B
+     WHY: The driver calls the EC2 API to create each EBS volume, and each CSI driver needs IAM permissions for these calls. With no permission, AWS rejects CreateVolume, and the claim stays Pending.
+     IF C: The user creates only the claim, through the Kubernetes API. The driver calls AWS with its own IAM identity.
+     IF A: An access mode sets how nodes mount the volume. The AWS access error comes from the IAM permissions of the driver.
+     IF D: The driver uses its own IAM identity for the calls to AWS.
+
+ 34. [clo835-m11-034 batch pods on fargate] A team runs its web Pods on a managed node group of the EKS cluster shop. It now wants to run a batch Deployment on AWS Fargate. Which statement is true?
+     A. The team must create one more cluster, and then add Fargate to it
+     B. The team can add Fargate, and the web Pods also run on Fargate
+     C. The team must delete the node group of the web Pods, and then add Fargate
+   * D. The team can add Fargate, and the web Pods run on the node group
+     ANSWER D
+     WHY: One EKS cluster can use managed node groups and Fargate together. Fargate runs only the Pods that the team selects for it, so the node group runs the web Pods as before.
+     IF C: Fargate works beside a managed node group. The team deletes no node group.
+     IF B: Fargate runs only the Pods that the team selects for it. The web Pods stay on the node group.
+     IF A: One cluster can use both worker choices. A second cluster only adds a second control plane bill.
+
+ 35. [clo835-m11-035 nfs volume in a pod manifest] A Pod manifest has an nfs volume with the server 10.0.0.5. A second team must run this manifest on a second cluster, with the NFS server of that cluster. Which change lets both clusters use one Pod manifest?
+     A. The Pod lists two nfs volumes, one for the NFS server of each cluster
+   * B. The Pod names a claim that each cluster binds to its own PersistentVolume
+     C. The claim of the Pod names the NFS server of each cluster
+     D. The second team copies the data of 10.0.0.5 to the NFS server of its own cluster
+     ANSWER B
+     WHY: A claim hides the details of the storage. Each cluster has its own PersistentVolume (PV) for the claim, so the Pod manifest stays the same on both clusters.
+     IF A: The Pod mounts both volumes, so each cluster still needs the server 10.0.0.5.
+     IF C: A claim binds only to a PV, and it holds no server address. The PV of each cluster holds the NFS details.
+     IF D: A copy of the data does not change the manifest. The manifest still names 10.0.0.5.
+
+ 36. [clo835-m11-036 scope of a persistentvolume] Users in the namespace dev and in the namespace qa create PersistentVolumeClaims (PVCs). In which scope does a PersistentVolume (PV) exist?
+     A. At node level, on the node that holds its storage
+     B. In the namespace of the claim that binds it
+   * C. At cluster level, outside every namespace
+     D. In the namespace default, until a claim binds it
+     ANSWER C
+     WHY: A PV is a cluster-level object, as a node is. A claim is in a namespace, and it binds to a PV of the cluster.
+     IF B: The claim is in a namespace. The PV that it binds stays at cluster level.
+     IF A: The storage of a PV can be on one node, but the PV object is at cluster level, as a node object is.
+     IF D: A PV has no namespace at all, before and after a claim binds it. kubectl puts only a namespaced object into the namespace of the context, for example default.
+
+ 37. [clo835-m11-037 claim created before a storageclass] On a new kubeadm cluster, you create the claim data with ReadWriteOnce and no storageClassName field. The cluster has no StorageClass and no PersistentVolume (PV), so the claim stays Pending. Then you install the local-path provisioner and its default class standard, with WaitForFirstConsumer. What happens to the claim data?
+     A. It stays Pending, and it binds after a change to storageClassName
+     B. It stays Pending until you delete it and create a new claim
+   * C. It gets the class standard, and it binds when a Pod uses it
+     D. The provisioner gives it the class standard only after a restart
+     ANSWER C
+     WHY: A claim with no class field gets the default class, also when the default class comes later (retroactive default). The class standard uses WaitForFirstConsumer, so the claim binds when a Pod uses it.
+     IF B: Kubernetes also sets the default class on the old claim. You need no new claim.
+     IF A: Kubernetes sets the default class on the old claim. You change nothing in the claim.
+     IF D: Kubernetes sets the default class on the old claim, and the provisioner needs no restart. It creates the PV when a Pod uses the claim.
+
+ 38. [clo835-m11-038 statefulset with ondelete] The StatefulSet web has three Pods, web-0 to web-2, and updateStrategy: OnDelete. You change the image in its Pod template. Nobody deletes a Pod, and no node fails. What happens to the three Pods?
+   * A. Each Pod runs the old image until you delete that Pod
+     B. Each Pod gets the new image at its next container restart
+     C. Each Pod runs the old image, also after you delete that Pod
+     D. Each Pod gets the new image, in reverse order from web-2 to web-0
+     ANSWER A
+     WHY: With OnDelete, the StatefulSet controller changes no running Pod. When you delete a Pod, the controller creates it again from the new template.
+     IF D: That is the default RollingUpdate. OnDelete waits until you delete each Pod.
+     IF C: With OnDelete, the controller creates a deleted Pod again from the new template.
+     IF B: A container restart uses the same Pod, with its old image. Only a new Pod gets the new template.
+
+ 39. [clo835-m11-039 pod that uses a claim with no matching pv] No PersistentVolume (PV) matches the claim cache, and no provisioner can create one for it. You create the Pod worker, which uses the claim cache. What happens to the Pod worker?
+     A. It runs, and the claim holds an empty directory for the Pod
+     B. It stays in ContainerCreating on the node that the scheduler chooses
+   * C. It waits in Pending until a PV binds to the claim
+     D. It fails, and the Pod stays in the phase Failed
+     ANSWER C
+     WHY: The claim stays Pending, because no PV matches and no provisioner creates one. A Pod cannot start while its claim is Pending, so the Pod waits in Pending. When a matching PV binds to the claim, the Pod starts.
+     IF A: Kubernetes starts no container of the Pod before the claim is Bound. The claim holds no directory for the Pod.
+     IF B: The scheduler gives the Pod no node while its claim is Pending. With no node, the Pod does not reach ContainerCreating.
+     IF D: A Pod with a claim that is not Bound does not fail. It waits in Pending.
+
+ 40. [clo835-m11-040 storageclass with no binding mode field] On Amazon EKS, the manifest of the StorageClass slow names the provisioner ebs.csi.aws.com and sets no volumeBindingMode field. No PersistentVolume (PV) of this class exists. The driver runs and can create EBS volumes. You create the claim logs of the class slow, and no Pod uses the claim. What happens to the claim logs?
+   * A. It becomes Bound immediately, with a new PV from the provisioner
+     B. The API server rejects it, because the class has no binding mode
+     C. It stays Pending until a Pod uses it, and then the provisioner creates a PV
+     D. It stays Pending until you add a volumeBindingMode field to the class
+     ANSWER A
+     WHY: When the manifest of the class sets no volumeBindingMode field, the API server sets Immediate. The provisioner creates a PV as soon as the claim exists, and the claim becomes Bound with no Pod.
+     IF C: That is the behavior of WaitForFirstConsumer. With no field, the class uses Immediate.
+     IF D: The API server sets Immediate when the field is missing. The class needs no change.
+     IF B: volumeBindingMode is optional. The API server sets the default Immediate, and it accepts the claim.
