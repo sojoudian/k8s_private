@@ -1,0 +1,227 @@
+# check_week.py result
+
+GATE 1  (0 failed, 160 passed, 6 not applicable)
+
+## Checks
+
+| Result | Rule | Check | Detail |
+|---|---|---|---|
+| PASS | F1 | the course repo exists at /Users/maziar/Documents/c/r/CLO835_Fall_2026 |  |
+| PASS | B1 | lecture: canvas 13.333 x 7.5 in |  |
+| PASS | B1 | lecture: size near 1 MB |  |
+| PASS | B1 | lecture: .pptx uses Calibri and Consolas only |  |
+| PASS | B1 | lecture: PDF uses Calibri and Consolas only |  |
+| PASS | B8 | lecture: PDF page count equals slide count |  |
+| PASS | B8 | lecture: PDF is newer than the .pptx |  |
+| PASS | B1 | lecture: footer N / TOTAL on every slide |  |
+| PASS | B1 | lecture: whale on every slide |  |
+| PASS | B1 | lecture: no shape off the canvas |  |
+| PASS | B1 | lecture: no shape in the footer band |  |
+| PASS | B1 | lecture: no shape on the title band |  |
+| PASS | B6 | lecture: no image below 110 DPI |  |
+| PASS | B1 | lecture: no hidden slide (source has none) |  |
+| PASS | B1 | lecture: no speaker notes |  |
+| PASS | B3 | lecture: body text at least 12 pt |  |
+| PASS | B3 | lecture: terminal text 9 to 14 pt |  |
+| PASS | B7 | lecture: no duplicate title |  |
+| PASS | B7 | lecture: no bullet word for word on two slides |  |
+| PASS | B5 | lecture: no non-ASCII character in Consolas text |  |
+| PASS | A1 | lecture: no replaced word in the text |  |
+| PASS | A1 | lecture: no contraction |  |
+| PASS | A1 | lecture: small numbers in words |  |
+| PASS | B5 | lecture: each command starts with $ |  |
+| PASS | A1 | lecture: no sentence above 25 words |  |
+| PASS | F2 | lecture: no banned image, editor or private path |  |
+| PASS | B1 | lecture: 0 float coordinates |  |
+| PASS | B2 | lecture: palette only |  |
+| PASS | B1 | lecture: only the logo and the whale as images |  |
+| PASS | B1 | lecture: no blank thumbnail |  |
+| PASS | B1 | lecture: file title and author set |  |
+| PASS | B4 | lecture: no a:buChar bullet with the glyph of B4 (PowerPoint for Mac does not show it) |  |
+| PASS | B6 | lecture: no connector with zero extent, and no horizontal or vertical arrow drawn as a connector |  |
+| PASS | B5 | lecture: no wrapped terminal line in the rendered PDF |  |
+| PASS | B5 | lecture: no text past a terminal box in the rendered PDF |  |
+| PASS | B7 | lecture: has the slide Agenda |  |
+| PASS | B7 | lecture: has the slide Course Outline |  |
+| PASS | B7 | lecture: has the slide Optional Topics |  |
+| PASS | B7 | lecture: has the slide Key Takeaways |  |
+| PASS | B7 | lecture: has the slide Lab Week 12 at a Glance |  |
+| PASS | C8 | lecture: the repo script of each week that a terminal label names exists |  |
+| PASS | C8 | lecture: each step that a terminal label names is a step of the lab script |  |
+| PASS | C8 | lecture: each command of a terminal labeled Lab Week NN, Step M is in that lab step (16 terminals) |  |
+| PASS | C8 | lecture: each file of a terminal is a part of the lab file, line for line |  |
+| PASS | C8 | lecture: each labeled terminal shows a command or a part of a lab file |  |
+| PASS | B1 | lab: canvas 13.333 x 7.5 in |  |
+| PASS | B1 | lab: size near 1 MB |  |
+| PASS | B1 | lab: .pptx uses Calibri and Consolas only |  |
+| PASS | B1 | lab: PDF uses Calibri and Consolas only |  |
+| PASS | B8 | lab: PDF page count equals slide count |  |
+| PASS | B8 | lab: PDF is newer than the .pptx |  |
+| PASS | B1 | lab: footer N / TOTAL on every slide |  |
+| PASS | B1 | lab: whale on every slide |  |
+| PASS | B1 | lab: no shape off the canvas |  |
+| PASS | B1 | lab: no shape in the footer band |  |
+| PASS | B1 | lab: no shape on the title band |  |
+| PASS | B6 | lab: no image below 110 DPI |  |
+| PASS | B1 | lab: no hidden slide (source has none) |  |
+| PASS | B1 | lab: no speaker notes |  |
+| PASS | B3 | lab: body text at least 12 pt |  |
+| PASS | B3 | lab: terminal text 9 to 14 pt |  |
+| PASS | B7 | lab: no duplicate title |  |
+| PASS | B7 | lab: no bullet word for word on two slides |  |
+| PASS | B5 | lab: no non-ASCII character in Consolas text |  |
+| PASS | A1 | lab: no replaced word in the text |  |
+| PASS | A1 | lab: no contraction |  |
+| PASS | A1 | lab: small numbers in words |  |
+| PASS | B5 | lab: each command starts with $ |  |
+| PASS | A1 | lab: no sentence above 25 words |  |
+| PASS | F2 | lab: no banned image, editor or private path |  |
+| PASS | B1 | lab: 0 float coordinates |  |
+| PASS | B2 | lab: palette only |  |
+| PASS | B1 | lab: only the logo and the whale as images |  |
+| PASS | B1 | lab: no blank thumbnail |  |
+| PASS | B1 | lab: file title and author set |  |
+| PASS | B4 | lab: no a:buChar bullet with the glyph of B4 (PowerPoint for Mac does not show it) |  |
+| PASS | B6 | lab: no connector with zero extent, and no horizontal or vertical arrow drawn as a connector |  |
+| PASS | B5 | lab: no wrapped terminal line in the rendered PDF |  |
+| PASS | B5 | lab: no text past a terminal box in the rendered PDF |  |
+| PASS | A5 | lecture: build_week12_lecture_v8.py has a VERSION constant and a __main__ guard |  |
+| PASS | A5 | lab: build_week12_lab_v8.py has a VERSION constant and a __main__ guard |  |
+| PASS | C1 | lab: at most 40 commands on the master (39) |  |
+| PASS | C1 | lab: Step 0 to Step 6, and Step 6 has no command on the master |  |
+| PASS | C1 | lab: Step 6 holds only terraform destroy and the C1 comment |  |
+| PASS | C2 | lab: each step names its slide |  |
+| PASS | C2 | lab: Step 0 has the title of slide 3 |  |
+| PASS | C2 | lab: the repo script equals the deck script |  |
+| PASS | C2 | lab: the script header names the deck (M27) |  |
+| PASS | C2 | lab: the script head of Week 12 round 9 (round 3, MUST-FIX 2) |  |
+| PASS | C2 | lab: Step 6 of the script is STEP6 of Week 12 v7 (C2; round 3, MUST-FIX 3) |  |
+| PASS | F1 | lab: Step 0 has git fetch and git reset --hard origin/master (M19, S22) |  |
+| PASS | C5 | lab: no .terraform directory in the repo folder (C5) |  |
+| PASS | C5 | lab: 7 files |  |
+| PASS | C5 | lab: no state or key file |  |
+| PASS | C5 | lab: no README in the repo folder (C5) |  |
+| PASS | C5 | lab: bash -n localMachine.sh |  |
+| PASS | C5 | lab: bash -n bootstrap.sh |  |
+| PASS | C5 | lab: bash -n master-init.sh.tftpl |  |
+| PASS | C5 | lab: bash -n worker-join.sh.tftpl |  |
+| PASS | C5 | lab: terraform fmt |  |
+| PASS | F3 | lab: repo scan (F3, other weeks) |  |
+| PASS | C5 | lab: no cleanup script or cleanup text in the repo folder |  |
+| PASS | F2 | lab: images of maziar only |  |
+| PASS | C3 | lab: no maziar/curl and no busybox helper image (C3) |  |
+| PASS | F2 | lab: Flannel images of maziar only |  |
+| PASS | F2 | lab: each image of master-init.sh.tftpl and of the extra repo files is of maziar (F2) |  |
+| PASS | C6 | lab: the message of the day names Week 12, the MASTER node and localMachine.sh |  |
+| PASS | C5 | lab: key_name has no default; lab_instance_profile defaults to LabInstanceProfile |  |
+| PASS | C3 | lab: each manifest is written with cat > file <<'EOF' (C3, M24) |  |
+| N/A | C3 | lab: each object keeps its name | no OBJECTS in the spec |
+| PASS | A1 | lab: A1 words in the comments of the script and the repo files, and in the Blackboard text |  |
+| PASS | C4 | lab: the sample version is v1.35.10 |  |
+| N/A | C5 | lab: the repo text equals the repo text of the model week, except the week name and the topic | no REPO_BASE in the spec |
+| PASS | C1 | lab deck: 10 slides |  |
+| N/A | C1 | lab deck: the slide titles of C1, in order | no SLIDE_TITLES in the spec |
+| PASS | C1 | lab deck: slides 1, 2, 9 and 10 have the fixed titles of C1 |  |
+| PASS | A1 | lab deck: no -ing form in a slide title |  |
+| PASS | A1 | lab deck: Kubernetes, not K8s |  |
+| PASS | A1 | lab deck: A1 words of the review rounds (no -ing form, full sentences, Kubernetes) |  |
+| PASS | C1 | lab deck: the label is Lab Week NN, never Lab NN (C1, G1) |  |
+| PASS | C1 | lab deck: slide 2 labels (round 2, MUST-FIX 1) |  |
+| PASS | C2 | lab deck: slide 3 left panel, line for line (M19 to M21; round 2 MUST-FIX 2, SHOULD-FIX 1) |  |
+| PASS | C4 | lab deck: slide 3 right panel (round 2, SHOULD-FIX 1) |  |
+| PASS | C4 | lab deck: slide 3 sample output is 4 comment lines with v1.35.10 (B5, C4) |  |
+| PASS | C2 | lab: Step 0 of the script holds the lines of slide 3, in order (C2; round 2, MUST-FIX 3) |  |
+| PASS | C1 | lab deck: slide 9 is STEP6 of Week 12 v7: only terraform destroy and the comments (round 3, MUST-FIX 3) |  |
+| PASS | C2 | lab deck: each command of slides 4 to 8 is in the script |  |
+| PASS | C2 | lab deck: each command of Steps 1 to 5 is on a slide |  |
+| PASS | C3 | lab deck: slide 4 shows fortune-args.yaml as written by the script |  |
+| PASS | C3 | lab deck: slide 5 shows config-env.yaml as written by the script |  |
+| PASS | C3 | lab deck: slide 6 shows config-volume.yaml as written by the script |  |
+| PASS | C3 | lab deck: slide 7 shows secret-pod.yaml as written by the script |  |
+| PASS | C3 | lab deck: slide 8 shows config-dev.yaml as written by the script |  |
+| PASS | C7 | blackboard: title |  |
+| PASS | C7 | blackboard: Submission Instructions with all 7 sections |  |
+| PASS | C7 | blackboard: 7 sections |  |
+| N/A | C7 | blackboard: the section titles use the words of the deck (S26) | no SECTIONS in the spec |
+| PASS | C7 | blackboard: no -ing form in a section title |  |
+| PASS | C7 | blackboard: no pledge |  |
+| PASS | C7 | blackboard: ends with the Important paragraph |  |
+| PASS | C7 | blackboard: no control-plane node; master node |  |
+| PASS | C7 | blackboard: section 7 is Destroy the Cluster, with no cleanup item |  |
+| PASS | C7 | blackboard: directory, not folder (M29); the item starts with its verb (round 3, MUST-FIX 4) |  |
+| PASS | C7 | blackboard: no 'using', 'showing' or '!.' (S24) |  |
+| PASS | C7 | blackboard: kubeadm forms the Kubernetes cluster at boot (round 2, SHOULD-FIX 3) |  |
+| PASS | C7 | blackboard: one instruction in one item (round 2, MUST-FIX 8) |  |
+| PASS | C7 | blackboard: Submission Requirements with six items |  |
+| PASS | C1 | blackboard: the label is Lab Week NN, never Lab NN (C1, G1) |  |
+| PASS | C7 | blackboard: 'You must:' in section 1 |  |
+| PASS | C7 | blackboard: Explain items last in 'Build and Check the Cluster' |  |
+| PASS | C7 | blackboard: 'You must:' in section 2 |  |
+| PASS | C7 | blackboard: Explain items last in 'Replace the CMD of an Image' |  |
+| PASS | C7 | blackboard: 'You must:' in section 3 |  |
+| PASS | C7 | blackboard: Explain items last in 'Use a ConfigMap as Environment' |  |
+| PASS | C7 | blackboard: 'You must:' in section 4 |  |
+| PASS | C7 | blackboard: Explain items last in 'Use a ConfigMap as a Volume' |  |
+| PASS | C7 | blackboard: 'You must:' in section 5 |  |
+| PASS | C7 | blackboard: Explain items last in 'Use a Secret, and Find the Ser' |  |
+| PASS | C7 | blackboard: 'You must:' in section 6 |  |
+| PASS | C7 | blackboard: Explain items last in 'Use a Second Environment, and ' |  |
+| PASS | C7 | blackboard: 'You must:' in section 7 |  |
+| PASS | C7 | blackboard: Explain items last in 'Destroy the Cluster' |  |
+| N/A | F4 | F4: each Blackboard item has a row of the F4 table | no F4 table in the spec |
+| PASS | D9 | quiz: audit_easy20_w12_v2.py on Quiz_W12_Easy20_v2 |  |
+| PASS | D10 | quiz: cue simulation of Quiz_W12_Easy20_v2_Blackboard.txt (no strategy above 6.0 of 20) |  |
+| N/A | E3 | live: the checks of a live test | no --live folder: the checker did no live check (E3, C9) |
+
+## Rules
+
+| Result | Rule | Title | Reason |
+|---|---|---|---|
+| PASS | A1 | Language: ASD-STE100 | 12 checks; not checked: the checks find listed words and long sentences; the rest needs a reader |
+| N/A | A2 | Scope and permission | a rule for the work, not for a file |
+| N/A | A3 | The answer in the chat | a rule for the chat, not for a file |
+| N/A | A4 | Reports | a rule for the work, not for a file |
+| PASS | A5 | Files, versions and builders | 2 checks |
+| N/A | A6 | The machine and the tools | a rule for the work, not for a file |
+| N/A | A7 | Fixed, good, done: 0 or 1 | a rule for the work: this checker is step 2 of A7 |
+| PASS | B1 | Canvas and chrome | 30 checks |
+| PASS | B2 | Palette | 2 checks |
+| PASS | B3 | Text sizes | 4 checks |
+| PASS | B4 | Bullets | 2 checks |
+| PASS | B5 | Terminals | 8 checks |
+| PASS | B6 | Diagrams and images | 4 checks; not checked: the drawing rules need a look at the PDF pages |
+| PASS | B7 | Content | 9 checks; not checked: the facts for v1.35, the links (HTTP 200) and the repeated points need a reader |
+| PASS | B8 | The build and QA pipeline of a deck | 4 checks |
+| PASS | C1 | Size and structure | 9 checks |
+| PASS | C2 | One content list | 10 checks |
+| PASS | C3 | Commands | 7 checks; not checked: an exit 0 of each command needs --live |
+| PASS | C4 | Comments and sample output | 3 checks; not checked: each comment against the live output needs --live and a reader |
+| PASS | C5 | The repo folder of a week | 11 checks |
+| PASS | C6 | The cluster | 1 checks |
+| PASS | C7 | The Blackboard lab text | 27 checks |
+| PASS | C8 | Lecture and lab agree | 5 checks; not checked: the content of the slide Lab Week NN at a Glance needs a reader |
+| N/A | C9 | The lab checks | no check ran for this week (see the N/A lines) |
+| N/A | D1 | The kinds of quiz | a rule for the design of the quiz |
+| N/A | D2 | Each question | the audit (D9) checks a part; the rest needs the review of D11 |
+| N/A | D3 | The options | the audit (D9) and the cue simulation (D10) check a part; the rest needs D11 |
+| N/A | D4 | Across the quiz or the pool | the audit (D9) checks the leaks; the rest needs D11 |
+| N/A | D5 | Correctness and proof | needs a live probe or the documentation |
+| N/A | D6 | Feedback | needs the review of D11 |
+| N/A | D7 | Platform rules | the audit (D9) checks the letters and the runs |
+| N/A | D8 | The quiz builder | the builder overwrites its outputs (A5), so the checker does not run it |
+| PASS | D9 | The audit | 1 checks |
+| PASS | D10 | Cue simulations | 1 checks |
+| N/A | D11 | The review loop | a rule for the work, not for a file |
+| N/A | D12 | Blackboard delivery of a quiz | a setting in Blackboard, not a file |
+| N/A | E1 | The environment | a fact of the AWS account, not a file |
+| N/A | E2 | Permission | a rule for the work, not for a file |
+| N/A | E3 | The live test protocol of a lab | no check ran for this week (see the N/A lines) |
+| PASS | F1 | The course repo | 2 checks |
+| PASS | F2 | Accounts and images | 5 checks; not checked: that each tag exists on Docker Hub needs a network check |
+| PASS | F3 | Security | 1 checks |
+| N/A | F4 | A rubric line must be runnable | no check ran for this week (see the N/A lines) |
+| N/A | F5 | Git authorship | the user does the git part (F1) |
+| N/A | G1 | Lab item names | a name in Blackboard, not a file (the label rule of C1 has its own checks) |
+| N/A | G2 | Lab items | a setting in Blackboard, not a file |
+| N/A | G3 | The schedule | a fact of the course, not a file |
+| N/A | G4 | Grading text for students | a rule for the grading text, not for a week file |
